@@ -2,14 +2,32 @@
     "manifest_version": 2,
 
     "name": "douban.fm improve",
-    "description": "This extension is for improving douban.fm.",
-    "version": "1.0",
+    "description": "This extension is for improving douban.fm",
+    "version": "1.0.0",
 
     "permissions": [
         "https://douban.fm/"
-        ],
+     ],
     "browser_action": {
         "default_icon": "icon.png",
         "default_popup": "popup.html"
-    }
+    },
+    "icons": {
+        "128": "icon.png",
+        "16": "icon.png",
+        "32": "icon.png",
+        "48": "icon.png"
+    },
+    "web_accessible_resources": [
+        "config.js",
+        "seajs/*.js",
+        "js/*.js",
+        "lib/*.js"
+    ],
+    "content_scripts": [{
+        "matches": ["http://douban.fm/*"],
+        "css":     ["doubanfm.css"],
+        "js":      ["doubanfm.js"],
+        "run_at":  "document_end"
+    }]
 }
