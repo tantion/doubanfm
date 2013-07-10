@@ -2,3 +2,16 @@
     color: #369;
     background: transparent;
 }
+#fm-improve a:hover {
+    text-decoration: underline;
+}
+
+.fm-improve-picture {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+}
+.fm-improve-picture img {
+    height: 100%;
+
+}

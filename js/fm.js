@@ -8,11 +8,16 @@ define(function(require, exports, module) {
 
     function DoubanFM(elem) {
         this.$elem = $(elem);
-        this.$im = $('#fm-improve');
+        this.$wrap = this.$elem.find('.player-wrap');
+        this.$container = $('#fm-improve');
+        
+        this.$download = null;
+        this.$picture = null;
+        this.$loop = null;
 
         this._fmFirstSong = false;
         this._currentSong = null;
-        this._prevSong = null;
+        this._prevSongs = [];
 
         this._init();
     }
@@ -22,9 +27,13 @@ define(function(require, exports, module) {
     DoubanFM.prototype = {
 
         _init: function () {
-            if (this.$im || this.$im.length) {
-                this.$im = $('<div id="fm-improve" />').appendTo(this.$elem);
-                this.$download = $('<a class="fm-improve-download" download="">下载</a>').appendTo(this.$im);
+            //this.$wrap.css({position: 'relative'});
+
+            if (this.$container || this.$container.length) {
+                this.$container = $('<div id="fm-improve" />').appendTo(this.$elem);
+                this.$picture = $('<a class="fm-improve-picture" dowload=""><img src=""></a>').appendTo(this.$container);
+                this.$download = $('<a class="fm-improve-download" download="">下载</a>').appendTo(this.$container);
+                this.$loop = $('<label><input type="checkbox" /><span>循环播放</span></label>').appendTo(this.$container);
             }
 
             var fmPlayerReady = false,
@@ -80,12 +89,12 @@ define(function(require, exports, module) {
         },
 
         _onFMNext: function (song) {
-            if (this._currentSong) {
-                this._prevSong = this._currentSong;
+            if (this._prevSongs.indexOf(this._currentSong) < 0) {
+                this._prevSongs.push(this._currentSong);
             }
             this._currentSong = song;
 
-            this.currentSong();
+            this.render();
         },
 
         _onFMSkip: function (data) {
@@ -103,23 +112,24 @@ define(function(require, exports, module) {
             this._fmFirstSong = true;
         },
 
-        currentSong: function () {
+        render: function () {
             var song = this._currentSong,
-                filename = song.title + ' - ' + song.artist + '.mp3';
+                pictrueExt = (song.picture.match(/(.*)\.(\w+)$/))[2],
+                songName = song.title + ' - ' + song.artist,
+                piectureName = songName + pictrueExt,
+                fileName = songName + '.mp3';
+
             this.$download
                 .attr('href', song.url)
-                .attr('download', filename)
-                .attr('title', filename)
-        },
+                .attr('download', fileName)
+                .attr('title', fileName)
 
-        remove: function () {
-            this.$elem.remove();
-            return this;
-        },
-
-        hide: function () {
-            this.$elem.hide();
-            return this;
+            this.$picture
+                .attr('href', song.picture)
+                .attr('download', piectureName)
+                .attr('title', piectureName)
+                .find('img')
+                .attr('src', song.picture)
         }
     };
 
