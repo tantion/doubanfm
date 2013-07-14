@@ -1,17 +1,12 @@
-Douban FM Improve
-========
+# Douban FM Improve
 
 A chrome extension for Douban FM
 
-Change Log
-=======
-=======
+## Change Log
 
-- 0.1 - July 15 2013
+- v0.1 - July 15 2013
     - Can download mp3 and album picture.
 
-License
-=======
-=======
+## License
 
 MIT license
