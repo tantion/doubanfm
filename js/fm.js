@@ -40,6 +40,9 @@ define(function(require, exports, module) {
             var fmPlayerReady = false,
                 that = this;
 
+            this._initJPlayer();
+            this._initLoop();
+
             Do.ready('fm-player', function () {
                 fmPlayerReady = true;
                 that._handlerStatus();
@@ -47,10 +50,45 @@ define(function(require, exports, module) {
 
         },
 
+        _initLoop: function () {
+
+            this.$loop.find('input[type=checkbox]')
+                .on('click', $.proxy(function () {
+                    if (this.isLoop()) {
+                        this._onLoopSeted();
+                    } else {
+                        this._onLoopCancel();
+                    }
+                }, this));
+
+        },
+
+        _onLoopSeted: function () {
+
+        },
+
+        _onLoopCancel: function () {
+            this.$jplayer.jPlayer('pause');
+
+            if (this.isFMPaused()) {
+                this.playFM();
+                this.next();
+            }
+        },
+
         _initJPlayer: function () {
 
             if (!this.$jplayer) {
-                this.$jplayer = $('<div />').jPlayer();
+                this.$jplayer = $('<div />').jPlayer({
+                    ready: function () {
+                        logger.log('jplayer is ready.');
+                    },
+                    canplay: function () {
+                        $(this).jPlayer('play');
+                    },
+                    loop: true,
+                    supplied: "mp3"
+                });
             }
         },
 
@@ -75,7 +113,7 @@ define(function(require, exports, module) {
                 logger.error(e);
             }
 
-            console.log(data.type);
+            console.log(data.type, data);
             switch (data.type) {
                 case 'nl':
                     this._onFMNextList(data);
@@ -89,13 +127,41 @@ define(function(require, exports, module) {
                 case 's':
                     this._onFMSkip(data);
                     break;
+                case 'pause':
+                    this._onFMPause(data);
+                    break;
+                case 'gotoplay':
+                    this._onFMPlay(data);
+                    break;
+            }
+        },
+
+        _onFMPause: function (data) {
+            logger.log('on fm pause', data);
+
+        },
+
+        _onFMPlay: function (data) {
+            logger.log('on fm go to play', data);
+
+            if (this.isLoop()) {
+                this.$loop.find('input[type=checkbox]').prop('checked', false);
+                this.$jplayer.jPlayer('pause');
+                this.next();
             }
         },
 
         _onFMNext: function (data) {
             logger.log('on fm play next song', data);
 
-            this.next();
+            if (this.isLoop() && !this.isFMPaused()) {
+                setTimeout($.proxy(function () {
+                    this.pauseFM();
+                    this.loop();
+                }, this), 500);
+            } else {
+                this.next();
+            }
         },
 
         _onFMSkip: function (data) {
@@ -107,7 +173,17 @@ define(function(require, exports, module) {
 
             this._playlist = data.playlist;
 
-            this.next();
+            console.log(this.isLoop(), this.isFMPaused());
+
+            if (this.isLoop() && !this.isFMPaused()) {
+                setTimeout($.proxy(function () {
+                    this.pauseFM();
+                    this.loop();
+                }, this), 500);
+
+            } else {
+                this.next();
+            }
         },
 
         _onFMInit: function (data) {
@@ -115,7 +191,23 @@ define(function(require, exports, module) {
         },
 
         isLoop: function () {
-            return this.$loop.prop('checked');
+            return this.$loop.find('input[type=checkbox]').prop('checked');
+        },
+
+        isFMPaused: function () {
+           return DBR.is_paused();
+        },
+
+        pauseFM: function () {
+            if (!this.isFMPaused()) {
+                DBR.act('pause');
+            }
+        },
+
+        playFM: function () {
+            if (this.isFMPaused()) {
+                DBR.act('pause');
+            }
         },
 
         addHistory: function (song) {
@@ -130,6 +222,15 @@ define(function(require, exports, module) {
                 lastSong = this._songs[len - 1];
 
             return lastSong;
+        },
+
+        loop: function () {
+            var song = this.lastSong();
+
+            this.$jplayer.jPlayer('setMedia', {
+                mp3: song.url
+            });
+
         },
 
         next: function () {
