@@ -10,14 +10,15 @@ define(function(require, exports, module) {
         this.$elem = $(elem);
         this.$wrap = this.$elem.find('.player-wrap');
         this.$container = $('#fm-improve');
+
+        this.jplayer = null;
         
         this.$download = null;
         this.$picture = null;
         this.$loop = null;
 
-        this._fmFirstSong = false;
-        this._currentSong = null;
-        this._prevSongs = [];
+        this._playlist = [];
+        this._songs = [];
 
         this._init();
     }
@@ -46,6 +47,13 @@ define(function(require, exports, module) {
 
         },
 
+        _initJPlayer: function () {
+
+            if (!this.$jplayer) {
+                this.$jplayer = $('<div />').jPlayer();
+            }
+        },
+
         _handlerStatus: function () {
             var that = this;
 
@@ -70,53 +78,81 @@ define(function(require, exports, module) {
             console.log(data.type);
             switch (data.type) {
                 case 'nl':
-                    this._onNewListLoad(data);
-                    logger.log(data);
+                    this._onFMNextList(data);
                     break;
                 case 'init':
                     this._onFMInit(data);
-                    logger.log(data);
                     break;
                 case 'e':
-                    this._onFMNext(data.song);
-                    logger.log(data);
+                    this._onFMNext(data);
                     break;
                 case 's':
                     this._onFMSkip(data);
-                    logger.log(data);
                     break;
             }
         },
 
-        _onFMNext: function (song) {
-            if (this._prevSongs.indexOf(this._currentSong) < 0) {
-                this._prevSongs.push(this._currentSong);
-            }
-            this._currentSong = song;
+        _onFMNext: function (data) {
+            logger.log('on fm play next song', data);
 
-            this.render();
+            this.next();
         },
 
         _onFMSkip: function (data) {
-            this._onFMNext(data.playlist[0]);
+            logger.log('on fm skip the prev song', data);
         },
 
-        _onNewListLoad: function (data) {
-            if (this._fmFirstSong) {
-                this._onFMNext(data.playlist[0]);
-                this._fmFirstSong = false;
-            }
+        _onFMNextList: function (data) {
+            logger.log('on fm new player list changed', data);
+
+            this._playlist = data.playlist;
+
+            this.next();
         },
 
         _onFMInit: function (data) {
-            this._fmFirstSong = true;
+            logger.log('on fm init', data);
         },
 
-        render: function () {
-            var song = this._currentSong,
-                pictrueExt = (song.picture.match(/(.*)\.(\w+)$/))[2],
+        isLoop: function () {
+            return this.$loop.prop('checked');
+        },
+
+        addHistory: function (song) {
+            var lastSong = this.lastSong();
+            if (lastSong !== song && song) {
+                this._songs.push(song);
+            }
+        },
+
+        lastSong: function () {
+            var len = this._songs.length,
+                lastSong = this._songs[len - 1];
+
+            return lastSong;
+        },
+
+        next: function () {
+            var song = this._playlist.shift();
+
+            logger.log('fm ready to play next song', song);
+
+            if (song) {
+                this.play(song);
+            }
+        },
+
+        play: function (song) {
+            logger.log('fm play song', song);
+
+            this._render(song);
+            this.addHistory(song);
+        },
+
+        _render: function (song) {
+            var pictrueExt = (song.picture.match(/(.*)\.(\w+)$/))[2],
                 songName = song.title + ' - ' + song.artist,
-                piectureName = songName + pictrueExt,
+                pictureName = songName + pictrueExt,
                 fileName = songName + '.mp3';
 
             this.$download
@@ -126,8 +162,8 @@ define(function(require, exports, module) {
 
             this.$picture
                 .attr('href', song.picture)
-                .attr('download', piectureName)
-                .attr('title', piectureName)
+                .attr('download', pictureName)
+                .attr('title', pictureName)
                 .find('img')
                 .attr('src', song.picture)
         }
