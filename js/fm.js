@@ -158,7 +158,7 @@ define(function(require, exports, module) {
                 setTimeout($.proxy(function () {
                     this.pauseFM();
                     this.loop();
-                }, this), 500);
+                }, this), 200);
             } else {
                 this.next();
             }
@@ -179,7 +179,7 @@ define(function(require, exports, module) {
                 setTimeout($.proxy(function () {
                     this.pauseFM();
                     this.loop();
-                }, this), 500);
+                }, this), 200);
 
             } else {
                 this.next();
