@@ -43,6 +43,8 @@ define(function(require, exports, module) {
             this._initJPlayer();
             this._initLoop();
 
+            window.$(window).bind('radio:start', $.proxy(this._onFMStart, this));
+
             Do.ready('fm-player', function () {
                 fmPlayerReady = true;
                 that._handlerStatus();
@@ -161,18 +163,12 @@ define(function(require, exports, module) {
             if (this.isLoop()) {
                 this.$loop.find('input[type=checkbox]').prop('checked', false);
                 this.$jplayer.jPlayer('pause');
-                this.next();
             }
         },
 
         _onFMRecommend: function (data) {
             logger.log('on fm play recommend song', data);
 
-            var song = data.song;
-
-            this._recommendSong = song;
-
-            this.play(song);
         },
 
         _onFMNext: function (data) {
@@ -183,8 +179,6 @@ define(function(require, exports, module) {
                     this.pauseFM();
                     this.loop();
                 }, this), 200);
-            } else {
-                this.next();
             }
         },
 
@@ -197,22 +191,19 @@ define(function(require, exports, module) {
 
             this._playlist = data.playlist || [];
 
-            if (this._recommendSong) {
-                this._playlist.unshift(this._recommendSong);
-                this._recommendSong = null;
-            }
-
-            console.log(this.isLoop(), this.isFMPaused());
-
             if (this.isLoop() && !this.isFMPaused()) {
                 setTimeout($.proxy(function () {
                     this.pauseFM();
                     this.loop();
                 }, this), 200);
 
-            } else {
-                this.next();
             }
+        },
+
+        _onFMStart: function (evt, data) {
+            logger.log('on fm player song start to play.', data);
+
+            this.play(data.song);
         },
 
         _onFMInit: function (data) {
@@ -273,7 +264,7 @@ define(function(require, exports, module) {
         },
 
         play: function (song) {
-            logger.log('fm play song', song);
+            logger.log('fm play song', song.title);
 
             if (song) {
                 this._render(song);
@@ -284,7 +275,7 @@ define(function(require, exports, module) {
         _render: function (song) {
             var pictrueExt = (song.picture.match(/(.*)\.(\w+)$/))[2],
                 songName = song.title + ' - ' + song.artist,
-                pictureName = songName + pictrueExt,
+                pictureName = songName + '.' + pictrueExt,
                 fileName = songName + '.mp3';
 
             this.$download
