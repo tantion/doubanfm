@@ -16,6 +16,7 @@ define(function(require, exports, module) {
         this.$download = null;
         this.$picture = null;
         this.$loop = null;
+        this.$private = null;
 
         this._playlist = [];
         this._songs = [];
@@ -35,6 +36,7 @@ define(function(require, exports, module) {
                 this.$picture = $('<a class="fm-improve-picture" dowload=""><img src=""></a>').appendTo(this.$container);
                 this.$download = $('<a class="fm-improve-download" download="">下载</a>').appendTo(this.$container);
                 this.$loop = $('<label><input type="checkbox" /><span>循环播放</span></label>').appendTo(this.$container);
+                this.$private = $('<label><input type="checkbox" /><span>使用私人频道</span></label>').appendTo(this.$container);
             }
 
             var fmPlayerReady = false,
@@ -42,15 +44,38 @@ define(function(require, exports, module) {
 
             this._initJPlayer();
             this._initLoop();
+            this._initPrivate();
 
-            window.$(window).bind('radio:start', $.proxy(this._onFMStart, this));
 
             Do.ready('fm-player', function () {
                 fmPlayerReady = true;
+                window.$(window).bind('radio:start', $.proxy(that._onFMStart, that));
                 that._handlerStatus();
                 that._handlerDBR();
             });
 
+        },
+
+        _initPrivate: function () {
+
+            this.$private.find('input[type=checkbox]')
+                .on('click', $.proxy(function () {
+                    if (this.isPrivate()) {
+                        window.set_cookie({always_use_private: 1}, 365, 'douban.fm');
+                    } else {
+                        window.set_cookie({always_use_private: 0}, 365, 'douban.fm');
+                    }
+                }, this));
+
+            if (document.cookie.match(/always_use_private=1/i)) {
+                this.$private.find('input[type=checkbox]').prop('checked', true);
+            }
+
+            var href = location.href,
+                newHref = href.replace(/g([-\d]+)&cid=([-\d]+)/i, 'g0&cid=0');
+            if (this.isPrivate() && href != newHref) {
+                location.href = newHref;
+            }
         },
 
         _initLoop: function () {
@@ -58,25 +83,14 @@ define(function(require, exports, module) {
             this.$loop.find('input[type=checkbox]')
                 .on('click', $.proxy(function () {
                     if (this.isLoop()) {
-                        this._onLoopSeted();
-                    } else {
-                        this._onLoopCancel();
+                        this.$jplayer.jPlayer('pause');
+
+                        if (this.isFMPaused()) {
+                            this.playFM();
+                        }
                     }
                 }, this));
 
-        },
-
-        _onLoopSeted: function () {
-
-        },
-
-        _onLoopCancel: function () {
-            this.$jplayer.jPlayer('pause');
-
-            if (this.isFMPaused()) {
-                this.playFM();
-                this.next();
-            }
         },
 
         _initJPlayer: function () {
@@ -212,6 +226,10 @@ define(function(require, exports, module) {
 
         isLoop: function () {
             return this.$loop.find('input[type=checkbox]').prop('checked');
+        },
+
+        isPrivate: function () {
+            return this.$private.find('input[type=checkbox]').prop('checked');
         },
 
         isFMPaused: function () {
