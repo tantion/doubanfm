@@ -46,6 +46,7 @@ define(function(require, exports, module) {
             Do.ready('fm-player', function () {
                 fmPlayerReady = true;
                 that._handlerStatus();
+                that._handlerDBR();
             });
 
         },
@@ -95,12 +96,22 @@ define(function(require, exports, module) {
         _handlerStatus: function () {
             var that = this;
 
-            window._DBR = window.DBR;
             window._extStatusHandler = window.extStatusHandler;
 
             window.extStatusHandler = function () {
                 window._extStatusHandler.apply(this, arguments);
                 that._onStatusChange.apply(that, arguments);
+            }
+        },
+
+        _handlerDBR: function () {
+            var that = this;
+
+            window.DBR._act = window.DBR.act;
+
+            window.DBR.act = function () {
+                logger.log(arguments);
+                window.DBR._act.apply(this, arguments);
             }
         },
 
@@ -113,7 +124,7 @@ define(function(require, exports, module) {
                 logger.error(e);
             }
 
-            console.log(data.type, data);
+            logger.log(data.type, data);
             switch (data.type) {
                 case 'nl':
                     this._onFMNextList(data);
@@ -123,6 +134,9 @@ define(function(require, exports, module) {
                     break;
                 case 'e':
                     this._onFMNext(data);
+                    break;
+                case 'r':
+                    this._onFMRecommend(data);
                     break;
                 case 's':
                     this._onFMSkip(data);
@@ -151,6 +165,16 @@ define(function(require, exports, module) {
             }
         },
 
+        _onFMRecommend: function (data) {
+            logger.log('on fm play recommend song', data);
+
+            var song = data.song;
+
+            this._recommendSong = song;
+
+            this.play(song);
+        },
+
         _onFMNext: function (data) {
             logger.log('on fm play next song', data);
 
@@ -171,7 +195,12 @@ define(function(require, exports, module) {
         _onFMNextList: function (data) {
             logger.log('on fm new player list changed', data);
 
-            this._playlist = data.playlist;
+            this._playlist = data.playlist || [];
+
+            if (this._recommendSong) {
+                this._playlist.unshift(this._recommendSong);
+                this._recommendSong = null;
+            }
 
             console.log(this.isLoop(), this.isFMPaused());
 
@@ -246,8 +275,10 @@ define(function(require, exports, module) {
         play: function (song) {
             logger.log('fm play song', song);
 
-            this._render(song);
-            this.addHistory(song);
+            if (song) {
+                this._render(song);
+                this.addHistory(song);
+            }
         },
 
         _render: function (song) {
