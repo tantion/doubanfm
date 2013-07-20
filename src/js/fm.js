@@ -51,9 +51,6 @@ define(function(require, exports, module) {
             Do.ready('fm-player', function () {
                 fmPlayerReady = true;
                 window.$(window).bind('radio:start', $.proxy(that._onFMStart, that));
-                window.$(window).bind('radio:end', function() {console.log(arguments);});
-                window.$(window).bind('radio:process', function() {console.log(arguments);});
-                window.$(window).bind('radio:progress', function() {console.log(arguments);});
                 that._handlerStatus();
                 that._handlerDBR();
             });
@@ -240,6 +237,15 @@ define(function(require, exports, module) {
             logger.log('on fm init', data);
         },
 
+        _isEqualSong: function (song1, song2) {
+            if (song1 && song2) {
+                if (song1.sid === song2.sid && song1.ssid === song2.ssid) {
+                    return true;
+                }
+            }
+            return false;
+        },
+
         isLoop: function () {
             return this.$loop.find('input[type=checkbox]').prop('checked');
         },
@@ -264,13 +270,18 @@ define(function(require, exports, module) {
             }
         },
 
-        switchFM: function (song) {
-            var start = '';
+        switchFM: function (sid, ssid, channel) {
+            channel = channel || 0;
+
+            if (sid && ssid) {
+                set_cookie({start: sid + 'g' + ssid + 'g' + channel}, 1, 'doubam.fm');
+                DBR.act('switch', channel);
+            }
         },
 
         addHistory: function (song) {
             var lastSong = this.lastSong();
-            if (lastSong !== song && song) {
+            if (!this._isEqualSong(lastSong, song)) {
                 this._songs.push(song);
             }
         },
