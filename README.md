@@ -14,6 +14,9 @@ A chrome extension for Douban FM
     - Improve use better way to listen download song.
     - Can auto use private channel from share url.
 
+- v0.2.1 - July 20 2013
+    - Bugfix loop play can't work.
+
 ## License
 
 MIT license
