@@ -20,6 +20,7 @@ define(function(require, exports, module) {
 
         this._playlist = [];
         this._songs = [];
+        this._delaySong = null;
 
         this._init();
     }
@@ -50,6 +51,9 @@ define(function(require, exports, module) {
             Do.ready('fm-player', function () {
                 fmPlayerReady = true;
                 window.$(window).bind('radio:start', $.proxy(that._onFMStart, that));
+                window.$(window).bind('radio:end', function() {console.log(arguments);});
+                window.$(window).bind('radio:process', function() {console.log(arguments);});
+                window.$(window).bind('radio:progress', function() {console.log(arguments);});
                 that._handlerStatus();
                 that._handlerDBR();
             });
@@ -82,11 +86,15 @@ define(function(require, exports, module) {
 
             this.$loop.find('input[type=checkbox]')
                 .on('click', $.proxy(function () {
-                    if (this.isLoop()) {
+                    if (!this.isLoop()) {
                         this.$jplayer.jPlayer('pause');
 
                         if (this.isFMPaused()) {
                             this.playFM();
+                            if (this._delaySong) {
+                                this.play(this._delaySong);
+                                this._delaySong = null;
+                            }
                         }
                     }
                 }, this));
@@ -177,6 +185,10 @@ define(function(require, exports, module) {
             if (this.isLoop()) {
                 this.$loop.find('input[type=checkbox]').prop('checked', false);
                 this.$jplayer.jPlayer('pause');
+                if (this._delaySong) {
+                    this.play(this._delaySong);
+                    this._delaySong = null;
+                }
             }
         },
 
@@ -210,14 +222,18 @@ define(function(require, exports, module) {
                     this.pauseFM();
                     this.loop();
                 }, this), 200);
-
             }
         },
 
         _onFMStart: function (evt, data) {
             logger.log('on fm player song start to play.', data);
 
-            this.play(data.song);
+            if (this.isLoop()) {
+                this._delaySong = data.song;
+            } else {
+                this.play(data.song);
+            }
+
         },
 
         _onFMInit: function (data) {
@@ -246,6 +262,10 @@ define(function(require, exports, module) {
             if (this.isFMPaused()) {
                 DBR.act('pause');
             }
+        },
+
+        switchFM: function (song) {
+            var start = '';
         },
 
         addHistory: function (song) {
