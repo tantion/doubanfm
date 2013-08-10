@@ -3,33 +3,30 @@
 //
 define(function(require, exports, module) {
 
-    var $ = require('jquery');
     var isDebug = false;
-    var logger = {};
-
-    logger = {
+    var logger = {
         log: function () {
-            if (window.console && console.log) {
+            if (window.console && console.log && isDebug) {
                 console.log.apply(console, arguments);
             }
         },
         debug: function () {
-            if (window.console && console.debug) {
+            if (window.console && console.debug && isDebug) {
                 console.debug.apply(console, arguments);
             }
         },
         error: function () {
-            if (window.console && console.error) {
+            if (window.console && console.error && isDebug) {
                 console.error.apply(console, arguments);
             }
         },
         warn: function () {
-            if (window.console && console.warn) {
+            if (window.console && console.warn && isDebug) {
                 console.warn.apply(console, arguments);
             }
         },
         info: function () {
-            if (window.console && console.info) {
+            if (window.console && console.info && isDebug) {
                 console.info.apply(console, arguments);
             }
         }
