@@ -6,7 +6,10 @@
     "version": "0.3.0",
 
     "permissions": [
-        "https://douban.fm/"
+        "webRequest",
+        "webRequestBlocking",
+        "http://douban.fm/",
+        "http://music.douban.com/"
      ],
     "icons": {
         "128": "icon.png",
@@ -20,6 +23,9 @@
         "js/*.js",
         "lib/*.js"
     ],
+    "background": {
+        "scripts": ["background.js"]
+    },
     "content_scripts": [{
         "matches": ["http://douban.fm/*"],
         "css":     ["doubanfm.css"],

@@ -39,7 +39,7 @@ define(function(require, exports, module) {
                 this.$download = $('<a class="fm-improve-download" download="">下载</a>').appendTo(this.$container);
                 this.$loop = $('<label><input type="checkbox" /><span>循环播放</span></label>').appendTo(this.$container);
                 this.$private = $('<label><input type="checkbox" /><span>私人频道</span></label>').appendTo(this.$container);
-                //this.$album = $('<button>播放专辑</button>').appendTo(this.$container);
+                this.$album = $('<button>播放专辑</button>').appendTo(this.$container);
                 this.$next = $('<button>下一首</button>').appendTo(this.$container);
                 this.$nextSong = $('<span class="fm-improve-info"></span>').appendTo(this.$container);;
             }
@@ -91,7 +91,13 @@ define(function(require, exports, module) {
         },
 
         _initAlbum: function () {
+            var that = this;
 
+
+            this.$album.on('click', function (evt) {
+                evt.preventDefault();
+                that.requestAlbum();
+            });
         },
 
         _handlerStatus: function () {
@@ -245,6 +251,18 @@ define(function(require, exports, module) {
             logger.log(res);
 
             DBR.swf().list_onload(res);
+        },
+
+        requestAlbum: function () {
+            $.ajax({
+                url: 'http://music.douban.com/subject/21430965/'
+            })
+            .done(function (data) {
+                logger.log(arguments);
+            })
+            .fail(function () {
+                logger.log(arguments);
+            });
         },
 
         song: function () {
