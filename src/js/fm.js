@@ -5,22 +5,23 @@ define(function(require, exports, module) {
 
     var $ = require('jquery');
     var logger = require('js/logger');
+    var helper = require('js/helper');
 
     function DoubanFM(elem) {
         this.$elem = $(elem);
         this.$wrap = this.$elem.find('.player-wrap');
         this.$container = $('#fm-improve');
-
-        this.jplayer = null;
         
         this.$download = null;
         this.$picture = null;
         this.$loop = null;
         this.$private = null;
+        this.$album = null;
+        this.$next = null;
+        this.$nextSong = null;
 
         this._playlist = [];
-        this._songs = [];
-        this._delaySong = null;
+        this._song = null;
 
         this._init();
     }
@@ -32,21 +33,24 @@ define(function(require, exports, module) {
         _init: function () {
             //this.$wrap.css({position: 'relative'});
 
-            if (this.$container || this.$container.length) {
+            if (!this.$container.length) {
                 this.$container = $('<div id="fm-improve" />').appendTo(this.$elem);
                 this.$picture = $('<a class="fm-improve-picture" dowload=""><img src=""></a>').appendTo(this.$container);
                 this.$download = $('<a class="fm-improve-download" download="">下载</a>').appendTo(this.$container);
                 this.$loop = $('<label><input type="checkbox" /><span>循环播放</span></label>').appendTo(this.$container);
-                this.$private = $('<label><input type="checkbox" /><span>使用私人频道</span></label>').appendTo(this.$container);
+                this.$private = $('<label><input type="checkbox" /><span>私人频道</span></label>').appendTo(this.$container);
+                this.$album = $('<button>播放专辑</button>').appendTo(this.$container);
+                this.$next = $('<button>下一首</button>').appendTo(this.$container);
+                this.$nextSong = $('<span class="fm-improve-info"></span>').appendTo(this.$container);;
             }
 
             var fmPlayerReady = false,
                 that = this;
 
-            this._initJPlayer();
-            this._initLoop();
             this._initPrivate();
-
+            this._initLoop();
+            this._initNext();
+            this._initAlbum();
 
             Do.ready('fm-player', function () {
                 fmPlayerReady = true;
@@ -79,39 +83,27 @@ define(function(require, exports, module) {
             }
         },
 
+        _initNext: function () {
+            var that = this;
+            this.$next.on('click', function (evt) {
+                evt.preventDefault();
+                that.nextFM();
+            });
+        },
+
         _initLoop: function () {
 
             this.$loop.find('input[type=checkbox]')
                 .on('click', $.proxy(function () {
                     if (!this.isLoop()) {
-                        this.$jplayer.jPlayer('pause');
 
-                        if (this.isFMPaused()) {
-                            this.playFM();
-                            if (this._delaySong) {
-                                this.play(this._delaySong);
-                                this._delaySong = null;
-                            }
-                        }
                     }
                 }, this));
 
         },
 
-        _initJPlayer: function () {
+        _initAlbum: function () {
 
-            if (!this.$jplayer) {
-                this.$jplayer = $('<div />').jPlayer({
-                    ready: function () {
-                        logger.log('jplayer is ready.');
-                    },
-                    canplay: function () {
-                        $(this).jPlayer('play');
-                    },
-                    loop: true,
-                    supplied: "mp3"
-                });
-            }
         },
 
         _handlerStatus: function () {
@@ -154,13 +146,10 @@ define(function(require, exports, module) {
                     this._onFMInit(data);
                     break;
                 case 'e':
-                    this._onFMNext(data);
-                    break;
-                case 'r':
-                    this._onFMRecommend(data);
+                    this._onFMEnd(data);
                     break;
                 case 's':
-                    this._onFMSkip(data);
+                    this._onFMStart(data);
                     break;
                 case 'pause':
                     this._onFMPause(data);
@@ -181,32 +170,20 @@ define(function(require, exports, module) {
 
             if (this.isLoop()) {
                 this.$loop.find('input[type=checkbox]').prop('checked', false);
-                this.$jplayer.jPlayer('pause');
-                if (this._delaySong) {
-                    this.play(this._delaySong);
-                    this._delaySong = null;
-                }
             }
         },
 
-        _onFMRecommend: function (data) {
-            logger.log('on fm play recommend song', data);
+        _onFMStart: function (evt, data) {
+            logger.log('on fm player start to play song', data.song);
 
+            this.render(data.song);
+            this.renderNextSong();
         },
 
-        _onFMNext: function (data) {
-            logger.log('on fm play next song', data);
+        _onFMEnd: function (data) {
+            logger.log('on fm player play song end', data.song);
 
-            if (this.isLoop() && !this.isFMPaused()) {
-                setTimeout($.proxy(function () {
-                    this.pauseFM();
-                    this.loop();
-                }, this), 200);
-            }
-        },
 
-        _onFMSkip: function (data) {
-            logger.log('on fm skip the prev song', data);
         },
 
         _onFMNextList: function (data) {
@@ -214,36 +191,11 @@ define(function(require, exports, module) {
 
             this._playlist = data.playlist || [];
 
-            if (this.isLoop() && !this.isFMPaused()) {
-                setTimeout($.proxy(function () {
-                    this.pauseFM();
-                    this.loop();
-                }, this), 200);
-            }
-        },
-
-        _onFMStart: function (evt, data) {
-            logger.log('on fm player song start to play.', data);
-
-            if (this.isLoop()) {
-                this._delaySong = data.song;
-            } else {
-                this.play(data.song);
-            }
-
+            this.renderNextSong();
         },
 
         _onFMInit: function (data) {
             logger.log('on fm init', data);
-        },
-
-        _isEqualSong: function (song1, song2) {
-            if (song1 && song2) {
-                if (song1.sid === song2.sid && song1.ssid === song2.ssid) {
-                    return true;
-                }
-            }
-            return false;
         },
 
         isLoop: function () {
@@ -270,58 +222,77 @@ define(function(require, exports, module) {
             }
         },
 
-        switchFM: function (sid, ssid, channel) {
-            channel = channel || 0;
+        nextFM: function () {
+            var fmPlaylist= helper.getFMPlaylist(this.playlist(), this.song());
 
-            if (sid && ssid) {
-                set_cookie({start: sid + 'g' + ssid + 'g' + channel}, 1, 'doubam.fm');
-                DBR.act('switch', channel);
+            this.skipFM();
+            this.loadFMList(fmPlaylist);
+        },
+
+        skipFM: function () {
+            DBR.act('skip');
+        },
+
+        switchFM: function (channel) {
+            channel = channel || window.now_play_channel;
+
+            DBR.act('switch', channel);
+        },
+
+        loadFMList: function (playlist) {
+            var res = helper.convertToFMResponse(playlist);
+            logger.log(res);
+
+            DBR.swf().list_onload(res);
+        },
+
+        song: function () {
+            return this._song;
+        },
+
+        playlist: function (index) {
+            if (typeof index === 'undefined') {
+                return this._playlist;
+            } else {
+                if (index < 0) {
+                    index = 0;
+                } else if (index > this._playlist.length - 1) {
+                    index = this._playlist.length - 1;
+                }
+                return this._playlist[index];
             }
         },
 
-        addHistory: function (song) {
-            var lastSong = this.lastSong();
-            if (!this._isEqualSong(lastSong, song)) {
-                this._songs.push(song);
+        getNextSong: function () {
+            var playlist = helper.getFMPlaylist(this.playlist(), this.song());
+            var nextSong = {};
+
+            if (playlist && playlist.length) {
+                nextSong = playlist[0];
             }
+            return nextSong;
         },
 
-        lastSong: function () {
-            var len = this._songs.length,
-                lastSong = this._songs[len - 1];
+        renderNextSong: function () {
+            var song = this.getNextSong();
+            var info = '';
 
-            return lastSong;
-        },
-
-        loop: function () {
-            var song = this.lastSong();
-
-            this.$jplayer.jPlayer('setMedia', {
-                mp3: song.url
-            });
-
-        },
-
-        next: function () {
-            var song = this._playlist.shift();
-
-            logger.log('fm ready to play next song', song);
-
-            if (song) {
-                this.play(song);
+            if (song && song.title && song.artist) {
+                info = song.title + ' - ' + song.artist;
             }
+
+            this.$nextSong.attr('title', info);
+            this.$nextSong.text(info);
         },
 
-        play: function (song) {
-            logger.log('fm play song', song.title);
+        render: function (song) {
 
-            if (song) {
-                this._render(song);
-                this.addHistory(song);
+            if (!song) {
+                return;
             }
-        },
 
-        _render: function (song) {
+            this._song = song;
+
             var pictrueExt = (song.picture.match(/(.*)\.(\w+)$/))[2],
                 songName = song.title + ' - ' + song.artist,
                 pictureName = songName + '.' + pictrueExt,
