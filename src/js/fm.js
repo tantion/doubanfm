@@ -48,7 +48,6 @@ define(function(require, exports, module) {
                 that = this;
 
             this._initPrivate();
-            this._initLoop();
             this._initNext();
             this._initAlbum();
 
@@ -89,17 +88,6 @@ define(function(require, exports, module) {
                 evt.preventDefault();
                 that.nextFM();
             });
-        },
-
-        _initLoop: function () {
-
-            this.$loop.find('input[type=checkbox]')
-                .on('click', $.proxy(function () {
-                    if (!this.isLoop()) {
-
-                    }
-                }, this));
-
         },
 
         _initAlbum: function () {
@@ -183,6 +171,9 @@ define(function(require, exports, module) {
         _onFMEnd: function (data) {
             logger.log('on fm player play song end', data.song);
 
+            if (this.isLoop()) {
+                this.loopFM();
+            }
 
         },
 
@@ -224,6 +215,16 @@ define(function(require, exports, module) {
 
         nextFM: function () {
             var fmPlaylist= helper.getFMPlaylist(this.playlist(), this.song());
+
+            this.skipFM();
+            this.loadFMList(fmPlaylist);
+        },
+
+        loopFM: function () {
+            var fmPlaylist= helper.getFMPlaylist(this.playlist(), this.song());
+
+            fmPlaylist.unshift(this.song());
+            fmPlaylist.unshift(this.song());
 
             this.skipFM();
             this.loadFMList(fmPlaylist);

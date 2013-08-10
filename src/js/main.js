@@ -9,7 +9,7 @@ define(function(require, exports, module) {
     var $ = require('jquery');
 
     // jquery plugins
-    require('lib/jplayer/jquery.jplayer.js')($);
+    //require('lib/jplayer/jquery.jplayer.js')($);
 
     var DoubanFM = require('js/fm');
     var fm = new DoubanFM('#fm-player');
