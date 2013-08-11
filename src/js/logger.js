@@ -3,7 +3,7 @@
 //
 define(function(require, exports, module) {
 
-    var isDebug = true;
+    var isDebug = false;
     var logger = {
         log: function () {
             if (window.console && console.log && isDebug) {

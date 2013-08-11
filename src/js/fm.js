@@ -21,7 +21,11 @@ define(function(require, exports, module) {
         this.$nextSong = null;
 
         this._playlist = [];
-        this._song = null;
+        this._album = [];
+        this._albumSongs = [];
+        this._song = {};
+        this._delay = 1;
+        this._albumLoding = false;
 
         this._init();
     }
@@ -178,9 +182,30 @@ define(function(require, exports, module) {
             logger.log('on fm player play song end', data.song);
 
             if (this.isLoop()) {
-                this.loopFM();
+                this.playFMSong(this.song());
             }
 
+            var albumSongs = this.albumSongs();
+            if (albumSongs && albumSongs.length) {
+                this.playFMlist(albumSongs);
+                if (!this.isAlbumLoading()) {
+                    this._albumSongs = [];
+                }
+            }
+
+        },
+
+        _onFMNext: function (song) {
+            logger.log('on fm player play next song', song);
+
+            var albumSongs = this.albumSongs();
+            if (albumSongs && albumSongs.length) {
+                this.delay(0.001, 1);
+                this.playFMlist(albumSongs);
+                if (!this.isAlbumLoading()) {
+                    this._albumSongs = [];
+                }
+            }
         },
 
         _onFMNextList: function (data) {
@@ -222,15 +247,21 @@ define(function(require, exports, module) {
         nextFM: function () {
             var fmPlaylist= helper.getFMPlaylist(this.playlist(), this.song());
 
-            this.skipFM();
-            this.loadFMList(fmPlaylist);
+            if (fmPlaylist && fmPlaylist.length) {
+                this.playFMSong(fmPlaylist[0]);
+                this._onFMNext(fmPlaylist[0]);
+            } else {
+                this.skipFM();
+            }
         },
 
-        loopFM: function () {
+        playFMSong: function (song) {
             var fmPlaylist= helper.getFMPlaylist(this.playlist(), this.song());
 
-            fmPlaylist.unshift(this.song());
-            fmPlaylist.unshift(this.song());
+            if (helper.isEqualSong(this.song(), song)) {
+                fmPlaylist.unshift(this.song());
+                fmPlaylist.unshift(this.song());
+            }
 
             this.skipFM();
             this.loadFMList(fmPlaylist);
@@ -246,23 +277,161 @@ define(function(require, exports, module) {
             DBR.act('switch', channel);
         },
 
+        playFMlist: function (playlist) {
+            var fmPlaylist= helper.getFMPlaylist(playlist, this.song());
+
+            this.skipFM();
+            this.loadFMList(fmPlaylist);
+        },
+
         loadFMList: function (playlist) {
             var res = helper.convertToFMResponse(playlist);
-            logger.log(res);
+            //logger.log(res);
 
             DBR.swf().list_onload(res);
         },
 
         requestAlbum: function () {
+            var that = this;
+            var url = helper.requestAlbumUrl(this.song());
+
+            if (!url) {
+                return;
+            }
+
+            this.$album.prop('disabled', true);
+
             $.ajax({
-                url: 'http://music.douban.com/subject/21430965/'
+                url: url
             })
             .done(function (data) {
-                logger.log(arguments);
+                logger.log("loading album done: ", url);
+
+                var $doc = $($.parseHTML(data));
+                var $items = $doc.find('.song-items-wrapper .song-item');
+                var album = [];
+
+                $items.each(function () {
+                    var $item = $(this),
+                        id = $item.attr('id'),
+                        ssid = $item.data('ssid');
+
+                    if (id && ssid) {
+                        album.push({
+                            id: id,
+                            ssid: ssid
+                        });
+                    }
+                });
+
+                that._album = album;
+                that.$album.prop('disabled', false);
+                that.requestAlbumSongs();
             })
             .fail(function () {
-                logger.log(arguments);
+                logger.log("loading album fail: ", url);
+                this.$album.prop('disabled', false);
             });
+        },
+
+        requestSongs: function (songs, dfd) {
+            var song = songs.shift() || [];
+            var url = helper.requestSongUrl(song.id, song.ssid, this.song().kbps);
+            var that = this;
+
+            if (url) {
+                $.ajax({
+                    url: url,
+                    dataType: 'json'
+                })
+                .done(function (data) {
+                    var res = data.song;
+                    if (res && res.length) {
+                        dfd.notify(res.shift(), songs.length);
+                    }
+
+                    if (songs && songs.length) {
+                        setTimeout(function () {
+                            that.requestSongs(songs, dfd);
+                        }, (that.delay() || 1) * 60 * 1000);
+                    } else {
+                        dfd.resolve();
+                    }
+                })
+                .fail(function () {
+                    dfd.reject();
+                });
+            } else {
+                if (songs && songs.length) {
+                    that.requestSongs(songs, dfd);
+                } else {
+                    dfd.resolve();
+                }
+            }
+        },
+
+        requestAlbumSongs: function () {
+            var songs = helper.cloneAlbum(this.album());
+            var dfd = new $.Deferred();
+            var that = this;
+            var playing = false;
+
+            logger.log('start request album songs.', songs);
+            helper.changeAlbumStatus(this.$album, 'loading');
+
+            this._albumLoding = true;
+
+            dfd.progress(function (song, len) {
+                    logger.log('request album song.', song, len);
+                    helper.changeAlbumStatus(that.$album, 'pending', len);
+                    that._albumSongs.push(song);
+                    if (!playing) {
+                        that.delay(0.001);
+                        if (that._albumSongs.length === 2) {
+                            that.playFMlist(that._albumSongs);
+                            playing = true;
+                        }
+                    } else {
+                        that.delay(0.5);
+                    }
+                })
+                .done(function () {
+                    logger.log('request album songs done.');
+                    helper.changeAlbumStatus(that.$album, 'done');
+                    that._albumLoding = false;
+                })
+                .fail(function () {
+                    logger.log('request album songs fail.');
+                    helper.changeAlbumStatus(that.$album, 'fail');
+                    that._albumLoding = false;
+                });
+
+            this.requestSongs(songs, dfd);
+
+            return dfd.promise();
+        },
+
+        //
+        // 请求 album songs 的时间间隔，默认 1 minute
+        //
+        delay: function (delay, lock) {
+            if (typeof delay === 'undefined') {
+                return this._delay;
+            }
+
+            var that = this;
+
+            if (!this._delayLocked) {
+                this._delay = delay;
+                if (lock) {
+                    that._delayLocked = true;
+                    setTimeout(function () {
+                        that._delayLocked = false;
+                    }, lock * 1000);
+                }
+            }
+
+            return this._delay;
         },
 
         song: function () {
@@ -280,6 +449,18 @@ define(function(require, exports, module) {
                 }
                 return this._playlist[index];
             }
+        },
+
+        album: function () {
+            return this._album;
+        },
+
+        albumSongs: function () {
+            return this._albumSongs;
+        },
+
+        isAlbumLoading: function () {
+            return this._albumLoding;
         },
 
         getNextSong: function () {

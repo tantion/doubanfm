@@ -22,7 +22,7 @@ define(function(require, exports, module) {
             var count = 0;
 
             if (!max) {
-                max = 10;
+                max = 200;
             }
 
             for (var key in playlist) {
@@ -58,8 +58,8 @@ define(function(require, exports, module) {
             for (var key in playlist) {
                 var song = playlist[key];
                 song.like = song.like ? "1" : "0";
-                song.length = song.len;
-                song.public_time = song.pubtime;
+                song.length = song.length ? song.length : song.len;
+                song.public_time = song.public_time ? song.public_time : song.pubtime;
             }
 
             var data = {
@@ -68,7 +68,66 @@ define(function(require, exports, module) {
             };
 
             return  JSON.stringify(data);
+        },
+
+        //
+        // request album url
+        //
+        requestAlbumUrl: function (song) {
+            song = song || {};
+
+            var uri = song.album;
+
+            if (uri) {
+                return 'http://music.douban.com' + uri;
+            }
+        },
+
+        setStartSong: function (id, ssid) {
+            var start = id + 'g' + ssid + 'g0';
+
+            if (id && ssid && window.set_cookie) {
+                window.set_cookie({start: start}, 1, 'douban.fm');
+            }
+        },
+
+        requestSongUrl: function (id, ssid, kbps) {
+            kbps = kbps || 64;
+
+            var url = '';
+
+            if (id && ssid) {
+                url = "/j/mine/playlist?type=n&sid=&pt=0.0&channel=0&from=mainsite&kbps=" + kbps;
+                this.setStartSong(id, ssid);
+            }
+
+            return url;
+        },
+
+        cloneAlbum: function (album) {
+            if (album) {
+                return album.concat();
+            }
+            return [];
+        },
+
+        changeAlbumStatus: function ($album, status, data) {
+            switch (status) {
+                case 'loading':
+                    $album.prop('disabled', true);
+                    $album.data('originText', $album.text());
+                    break;
+                case 'pending':
+                    $album.text('还有 ' + data + ' 首');
+                    break;
+                case 'fail':
+                case 'done':
+                    $album.prop('disabled', false);
+                    $album.text($album.data('originText'));
+                    break;
+            }
         }
+
     };
 
 });
