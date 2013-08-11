@@ -4,6 +4,9 @@ A chrome extension for Douban FM
 
 ## Change Log
 
+- v0.4.0 - August 11 2013
+    - Can play album list songs.
+
 - v0.3.0 - August 10 2013
     - Refactor Douban FM event callbacks.
     - A better way to loop play.
