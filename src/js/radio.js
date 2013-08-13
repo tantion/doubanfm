@@ -4,6 +4,7 @@
 define(function(require, exports, module) {
 
     var radio = null,
+        logger = require('js/logger'),
         $ = require('jquery');
 
     function Radio () {
@@ -15,12 +16,14 @@ define(function(require, exports, module) {
         constructor: Radio,
 
         _init: function () {
-            var fmPlayerReady = false,
-                that = this;
+            var that = this;
 
             Do.ready('fm-player', function () {
-                fmPlayerReady = true;
-                window.$(window).bind('radio:start', $.proxy(that._onFMStart, that));
+
+                window.$(window).bind('radio:start', function (evt, data) {
+                    that._trigger('radiosongstart', data);
+                });
+
                 that._handlerStatus();
                 that._handlerDBR();
                 that._trigger('radioready');
@@ -111,6 +114,59 @@ define(function(require, exports, module) {
                         }
                     }
                 }
+            }
+        },
+
+
+        _handlerStatus: function () {
+            var that = this;
+
+            window._extStatusHandler = window.extStatusHandler;
+
+            window.extStatusHandler = function () {
+                window._extStatusHandler.apply(this, arguments);
+                that._onStatusChange.apply(that, arguments);
+            }
+        },
+
+        _handlerDBR: function () {
+
+            window.DBR._act = window.DBR.act;
+
+            window.DBR.act = function () {
+                window.DBR._act.apply(this, arguments);
+            }
+        },
+
+        _onStatusChange: function (json) {
+            var data = null;
+
+            try {
+                data = $.parseJSON(json);
+            } catch (e) {
+                logger.error(e);
+            }
+
+            logger.log(data.type, data);
+            switch (data.type) {
+                case 'nl':
+                    this._trigger('radionewlist', data);
+                    break;
+                case 'init':
+                    this._trigger('radioinit', data);
+                    break;
+                case 'e':
+                    this._trigger('radiosongend', data);
+                    break;
+                case 's':
+                    this._trigger('radiosongstart', data);
+                    break;
+                case 'pause':
+                    this._trigger('radiopause', data);
+                    break;
+                case 'gotoplay':
+                    this._trigger('radioplay', data);
+                    break;
             }
         }
     };
