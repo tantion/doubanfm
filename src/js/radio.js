@@ -4,6 +4,7 @@
 define(function(require, exports, module) {
 
     var radio = null,
+        helper = require('js/helper'),
         logger = require('js/logger'),
         $ = require('jquery');
 
@@ -36,6 +37,53 @@ define(function(require, exports, module) {
             }
 
             return radio;
+        },
+
+        isPaused: function () {
+            return DBR.is_paused();
+        },
+
+        pause: function () {
+            if (!this.isPaused()) {
+                DBR.act('pause');
+            }
+        },
+
+        play: function () {
+            if (this.isPaused()) {
+                DBR.act('pause');
+            }
+        },
+
+        skip: function () {
+            DBR.act('skip');
+        },
+
+        switch: function (channel) {
+            channel = channel || window.now_play_channel;
+
+            DBR.act('switch', channel);
+        },
+
+
+        load: function (playlist) {
+            if (!Array.isArray(playlist)) {
+                playlist = new Array(playlist);
+            }
+
+            for (var key in playlist) {
+                var song = playlist[key];
+                song.like = song.like ? "1" : "0";
+                song.length = song.length ? song.length : song.len;
+                song.public_time = song.public_time ? song.public_time : song.pubtime;
+            }
+
+            var data = {
+                r: 0,
+                song: playlist
+            };
+
+            DBR.swf().list_onload(JSON.stringify(data));
         },
 
         on: function (type, func) {
@@ -116,7 +164,6 @@ define(function(require, exports, module) {
                 }
             }
         },
-
 
         _handlerStatus: function () {
             var that = this;
