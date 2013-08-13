@@ -48,29 +48,6 @@ define(function(require, exports, module) {
         },
 
         //
-        // 转换为豆瓣 FM 播放列表的 JSON
-        //
-        convertToFMResponse: function (playlist) {
-            if (!Array.isArray(playlist)) {
-                playlist = new Array(playlist);
-            }
-
-            for (var key in playlist) {
-                var song = playlist[key];
-                song.like = song.like ? "1" : "0";
-                song.length = song.length ? song.length : song.len;
-                song.public_time = song.public_time ? song.public_time : song.pubtime;
-            }
-
-            var data = {
-                r: 0,
-                song: playlist
-            };
-
-            return  JSON.stringify(data);
-        },
-
-        //
         // request album url
         //
         requestAlbumUrl: function (song) {

@@ -65,7 +65,6 @@ define(function(require, exports, module) {
             DBR.act('switch', channel);
         },
 
-
         load: function (playlist) {
             if (!Array.isArray(playlist)) {
                 playlist = new Array(playlist);
