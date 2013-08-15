@@ -11,7 +11,18 @@ define(function(require, exports, module) {
     // jquery plugins
     //require('lib/jplayer/jquery.jplayer.js')($);
 
-    var DoubanFM = require('js/fm');
-    var fm = new DoubanFM('#fm-player');
+    var DoubanFMImprove = require('js/fm-improve');
+    var $player = $('#fm-player');
+
+    if (!$player.length) {
+        return;
+    }
+
+    var fm = $player.data('doubanFMImprove');
+
+    if (!fm) {
+        fm = new DoubanFMImprove($player);
+        $player.data('doubanFMImprove', fm);
+    }
 
 });

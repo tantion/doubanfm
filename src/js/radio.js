@@ -10,6 +10,16 @@ define(function(require, exports, module) {
 
     function Radio () {
         this._obs = {};
+
+        this._init();
+    }
+
+    Radio.instance = function () {
+        if (!radio) {
+            radio = new Radio();
+        }
+
+        return radio;
     }
 
     Radio.prototype = {
@@ -29,14 +39,6 @@ define(function(require, exports, module) {
                 that._handlerDBR();
                 that._trigger('radioready');
             });
-        },
-
-        instance: function () {
-            if (!radio) {
-                radio = new Radio();
-            }
-
-            return radio;
         },
 
         isPaused: function () {
@@ -87,6 +89,7 @@ define(function(require, exports, module) {
 
         on: function (type, func) {
             var obs = this._obs;
+            var contains = false;
 
             if (!type || $.type(type) !== 'string') {
                 return;
@@ -99,6 +102,7 @@ define(function(require, exports, module) {
             for (var key in obs) {
                 var ob = obs[key];
                 if (obs.hasOwnProperty(key)) {
+                    contains = true;
                     if (key === type) {
                         if (!$.isArray(ob)) {
                             if ($.isFunction(ob)) {
@@ -112,6 +116,10 @@ define(function(require, exports, module) {
                     }
                     ob.push(func);
                 }
+            }
+
+            if (!contains) {
+                obs[type] = [func];
             }
         },
 
