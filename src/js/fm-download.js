@@ -42,7 +42,9 @@ define(function(require, exports, module) {
             .append($download);
 
         fm.on('radiosongstart', function (type, data) {
-            renderFMDownload(data.song);
+            if (data) {
+                renderFMDownload(data.song);
+            }
         });
     }
 
