@@ -6,10 +6,12 @@ define(function(require, exports, module) {
     var radio = null,
         helper = require('js/helper'),
         logger = require('js/logger'),
+        Playlist = require('js/fm-playlist'),
         $ = require('jquery');
 
     function Radio () {
         this._obs = {};
+        this.playlist = new Playlist(this);
 
         this._init();
     }
@@ -51,9 +53,13 @@ define(function(require, exports, module) {
             }
         },
 
-        play: function () {
+        play: function (song) {
             if (this.isPaused()) {
                 DBR.act('pause');
+            }
+
+            if (song) {
+                this.load(this.playlist.unshift(song));
             }
         },
 
@@ -65,6 +71,14 @@ define(function(require, exports, module) {
             channel = channel || window.now_play_channel;
 
             DBR.act('switch', channel);
+        },
+
+        next: function () {
+            var songs = this.playlist.songs || [];
+
+            this._trigger('radionext', songs[0]);
+            this.load(songs);
+
         },
 
         load: function (playlist) {
@@ -121,6 +135,8 @@ define(function(require, exports, module) {
             if (!contains) {
                 obs[type] = [func];
             }
+
+            return this;
         },
 
         off: function (type, func) {
@@ -146,6 +162,8 @@ define(function(require, exports, module) {
                     }
                 }
             }
+
+            return this;
         },
 
         _trigger: function (type, data) {
@@ -170,6 +188,8 @@ define(function(require, exports, module) {
                     }
                 }
             }
+
+            return this;
         },
 
         _handlerStatus: function () {
