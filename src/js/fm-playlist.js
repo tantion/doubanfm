@@ -38,9 +38,7 @@ define(function(require, exports, module) {
 
             for (var i = 0, len = songs.length; i < len; i++) {
                 if (helper.isEqualSong(song, songs[i])) {
-                    for (var j = 0; j < i; j++) {
-                        delete songs[j];
-                    }
+                    this.songs = songs.slice(i+1);
                     break;
                 }
             }
