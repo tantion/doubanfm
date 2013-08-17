@@ -59,6 +59,7 @@ define(function(require, exports, module) {
             }
 
             if (song) {
+                this.skip();
                 this.load(this.playlist.unshift(song));
             }
         },
@@ -77,6 +78,7 @@ define(function(require, exports, module) {
             var songs = this.playlist.songs || [];
 
             this._trigger('radionext', songs[0]);
+            this.skip();
             this.load(songs);
 
         },
@@ -116,8 +118,8 @@ define(function(require, exports, module) {
             for (var key in obs) {
                 var ob = obs[key];
                 if (obs.hasOwnProperty(key)) {
-                    contains = true;
                     if (key === type) {
+                        contains = true;
                         if (!$.isArray(ob)) {
                             if ($.isFunction(ob)) {
                                 ob = [ob];
@@ -129,6 +131,9 @@ define(function(require, exports, module) {
                         ob = [];
                     }
                     ob.push(func);
+                }
+                if (contains) {
+                    break;
                 }
             }
 
@@ -175,7 +180,7 @@ define(function(require, exports, module) {
 
             for (var key in obs) {
                 var ob = obs[key];
-                if (obs.hasOwnProperty(key)) {
+                if (obs.hasOwnProperty(key) && (type === key)) {
                     if ($.isFunction(ob)) {
                         ob.apply(this, [type].concat(data));
                     }
