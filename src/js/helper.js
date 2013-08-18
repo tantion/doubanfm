@@ -14,40 +14,6 @@ define(function(require, exports, module) {
         },
 
         //
-        // 返回豆瓣 FM 将要播放的列表
-        //
-        getFMPlaylist: function (playlist, song, max) {
-            var fmPlaylist = [];
-            var hasEqualSong = false;
-            var count = 0;
-
-            if (!max) {
-                max = 200;
-            }
-
-            for (var key in playlist) {
-                if (!hasEqualSong) {
-                    if (this.isEqualSong(playlist[key], song)) {
-                        hasEqualSong = true;
-                    }
-                } else {
-                    count++;
-                    if (count <= max) {
-                        fmPlaylist.push(playlist[key]);
-                    } else {
-                        break;
-                    }
-                }
-            }
-
-            if (!fmPlaylist.length) {
-                fmPlaylist = playlist.slice(0, max);
-            }
-
-            return fmPlaylist;
-        },
-
-        //
         // request album url
         //
         requestAlbumUrl: function (song) {
@@ -79,32 +45,7 @@ define(function(require, exports, module) {
             }
 
             return url;
-        },
-
-        cloneAlbum: function (album) {
-            if (album) {
-                return album.concat();
-            }
-            return [];
-        },
-
-        changeAlbumStatus: function ($album, status, data) {
-            switch (status) {
-                case 'loading':
-                    $album.prop('disabled', true);
-                    $album.data('originText', $album.text());
-                    break;
-                case 'pending':
-                    $album.text('还有 ' + data + ' 首');
-                    break;
-                case 'fail':
-                case 'done':
-                    $album.prop('disabled', false);
-                    $album.text($album.data('originText'));
-                    break;
-            }
         }
-
     };
 
 });

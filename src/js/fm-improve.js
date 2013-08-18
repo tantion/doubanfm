@@ -11,7 +11,10 @@ define(function (require, exports, module) {
         this.options = $.extend({}, DoubanFMImprove.defaults, options);
         this.plugins = {
             download: require('js/fm-download'), // download mp3 and album picture
-            private: require('js/fm-private')  // always use private channel play for share url.
+            private: require('js/fm-private'),  // always use private channel play for share url.
+            loop: require('js/fm-loop'), // loop play one song
+            next: require('js/fm-next'), // play next song
+            album: require('js/fm-album') // play album songs
         };
 
         this.$elem = $(elem);
@@ -21,7 +24,7 @@ define(function (require, exports, module) {
     }
 
     DoubanFMImprove.defaults = {
-        enablePlugins: ['download', 'private']
+        enablePlugins: ['download', 'private', 'loop', 'next']
     };
 
     DoubanFMImprove.prototype = {
