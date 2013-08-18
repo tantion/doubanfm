@@ -4,6 +4,9 @@ A chrome extension for Douban FM
 
 ## Change Log
 
+- v0.5.0 - August 19 2013
+    - Module the plugins.
+
 - v0.4.0 - August 11 2013
     - Can play album list songs.
 
