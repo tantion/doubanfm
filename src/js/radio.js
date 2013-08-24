@@ -75,6 +75,8 @@ define(function(require, exports, module) {
         },
 
         next: function () {
+            this._trigger('radionextstart');
+
             var songs = this.playlist.songs || [];
 
             this._trigger('radionext', songs[0]);

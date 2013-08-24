@@ -48,6 +48,7 @@ define(function(require, exports, module) {
             }
             hasInit = true;
             initFmNext($wrap);
-        }
+        },
+        render: renderNextSong
     };
 });

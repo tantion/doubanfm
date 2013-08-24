@@ -24,7 +24,7 @@ define(function (require, exports, module) {
     }
 
     DoubanFMImprove.defaults = {
-        enablePlugins: ['download', 'private', 'loop', 'next']
+        enablePlugins: ['download', 'private', 'loop', 'album', 'next']
     };
 
     DoubanFMImprove.prototype = {

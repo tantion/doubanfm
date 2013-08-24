@@ -60,6 +60,13 @@ define(function(require, exports, module) {
             }
 
             return this.songs;
+        },
+
+        replace: function (songs) {
+            if (!Array.isArray(songs)) {
+                return;
+            }
+            this.songs = songs;
         }
     };
 
