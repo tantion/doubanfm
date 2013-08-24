@@ -7,6 +7,7 @@ define(function(require, exports, module) {
     var helper = require('js/helper');
     var Albumlist = require('js/fm-albumlist');
     var fmNext = require('js/fm-next');
+    var fmLoop = require('js/fm-loop');
     var Radio = require('js/radio');
     var fm = Radio.instance();
 
@@ -89,16 +90,18 @@ define(function(require, exports, module) {
         });
 
         fm.on('radionextstart', function () {
-            if (isAlbumPlay() && albumlist) {
+            if (isAlbumPlay() && albumlist && !fmLoop.isLoop()) {
                 startPlayAlbum = true;
                 fm.playlist.replace(albumlist.songs);
             }
         });
 
         fm.on('radiosongend', function () {
-            if (isAlbumPlay()) {
+            if (isAlbumPlay() && !fmLoop.isLoop()) {
                 startPlayAlbum = true;
-                loadAlbumlist();
+                if (isAlbumlistLower()) {
+                    loadAlbumlist();
+                }
             }
         });
 

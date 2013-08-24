@@ -92,7 +92,7 @@ define(function(require, exports, module) {
 
             for (var key in playlist) {
                 var song = playlist[key];
-                song.like = $.trim(song.like) == true ? "1" : "0";
+                song.like = song.like == true ? "1" : "0";
                 song.length = song.length ? song.length : song.len;
                 song.public_time = song.public_time ? song.public_time : song.pubtime;
             }

@@ -34,6 +34,8 @@ define(function(require, exports, module) {
             }
             hasInit = true;
             initFmLoop($wrap);
-        }
+        },
+
+        isLoop: isLoop
     };
 });
