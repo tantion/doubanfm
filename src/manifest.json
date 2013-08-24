@@ -1,9 +1,9 @@
 {
     "manifest_version": 2,
 
-    "name": "douban.fm improve",
+    "name": "Douban Fm Improve",
     "description": "This extension is for improving douban.fm",
-    "version": "0.5.0",
+    "version": "0.6.0",
 
     "permissions": [
         "webRequest",
