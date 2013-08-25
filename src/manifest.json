@@ -1,9 +1,9 @@
 {
     "manifest_version": 2,
 
-    "name": "Douban Fm Improve",
-    "description": "This extension is for improving douban.fm",
-    "version": "0.6.1",
+    "name": "豆瓣 FM 加强版",
+    "description": "让豆瓣 FM 支持下载 MP3，单曲循环，播放专辑等。",
+    "version": "0.6.2",
 
     "permissions": [
         "webRequest",

@@ -1,10 +1,12 @@
-# Douban FM Improve
+# 豆瓣 FM 加强版
 
-A chrome extension for Douban FM
+让豆瓣 FM 支持下载 MP3，单曲循环，播放专辑等。
 
-Version: 0.6.1
+Version: 0.6.2
 
 播放和下载的 kbps 码率，对于普通用户一般都是 64 kbps，对于 pro 用户取决于你账户的设置。
+
+[Chrome webstore 安装地址](https://chrome.google.com/webstore/detail/douban-fm-improve/dnkciehdibabbdadcjddhonkcpnaffjc)
 
 ## Features
 
