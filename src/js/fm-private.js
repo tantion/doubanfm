@@ -7,7 +7,7 @@ define(function(require, exports, module) {
     var Radio = require('js/radio');
     var fm = Radio.instance();
 
-    var $private = $('<label class="fm-improve-item fm-improve-private"><input type="checkbox" /><span>私人频道</span></label>');
+    var $private = $('<label class="fm-improve-item fm-improve-private"><input type="checkbox" /><span title="使用私人频道播放分享的链接">私人频道</span></label>');
 
     function isPrivate () {
         return $private.find('input[type=checkbox]').prop('checked');
@@ -24,6 +24,13 @@ define(function(require, exports, module) {
                     window.set_cookie({always_use_private: 0}, 365, 'douban.fm');
                 }
             }, this));
+
+        fm.on('radiopause', function () {
+            $private.hide();
+        });
+        fm.on('radioplay', function () {
+            $private.show();
+        });
 
         if (document.cookie.match(/always_use_private=1/i)) {
             $private.find('input[type=checkbox]').prop('checked', true);

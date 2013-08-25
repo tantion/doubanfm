@@ -37,6 +37,13 @@ define(function(require, exports, module) {
         fm.on('radiosongstart', function () {
             renderNextSong(fm.playlist.songs[0]);
         });
+
+        fm.on('radiopause', function () {
+            $next.hide();
+        });
+        fm.on('radioplay', function () {
+            $next.show();
+        });
     }
 
     var hasInit = false;

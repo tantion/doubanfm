@@ -7,7 +7,7 @@ define(function(require, exports, module) {
     var Radio = require('js/radio');
     var fm = Radio.instance();
 
-    var $loop = $('<label class="fm-improve-item fm-improve-loop"><input type="checkbox" /><span>循环播放</span></label>');
+    var $loop = $('<label class="fm-improve-item fm-improve-loop"><input type="checkbox" /><span title="单曲循环">循环播放</span></label>');
 
     var hasInit = false;
 
@@ -24,6 +24,13 @@ define(function(require, exports, module) {
                 fm.playlist.unshift([data.song, data.song]);
                 fm.next();
             }
+        });
+
+        fm.on('radiopause', function () {
+            $loop.hide();
+        });
+        fm.on('radioplay', function () {
+            $loop.show();
         });
     }
 
