@@ -7,7 +7,7 @@ define(function(require, exports, module) {
     var Radio = require('js/radio');
     var fm = Radio.instance();
 
-    var $loop = $('<label><input type="checkbox" /><span>循环播放</span></label>');
+    var $loop = $('<label class="fm-improve-item fm-improve-loop"><input type="checkbox" /><span>循环播放</span></label>');
 
     var hasInit = false;
 

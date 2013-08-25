@@ -12,7 +12,7 @@ define(function(require, exports, module) {
     //require('lib/jplayer/jquery.jplayer.js')($);
 
     var DoubanFMImprove = require('js/fm-improve');
-    var $player = $('#fm-player');
+    var $player = $('#fm-player .player-wrap');
 
     if (!$player.length) {
         return;

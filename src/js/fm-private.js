@@ -7,7 +7,7 @@ define(function(require, exports, module) {
     var Radio = require('js/radio');
     var fm = Radio.instance();
 
-    var $private = $('<label><input type="checkbox" /><span>私人频道</span></label>');
+    var $private = $('<label class="fm-improve-item fm-improve-private"><input type="checkbox" /><span>私人频道</span></label>');
 
     function isPrivate () {
         return $private.find('input[type=checkbox]').prop('checked');

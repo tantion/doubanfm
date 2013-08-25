@@ -21,7 +21,8 @@
         "config.js",
         "seajs/*.js",
         "js/*.js",
-        "lib/*.js"
+        "lib/*.js",
+        "images/*.png"
     ],
     "background": {
         "scripts": ["background.js"]

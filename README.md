@@ -2,6 +2,8 @@
 
 A chrome extension for Douban FM
 
+Version: 0.6.0
+
 播放和下载的 kbps 码率，对于普通用户一般都是 64 kbps，对于 pro 用户取决于你账户的设置。
 
 ## Features
@@ -17,6 +19,7 @@ A chrome extension for Douban FM
 - 工具栏快捷加红心按钮和快捷下一首按钮
 - 从专辑页面单个歌曲链接到 FM 播放
 - 在 FM 播放节目单的歌曲
+- 借助谷歌或微博歌曲搜索
 
 ## License
 

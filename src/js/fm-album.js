@@ -13,7 +13,7 @@ define(function(require, exports, module) {
 
     var albumlist = null;
 
-    var $album = $('<label><input type="checkbox" /><span>播放专辑</span></label>');
+    var $album = $('<label class="fm-improve-item fm-improve-album"><input type="checkbox" /><span>播放专辑</span></label>');
 
     var hasInit = false;
     var isQuerying = false;

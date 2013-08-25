@@ -7,8 +7,8 @@ define(function(require, exports, module) {
     var Radio = require('js/radio');
     var fm = Radio.instance();
 
-    var $download = $('<a class="fm-improve-download" download="">下载</a>');
-    var $picture = $('<a class="fm-improve-picture" dowload=""><img src=""></a>');
+    var $download = $('<a class="fm-improve-item fm-improve-download" download="">下载</a>');
+    var $picture = $('<a class="fm-improve-item fm-improve-picture" dowload=""><img src=""></a>');
 
     var hasInit = false;
 

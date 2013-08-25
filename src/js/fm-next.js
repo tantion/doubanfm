@@ -7,8 +7,8 @@ define(function(require, exports, module) {
     var Radio = require('js/radio');
     var fm = Radio.instance();
 
-    var $next = $('<button>下一首</button>');
-    var $nextSong = $('<span class="fm-improve-info"></span>');
+    var $next = $('<button class="fm-improve-item fm-improve-next">下一首</button>');
+    var $nextSong = $('<span class="fm-improve-item fm-improve-info"></span>');
 
     function renderNextSong (song) {
         if (!song) {
