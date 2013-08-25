@@ -3,7 +3,7 @@
 
     "name": "Douban Fm Improve",
     "description": "This extension is for improving douban.fm",
-    "version": "0.6.0",
+    "version": "0.6.1",
 
     "permissions": [
         "webRequest",

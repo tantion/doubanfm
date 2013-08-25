@@ -4,7 +4,8 @@ A chrome extension for Douban FM
 
 ## Change Log
 
-- v0.6.0 - August 25 2013
+- v0.6.1 - August 25 2013
+    - Beautify action button.
     - Added album list play plugins.
 
 - v0.5.0 - August 19 2013

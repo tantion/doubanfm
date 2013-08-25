@@ -2,7 +2,7 @@
 
 A chrome extension for Douban FM
 
-Version: 0.6.0
+Version: 0.6.1
 
 播放和下载的 kbps 码率，对于普通用户一般都是 64 kbps，对于 pro 用户取决于你账户的设置。
 
