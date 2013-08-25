@@ -61,27 +61,27 @@ fm-player .player-wrap {
     opacity: 0.8;
 }
 #fm-improve .fm-improve-private input[type=checkbox]:checked + span {
-     background: url(chrome-extension://okmihlghcdihcapgmjckmidnkobkimpk/images/people_checked.png) no-repeat 0 0;
+     background: url(chrome-extension://dnkciehdibabbdadcjddhonkcpnaffjc/images/people_checked.png) no-repeat 0 0;
      background-size: 100%;
  }
 #fm-improve .fm-improve-private input[type=checkbox] + span {
-    background: url(chrome-extension://okmihlghcdihcapgmjckmidnkobkimpk/images/people_unchecked.png) no-repeat 0 0;
+    background: url(chrome-extension://dnkciehdibabbdadcjddhonkcpnaffjc/images/people_unchecked.png) no-repeat 0 0;
     background-size: 100%;
 }
 #fm-improve .fm-improve-loop input[type=checkbox]:checked + span {
-    background: url(chrome-extension://okmihlghcdihcapgmjckmidnkobkimpk/images/loop_checked.png) no-repeat 0 center;
+    background: url(chrome-extension://dnkciehdibabbdadcjddhonkcpnaffjc/images/loop_checked.png) no-repeat 0 center;
     background-size: 100%;
 }
 #fm-improve .fm-improve-loop input[type=checkbox] + span {
-    background: url(chrome-extension://okmihlghcdihcapgmjckmidnkobkimpk/images/loop_unchecked.png) no-repeat 0 center;
+    background: url(chrome-extension://dnkciehdibabbdadcjddhonkcpnaffjc/images/loop_unchecked.png) no-repeat 0 center;
     background-size: 100%;
 }
 #fm-improve .fm-improve-album input[type=checkbox]:checked + span {
-    background: url(chrome-extension://okmihlghcdihcapgmjckmidnkobkimpk/images/album_checked.png) no-repeat 0 0;
+    background: url(chrome-extension://dnkciehdibabbdadcjddhonkcpnaffjc/images/album_checked.png) no-repeat 0 0;
     background-size: 100%;
 }
 #fm-improve .fm-improve-album input[type=checkbox] + span {
-    background: url(chrome-extension://okmihlghcdihcapgmjckmidnkobkimpk/images/album_unchecked.png) no-repeat 0 0;
+    background: url(chrome-extension://dnkciehdibabbdadcjddhonkcpnaffjc/images/album_unchecked.png) no-repeat 0 0;
     background-size: 100%;
 }
 #fm-improve .fm-improve-next {
@@ -92,7 +92,7 @@ fm-player .player-wrap {
     font-size: 0;
     left: 272px;
     top: 188px;
-    background: url(chrome-extension://okmihlghcdihcapgmjckmidnkobkimpk/images/next.png) no-repeat 0 0;
+    background: url(chrome-extension://dnkciehdibabbdadcjddhonkcpnaffjc/images/next.png) no-repeat 0 0;
     background-size: 100%;
     opacity: 0.9;
 }
