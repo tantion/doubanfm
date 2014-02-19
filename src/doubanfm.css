@@ -1,1 +1,16 @@
 
+.fm-improve-download-bar {
+    margin-left: -60px;
+}
+.fm-improve-download-bar img {
+    display: none;
+}
+.fm-improve-download-bar .fm-improve-item {
+    color: rgb(92, 192, 153);
+    background: none;
+    margin-right: 5px;
+    transition: 0.5s;
+}
+.fm-improve-download-bar .fm-improve-item:hover {
+    opacity: 0.8;
+}

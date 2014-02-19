@@ -7,8 +7,8 @@ define(function(require, exports, module) {
     var Radio = require('js/radio');
     var fm = Radio.instance();
 
-    var $download = $('<a class="fm-improve-item fm-improve-download" download="">下载</a>');
-    var $picture = $('<a class="fm-improve-item fm-improve-picture" dowload=""><img src=""></a>');
+    var $download = $('<a class="fm-improve-item fm-improve-download" download="">下载 MP3</a>');
+    var $picture = $('<a class="fm-improve-item fm-improve-picture" dowload=""><img src=""><span>下载封面</span></a>');
 
     var hasInit = false;
 
@@ -38,8 +38,11 @@ define(function(require, exports, module) {
 
     function initFmDownload ($wrap) {
 
-        $wrap.append($picture)
-            .append($download);
+        var $downloadBar = $('<div class="fm-improve-download-bar"></div>');
+
+        $downloadBar.append($download).append($picture);
+
+        $('#simulate-sec').append($downloadBar);
 
         fm.on('radiosongstart', function (type, data) {
             renderFMDownload(data.song);
