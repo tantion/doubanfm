@@ -11,6 +11,10 @@ define(function(require, exports, module) {
     // jquery plugins
     //require('lib/jplayer/jquery.jplayer.js')($);
 
+    // disable ads
+    var ads = require('js/ad');
+    ads.disable();
+
     var DoubanFMImprove = require('js/fm-improve');
     var $player = $('#fm-player .player-wrap');
 

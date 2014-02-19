@@ -3,11 +3,17 @@
 //
 define(function(require, exports, module) {
 
+    function removeBannerAd () {
+        window.initBannerAd = window.disableBannerAd = window.enableBannerAd = function () {};
+    }
+
     module.exports = {
         disable: function () {
-            if (window.disableBannerAd) {
+            removeBannerAd();
+            Do.ready('fm-bannerad', 'fm-bgad', function() {
                 disableBannerAd();
-            }
+                removeBannerAd();
+            });
         }
     };
 

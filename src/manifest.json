@@ -1,9 +1,9 @@
 {
     "manifest_version": 2,
 
-    "name": "豆瓣 FM 加强版",
-    "description": "让豆瓣 FM 支持下载 MP3，单曲循环，播放专辑等。",
-    "version": "0.6.3",
+    "name": "豆瓣 FM 下载",
+    "description": "让豆瓣 FM 支持下载 MP3 及封面图片。",
+    "version": "1.0.0",
 
     "permissions": [
         "webRequest",
@@ -19,13 +19,15 @@
     },
     "web_accessible_resources": [
         "config.js",
-        "seajs/*.js",
-        "js/*.js",
-        "lib/*.js",
-        "images/*.png"
+        "seajs/*.*",
+        "js/*.*",
+        "lib/*.*",
+        "images/*.*"
     ],
     "background": {
-        "scripts": ["background.js"]
+        "scripts": [
+            //"background.js"
+        ]
     },
     "content_scripts": [{
         "matches": ["http://douban.fm/*"],

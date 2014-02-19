@@ -1,5 +1,5 @@
 //
-// Call remote hosts
+// cross domain request
 //
 (function () {
 
