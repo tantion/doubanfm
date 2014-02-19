@@ -4,6 +4,10 @@ A chrome extension for Douban FM
 
 ## Change Log
 
+- v1.0.0
+   - Only for download mp3 and album cover image.
+   - Disabled douban ads.
+
 - v0.6.2 - August 25 2013
     - Added Chinese description.
     - Beautify action button.
