@@ -4,13 +4,9 @@
 define(function(require, exports, module) {
 
     var $ = require('jquery');
-    var Radio = require('js/radio');
-    var fm = Radio.instance();
-
     var $download = $('<a class="fm-improve-item fm-improve-download" download="">下载 MP3</a>');
     var $picture = $('<a class="fm-improve-item fm-improve-picture" dowload=""><img src=""><span>下载封面</span></a>');
-
-    var hasInit = false;
+    var hasInited = false;
 
     function renderFMDownload (song) {
 
@@ -26,36 +22,37 @@ define(function(require, exports, module) {
         $download
             .attr('href', song.url)
             .attr('download', fileName)
-            .attr('title', fileName)
+            .attr('title', fileName);
 
         $picture
             .attr('href', song.picture)
             .attr('download', pictureName)
             .attr('title', pictureName)
             .find('img')
-            .attr('src', song.picture)
+            .attr('src', song.picture);
     }
 
-    function initFmDownload ($wrap) {
+    function initRender () {
+        $('#simulate-sec').append(
+            $('<div class="fm-improve-download-bar"></div>').append($download).append($picture)
+        );
+    }
 
-        var $downloadBar = $('<div class="fm-improve-download-bar"></div>');
-
-        $downloadBar.append($download).append($picture);
-
-        $('#simulate-sec').append($downloadBar);
-
-        fm.on('radiosongstart', function (type, data) {
-            renderFMDownload(data.song);
+    function init () {
+        Do.ready('fm-player', function () {
+            window.$(window).bind('radio:start', function (evt, data) {
+                if (data && data.song) {
+                    if (!hasInited) {
+                        initRender();
+                        hasInited = true;
+                    }
+                    renderFMDownload(data.song);
+                }
+            });
         });
     }
 
     module.exports = {
-        init: function ($wrap) {
-            if (hasInit) {
-                return true;
-            }
-            hasInit = true;
-            initFmDownload($wrap);
-        }
+        init: init
     };
 });

@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
 
-    "name": "豆瓣 FM 下载",
-    "description": "让豆瓣 FM 支持下载 MP3 及封面图片。",
+    "name": "豆瓣FM音乐助手",
+    "description": "让豆瓣FM支持下载MP3和封面图片，可以播放红心、专辑、节目中的歌曲。",
     "version": "1.0.0",
 
     "permissions": [
@@ -29,7 +29,7 @@
         ]
     },
     "content_scripts": [{
-        "matches": ["http://douban.fm/*"],
+        "matches": ["http://douban.fm/*", "http://music.douban.com/*"],
         "css":     ["doubanfm.css"],
         "js":      ["doubanfm.js"],
         "run_at":  "document_end"

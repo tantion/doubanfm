@@ -12,7 +12,7 @@
         script.src = url;
         script.type = 'text/javascript';
 
-        for (key in options) {
+        for (var key in options) {
             script.setAttribute(key, options[key]);
         }
 

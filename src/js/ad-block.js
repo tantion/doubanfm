@@ -8,7 +8,7 @@ define(function(require, exports, module) {
     }
 
     module.exports = {
-        disable: function () {
+        block: function () {
             removeBannerAd();
             Do.ready('fm-bannerad', 'fm-bgad', function() {
                 disableBannerAd();
