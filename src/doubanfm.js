@@ -2,6 +2,8 @@
 // bootstrap for script
 //
 (function () {
+    "use strict";
+
     function injectScript (src, options) {
         var url = src;
         if (url.indexOf('chrome-extension://') !== 0) {
@@ -13,7 +15,9 @@
         script.type = 'text/javascript';
 
         for (var key in options) {
-            script.setAttribute(key, options[key]);
+            if (options.hasOwnProperty('key')) {
+                script.setAttribute(key, options[key]);
+            }
         }
 
         document.body.appendChild(script);

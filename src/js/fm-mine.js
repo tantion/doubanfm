@@ -2,6 +2,7 @@
 // fm mine page improve
 //
 define(function(require, exports, module) {
+    "use strict";
 
     var $ = require('jquery');
     var helper = require('helper');
@@ -31,7 +32,7 @@ define(function(require, exports, module) {
                         var song = null;
 
                         if (songs) {
-                            for (var i = 0, len = songs.length; i < len; i++) {
+                            for (var i = 0, len = songs.length; i < len; i += 1) {
                                 if (songs[i].sid === id) {
                                     song = songs[i];
                                     break;

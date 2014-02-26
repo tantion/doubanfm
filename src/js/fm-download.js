@@ -2,6 +2,7 @@
 // fm download mp3 and album picture improve
 //
 define(function(require, exports, module) {
+    "use strict";
 
     var $ = require('jquery');
     var $download = $('<a class="fm-improve-item fm-improve-download" download="">下载 MP3</a>');

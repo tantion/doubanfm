@@ -2,6 +2,7 @@
 // remove douban ads
 //
 define(function(require, exports, module) {
+    "use strict";
 
     function removeBannerAd () {
         window.initBannerAd = window.disableBannerAd = window.enableBannerAd = function () {};
@@ -11,7 +12,7 @@ define(function(require, exports, module) {
         block: function () {
             removeBannerAd();
             Do.ready('fm-bannerad', 'fm-bgad', function() {
-                disableBannerAd();
+                window.disableBannerAd();
                 removeBannerAd();
             });
         }

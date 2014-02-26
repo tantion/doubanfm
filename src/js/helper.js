@@ -2,12 +2,15 @@
 // helpful function
 //
 define(function(require, exports, module) {
+    "use strict";
+
+    var $ = require('jquery');
 
     var helper = {
         subjectId: function (path) {
             path = '' + path;
 
-            var matches = path.match(/subject\/(\w+)\//i);
+            var matches = path.match(/subject\/(\w+)\//i),
                 subjectId = matches ? matches[1] : '';
 
             return subjectId;

@@ -2,6 +2,7 @@
 // cross domain request
 //
 (function () {
+    "use strict";
 
     chrome.webRequest.onHeadersReceived.addListener(
         function(details) {
@@ -11,7 +12,7 @@
             var value = "http://douban.fm";
             var flag = false;
 
-            for (var i = 0, len = responseHeaders.length; i < len; i++) {
+            for (var i = 0, len = responseHeaders.length; i < len; i += 1) {
                 var header = responseHeaders[i];
                 if (header.name === name) {
                     header.value += "; " + value;
