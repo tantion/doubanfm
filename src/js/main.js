@@ -11,4 +11,7 @@ define(function(require, exports, module) {
 
     // 下载当前播放的音乐
     require('js/fm-download').init();
+
+    // 为 douban.fm/mine 页面添加实用的链接功能
+    require('js/fm-mine').init();
 });
