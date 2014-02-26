@@ -29,16 +29,7 @@ define(function(require, exports, module) {
                 if (subjectId ) {
                     helper.subjectList(subjectId)
                     .done(function (songs) {
-                        var song = null;
-
-                        if (songs) {
-                            for (var i = 0, len = songs.length; i < len; i += 1) {
-                                if (songs[i].sid === id) {
-                                    song = songs[i];
-                                    break;
-                                }
-                            }
-                        }
+                        var song = helper.findById(songs, id);
 
                         if (song) {
                             href = helper.fmLink(song.sid, song.ssid);

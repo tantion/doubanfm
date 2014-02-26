@@ -38,12 +38,25 @@ define(function(require, exports, module) {
             return dfd.promise();
         },
 
+        findById: function (songs, sid) {
+            var song = null;
+
+            for (var i = 0, len = songs.length; i < len; i += 1) {
+                if (songs[i].sid === sid) {
+                    song = songs[i];
+                    break;
+                }
+            }
+
+            return song;
+        },
+
         fmLink: function (sid, ssid, cid) {
             var href = 'http://douban.fm/?start=#sid#g#ssid#g#channel#&cid=#cid#',
                 channel = 0;
 
             if (typeof cid === 'undefined') {
-                cid = 2000000 + parseInt(sid);
+                cid = 2000000 + parseInt(sid, 10);
             } else {
                 channel = cid;
             }
