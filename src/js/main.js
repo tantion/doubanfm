@@ -7,6 +7,11 @@ define(function(require, exports, module) {
     "use strict";
 
     // 通过 require 引入依赖
+    var $ = require('jquery');
+
+    // 加载 jquery 插件
+    require('lib/tipsy/jquery.tipsy.js')($);
+
     // 移除广告
     require('js/ad-block').block();
 

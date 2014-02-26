@@ -15,3 +15,8 @@
 .fm-improve-download-bar .fm-improve-item:hover {
     opacity: 0.8;
 }
+
+/* fm-mine */
+.fm-improve-mine-link:hover {
+    opacity: 0.8;
+}

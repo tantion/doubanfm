@@ -16,14 +16,26 @@ define(function(require, exports, module) {
             return subjectId;
         },
 
-        subjectList: function (subjectId) {
+        subjectList: function (albumPath) {
             var dfd = new $.Deferred();
 
-            if (subjectId) {
-                $.get('http://douban.fm/j/mine/playlist?type=n&sid=&pt=0.0&channel=0&context=channel:0|subject_id:#subjectId#&from=mainsite'.replace(/#subjectId#/g, subjectId), 'json')
-                .done(function (data) {
-                    if (data && data.song) {
-                        dfd.resolve(data.song);
+            if (albumPath) {
+                $.get(albumPath)
+                .done(function (html) {
+                    var $html = $($.parseHTML(html)),
+                        $songs = $html.find('.song-item'),
+                        songs = [];
+
+                    $songs.each(function () {
+                        var $item = $(this);
+                        songs.push({
+                            sid: $item.attr('id'),
+                            ssid: $item.data('ssid')
+                        });
+                    });
+
+                    if (songs.length) {
+                        dfd.resolve(songs);
                     } else {
                         dfd.reject();
                     }
@@ -38,11 +50,22 @@ define(function(require, exports, module) {
             return dfd.promise();
         },
 
+        equalNum: function (str1, str2) {
+            if ($.type(str1) !== 'str') {
+                str1 = '' + str1;
+            }
+            if (str1.match(str2)) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
         findById: function (songs, sid) {
             var song = null;
 
             for (var i = 0, len = songs.length; i < len; i += 1) {
-                if (songs[i].sid === sid) {
+                if (this.equalNum(songs[i].sid, sid)) {
                     song = songs[i];
                     break;
                 }

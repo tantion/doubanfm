@@ -5,46 +5,35 @@ define(function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery');
-    var helper = require('helper');
-
-    // 在 target 页面打开该链接
-    function openInTab (href, target) {
-        window.open(href, target || '_fm');
-    }
+    var helper = require('js/helper');
 
     var cacheMap = {};
 
     function getLinkDefer ($link) {
         var id = $link.data('id'),
-            album = $link.data('album') || '',
+            album = $link.data('album'),
             href = cacheMap[id],
-            subjectId = '',
             dfd = new $.Deferred();
 
         if (id) {
             if (href) {
                 dfd.resolve(href);
             } else {
-                subjectId = helper.subjectId(album);
-                if (subjectId ) {
-                    helper.subjectList(subjectId)
-                    .done(function (songs) {
-                        var song = helper.findById(songs, id);
+                helper.subjectList(album)
+                .done(function (songs) {
+                    var song = helper.findById(songs, id);
 
-                        if (song) {
-                            href = helper.fmLink(song.sid, song.ssid);
-                            cacheMap[id] = href;
-                            dfd.resolve(href);
-                        } else {
-                            dfd.reject();
-                        }
-                    })
-                    .fail(function () {
+                    if (song) {
+                        href = helper.fmLink(song.sid, song.ssid);
+                        cacheMap[id] = href;
+                        dfd.resolve(href);
+                    } else {
                         dfd.reject();
-                    });
-                } else {
+                    }
+                })
+                .fail(function () {
                     dfd.reject();
-                }
+                });
             }
         } else {
             dfd.reject();
@@ -69,21 +58,33 @@ define(function(require, exports, module) {
 
         $tmpl.html(tmpl);
 
-        $('#record_viewer').on('click', '.fm-improve-mine-link', function (evt) {
+        $('#record_viewer')
+        //.on('mouseenter', '.fm-improve-mine-link', function (evt) {
+            //$(this).tipsy({gravity: 's'}).tipsy('show');
+        //})
+        .on('click', '.fm-improve-mine-link', function (evt) {
             var $link = $(this),
                 href = $link.attr('href') || '',
-                target = $link.attr('target'),
+                target = $link.attr('target') || '_fm',
                 dfd = getLinkDefer($link);
 
             if (!href.match(/^javascript/)) {
                 return;
             }
 
+            // 如果不这样的话，会提示 block popup
+            var fm = window.open('/', target);
+
             opened = false;
             dfd.done(function (link) {
                 if (!opened) {
-                    openInTab(href, target);
+                    $link.attr('href', link);
+                    fm.location.href = link;
+                    fm = null;
                 }
+            })
+            .fail(function () {
+                $link.attr('title', '找不到播放链接');
             });
         });
     }
