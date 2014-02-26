@@ -39,6 +39,11 @@ define(function(require, exports, module) {
     }
 
     function init () {
+
+        if (!$('#simulate-sec').length) {
+            return;
+        }
+
         Do.ready('fm-player', function () {
             window.$(window).bind('radio:start', function (evt, data) {
                 if (data && data.song) {
