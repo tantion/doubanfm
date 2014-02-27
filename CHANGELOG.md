@@ -4,6 +4,9 @@ A chrome extension for Douban FM
 
 ## Change Log
 
+- v1.6.0 - February 28 2014
+   - Added grunt for project build tool.
+
 - v1.5.0 - February 27 2014
    - Added fm-mine module.
    - Added fm-subject module.
