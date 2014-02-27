@@ -1,0 +1,1 @@
+define(function(require){"use strict";var a=require("jquery");require("lib/tipsy/jquery.tipsy.js")(a),require("js/ad-block").block(),require("js/fm-download").init(),require("js/fm-mine").init(),require("js/fm-subject").init(),require("js/fm-programme").init()});
