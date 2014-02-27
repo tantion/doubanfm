@@ -19,8 +19,34 @@ module.exports = function(grunt) {
         stripBanners: true
       },
       dist: {
-        src: [],
-        dest: ''
+        //src: [],
+        //dest: ''
+      }
+    },
+    replace: {
+      dist: {
+        options: {
+          patterns: [
+            {
+              match: /"version": "[\d\.]+"/,
+              replacement: '"version": "<%= pkg.version %>"',
+              expression: true
+            }, {
+              match: /"description": ".+"/,
+              replacement: '"description": "<%= pkg.description%>"',
+              expression: true
+            }, {
+              match: /\?v[\d\.]+'/,
+              replacement: '?v<%= pkg.version %>\'',
+              expression: true
+            }
+          ]
+        },
+        files: {
+          'src/manifest.json': 'src/manifest.json',
+          'src/config.js': 'src/config.js',
+          'src/doubanfm.js': 'src/doubanfm.js'
+        }
       }
     },
     uglify: {
@@ -28,8 +54,8 @@ module.exports = function(grunt) {
         banner: '<%= banner %>'
       },
       dist: {
-        src: '',
-        dest: ''
+        //src: '',
+        //dest: ''
       }
     },
     jshint: {
@@ -43,17 +69,22 @@ module.exports = function(grunt) {
       gruntfile: {
         files: '<%= jshint.gruntfile.src %>',
         tasks: ['jshint:gruntfile']
+      },
+      packagefile: {
+        files: 'package.json',
+        tasks: ['replace:dist']
       }
     }
   });
 
   // These plugins provide necessary tasks.
+  grunt.loadNpmTasks('grunt-replace');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
+  grunt.registerTask('default', ['replace', 'jshint', 'concat', 'uglify']);
 
 };
