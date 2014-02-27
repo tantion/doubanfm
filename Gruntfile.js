@@ -16,6 +16,7 @@ module.exports = function(grunt) {
     concat: {
       options: {
         banner: '<%= banner %>',
+        separator: '\n',
         stripBanners: true
       },
       dist: {
@@ -57,6 +58,7 @@ module.exports = function(grunt) {
     },
     jshint: {
       options: {
+        jshintrc: '.jshintrc'
       },
       gruntfile: {
         src: 'Gruntfile.js'
@@ -70,7 +72,7 @@ module.exports = function(grunt) {
     },
     uglify: {
       options: {
-        banner: '<%= banner %>',
+        //banner: '<%= banner %>',
         mangle: {
           except: ['require']
         }
@@ -84,7 +86,21 @@ module.exports = function(grunt) {
         }]
       }
     },
+    cssmin: {
+      options: {
+        //banner: '<%= banner %>'
+      },
+      dist: {
+        expand: true,
+        cwd: 'dist/',
+        src: '**/*.css',
+        dest: 'dist/'
+      }
+    },
     watch: {
+      options: {
+        livereload: true
+      },
       gruntfile: {
         files: '<%= jshint.gruntfile.src %>',
         tasks: ['jshint:gruntfile']
@@ -107,9 +123,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Default task.
-  grunt.registerTask('default', ['replace', 'clean', 'copy', 'jshint', 'concat', 'uglify']);
+  grunt.registerTask('default', ['replace', 'clean', 'copy', 'jshint', 'concat', 'uglify', 'cssmin']);
 
 };
