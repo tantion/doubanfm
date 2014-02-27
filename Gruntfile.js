@@ -55,20 +55,33 @@ module.exports = function(grunt) {
         files: [{expand: true, cwd: 'src/', src: ['**'], dest: 'dist/'}]
       }
     },
-    uglify: {
-      options: {
-        banner: '<%= banner %>'
-      },
-      dist: {
-        //src: '',
-        //dest: ''
-      }
-    },
     jshint: {
       options: {
       },
       gruntfile: {
         src: 'Gruntfile.js'
+      },
+      dev: {
+        src: 'src/js/**/*.js'
+      },
+      dist: {
+        src: 'dist/js/**/*.js'
+      }
+    },
+    uglify: {
+      options: {
+        banner: '<%= banner %>',
+        mangle: {
+          except: ['require']
+        }
+      },
+      dist: {
+        files: [{
+          expand: true,
+          cwd: 'dist/',
+          src: '**/*.js',
+          dest: 'dist/'
+        }]
       }
     },
     watch: {
@@ -79,6 +92,10 @@ module.exports = function(grunt) {
       packagefile: {
         files: 'package.json',
         tasks: ['replace:dist']
+      },
+      devjs: {
+        files: '<%= jshint.dev.src %>',
+        tasks: ['jshint:dev']
       }
     }
   });
