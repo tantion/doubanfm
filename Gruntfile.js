@@ -50,7 +50,7 @@ module.exports = function(grunt) {
         }
       }
     },
-    clean: ['dist/*'],
+    clean: ['dist/*', 'dist.zip'],
     copy: {
       dist: {
         files: [{expand: true, cwd: 'src/', src: ['**'], dest: 'dist/'}]
@@ -97,6 +97,12 @@ module.exports = function(grunt) {
         dest: 'dist/'
       }
     },
+    zip: {
+      dist: {
+        src: 'dist/**',
+        dest: 'dist.zip'
+      }
+    },
     watch: {
       options: {
         livereload: true
@@ -125,8 +131,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-zip');
 
   // Default task.
-  grunt.registerTask('default', ['replace', 'clean', 'copy', 'jshint', 'concat', 'uglify', 'cssmin']);
+  grunt.registerTask('default', ['replace', 'clean', 'copy', 'jshint', 'concat', 'uglify', 'cssmin', 'zip']);
 
 };

@@ -1,3 +1,4 @@
 .*.swp
 src.zip
+dist.zip
 node_modules/*
