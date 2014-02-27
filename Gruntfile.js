@@ -50,6 +50,11 @@ module.exports = function(grunt) {
       }
     },
     clean: ['dist/*'],
+    copy: {
+      dist: {
+        files: [{expand: true, cwd: 'src/', src: ['**'], dest: 'dist/'}]
+      }
+    },
     uglify: {
       options: {
         banner: '<%= banner %>'
@@ -81,12 +86,13 @@ module.exports = function(grunt) {
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-replace');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Default task.
-  grunt.registerTask('default', ['replace', 'clean', 'jshint', 'concat', 'uglify']);
+  grunt.registerTask('default', ['replace', 'clean', 'copy', 'jshint', 'concat', 'uglify']);
 
 };
