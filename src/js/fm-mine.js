@@ -1,5 +1,6 @@
 //
 // fm mine page improve
+// http://douban.fm/mine
 //
 define(function(require, exports, module) {
     "use strict";

@@ -1,5 +1,6 @@
 //
 // fm download mp3 and album picture improve
+// http://douban.fm
 //
 define(function(require, exports, module) {
     "use strict";

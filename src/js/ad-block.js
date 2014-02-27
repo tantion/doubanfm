@@ -1,5 +1,6 @@
 //
 // remove douban ads
+// http://douban.fm
 //
 define(function(require, exports, module) {
     "use strict";
