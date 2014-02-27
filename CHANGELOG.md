@@ -4,7 +4,13 @@ A chrome extension for Douban FM
 
 ## Change Log
 
-- v1.0.0
+- v1.5.0 - February 27 2014
+   - Added fm-mine module.
+   - Added fm-subject module.
+   - Added fm-programme module.
+   - Code Refactor.
+
+- v1.0.0 - February 20 2014
    - Only for download mp3 and album cover image.
    - Disabled douban ads.
 

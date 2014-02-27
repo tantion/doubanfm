@@ -1,6 +1,6 @@
 //
-// music subject page improve
-// http://music.douban.com/subject/:id
+// music programme page improve
+// http://music.douban.com/programme/:id
 //
 define(function(require, exports, module) {
     "use strict";
@@ -9,14 +9,14 @@ define(function(require, exports, module) {
         helper = require('js/helper');
 
     function init () {
-        if (!location.href.match(/^http:\/\/music\.douban\.com\/subject\/\d+/)) {
+        if (!location.href.match(/^http:\/\/music\.douban\.com\/programme\/\d+/)) {
             return;
         }
 
         $('.song-item').each(function () {
             var $song = $(this),
-                href = helper.fmLink($song.attr('id'), $song.data('ssid')),
-                $name = $song.find('.song-name'),
+                href = helper.fmLink($song.data('songid'), $song.data('ssid')),
+                $name = $song.find('span').eq(1),
                 name = $.trim($name.text()),
                 rpl = '<a href="#href#" target="_fm" title="在 FM 播放">#name#</a>'.replace('#name#', name).replace('#href#', href);
 
