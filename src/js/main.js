@@ -26,4 +26,7 @@ define(function(require, exports, module) {
 
     // 为 music.douban.com/programme/:id 页面添加在FM播放的链接功能
     require('js/fm-programme').init();
+
+    // 为 music.douban.com/musician/:id 页面添加在FM播放的链接功能
+    require('js/fm-musician').init();
 });
