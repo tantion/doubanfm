@@ -93,13 +93,15 @@ define(function(require, exports, module) {
         },
 
         search: function (key) {
-            var dfd = new $.Deferred();
+            var dfd = new $.Deferred(),
+                url = '';
 
             key += ' @豆瓣FM';
+            url = 'http://s.weibo.com/wb/' + encodeURIComponent(key);
 
             $.ajax({
                 type: 'get',
-                url: 'http://s.weibo.com/wb/' + encodeURIComponent(key),
+                url: url,
                 xhrFields: {
                     withCredentials: true
                 }
@@ -114,23 +116,33 @@ define(function(require, exports, module) {
                     html = matches[1];
                 }
 
-                html = $.parseJSON(html);
-                $html = $($.parseHTML(html));
+                try {
+                    html = $.parseJSON(html);
+                    $html = $($.parseHTML(html));
 
-                $html.find('.feed_list').each(function () {
-                    var $item = $(this),
-                    $em = $item.find('em').eq(0),
-                    $link = $em.find('a[title^="http://douban.fm"]'),
-                    $img = $item.find('.piclist img.bigcursor').eq(0);
+                    $html.find('.feed_list').each(function () {
+                        var $item = $(this),
+                        $em = $item.find('em').eq(0),
+                        $link = $em.find('a[title^="http://douban.fm"]'),
+                        $img = $item.find('.piclist img.bigcursor').eq(0);
 
-                    $link.remove();
+                        $link.remove();
 
-                    items.push({
-                        title: $em.text(),
-                        url: $link.attr('title'),
-                        img: $img.attr('src')
+                        items.push({
+                            title: $em.text(),
+                            url: $link.attr('title'),
+                            img: $img.attr('src')
+                        });
                     });
-                });
+                } catch (e) {
+                    // 可能是搜索太频繁，需要验证码
+                    items = [{
+                        title: '可能是搜索太频繁，需要验证码，点击查看具体事项。',
+                        url: url,
+                        target: '_blank',
+                        img: ''
+                    }];
+                }
 
                 dfd.resolve(items);
             })
