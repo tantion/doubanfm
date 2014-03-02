@@ -126,13 +126,15 @@ define(function(require, exports, module) {
                         $link = $em.find('a[title^="http://douban.fm"]'),
                         $img = $item.find('.piclist img.bigcursor').eq(0);
 
-                        $link.remove();
+                        if ($link.length) {
+                            $link.remove();
 
-                        items.push({
-                            title: $em.text(),
-                            url: $link.attr('title'),
-                            img: $img.attr('src')
-                        });
+                            items.push({
+                                title: $em.text(),
+                                url: $link.attr('title'),
+                                img: $img.attr('src')
+                            });
+                        }
                     });
                 } catch (e) {
                     // 可能是搜索太频繁，需要验证码
