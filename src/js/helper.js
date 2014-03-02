@@ -90,6 +90,55 @@ define(function(require, exports, module) {
                        .replace('#channel#', channel);
 
             return href;
+        },
+
+        search: function (key) {
+            var dfd = new $.Deferred();
+
+            key += ' @豆瓣FM';
+
+            $.ajax({
+                type: 'get',
+                url: 'http://s.weibo.com/wb/' + encodeURIComponent(key),
+                xhrFields: {
+                    withCredentials: true
+                }
+            })
+            .done(function (data) {
+                var matches = data.match(/"pid":"pl_wb_feedlist".+,"html":(".*")}\)<\/script>/),
+                items = [],
+                $html = null,
+                html = '';
+
+                if (matches && matches.length > 1) {
+                    html = matches[1];
+                }
+
+                html = $.parseJSON(html);
+                $html = $($.parseHTML(html));
+
+                $html.find('.feed_list').each(function () {
+                    var $item = $(this),
+                    $em = $item.find('em').eq(0),
+                    $link = $em.find('a[title^="http://douban.fm"]'),
+                    $img = $item.find('.piclist img.bigcursor').eq(0);
+
+                    $link.remove();
+
+                    items.push({
+                        title: $em.text(),
+                        url: $link.attr('title'),
+                        img: $img.attr('src')
+                    });
+                });
+
+                dfd.resolve(items);
+            })
+            .fail(function () {
+                dfd.reject();
+            });
+
+            return dfd.promise();
         }
     };
 

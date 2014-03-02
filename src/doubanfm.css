@@ -20,3 +20,29 @@
 .fm-improve-mine-link:hover {
     opacity: 0.8;
 }
+
+
+/* fm-search */
+#db-nav-music .fm-improve-search {
+    position: absolute;
+    top: 7px;
+    left: 520px;
+    width: 300px;
+    height: 34px;
+}
+#db-nav-music .fm-improve-search input {
+    width: 37px;
+    height: 34px;
+}
+#db-nav-music .fm-improve-search label {
+    position: static;
+    padding: 0 0 0 10px;
+    line-height: 34px;
+    height: 34px;
+    cursor: pointer;
+}
+#db-nav-music .fm-improve-search .fm-improve-search-song,
+#db-nav-music .fm-improve-search .fm-improve-search-default {
+    -webkit-appearance: radio;
+    width: 20px;
+}

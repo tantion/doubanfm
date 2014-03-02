@@ -9,7 +9,9 @@
         "webRequest",
         "webRequestBlocking",
         "http://douban.fm/",
-        "http://music.douban.com/"
+        "http://*.douban.com/",
+        "http://weibo.com/",
+        "http://*.weibo.com/"
      ],
     "icons": {
         "128": "icon.png",

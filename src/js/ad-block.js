@@ -12,10 +12,13 @@ define(function(require, exports, module) {
     module.exports = {
         block: function () {
             removeBannerAd();
-            Do.ready('fm-bannerad', 'fm-bgad', function() {
-                window.disableBannerAd();
-                removeBannerAd();
-            });
+
+            if (location.hostname === 'douban.fm' && location.pathname === '/') {
+                Do.ready('fm-bannerad', 'fm-bgad', function() {
+                    window.disableBannerAd();
+                    removeBannerAd();
+                });
+            }
         }
     };
 

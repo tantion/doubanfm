@@ -29,4 +29,7 @@ define(function(require, exports, module) {
 
     // 为 music.douban.com/musician/:id 页面添加在FM播放的链接功能
     require('js/fm-musician').init();
+
+    // 搜索插件
+    require('js/fm-search').init();
 });
