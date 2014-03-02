@@ -4,6 +4,10 @@ A chrome extension for Douban FM
 
 ## Change Log
 
+- v1.7.0 - March 3 2014
+   - Added douban musician page fm play link.
+   - Added douban music page search song plugins.
+
 - v1.6.0 - February 28 2014
    - Added grunt for project build tool.
 
