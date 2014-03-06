@@ -18,7 +18,7 @@ define(function(require, exports, module) {
                 href = helper.fmLink($song.data('songid'), $song.data('ssid')),
                 $name = $song.find('span').eq(1),
                 name = $.trim($name.text()),
-                rpl = '<a href="#href#" target="_fm" title="在 FM 播放">#name#</a>'.replace('#name#', name).replace('#href#', href);
+                rpl = '<a href="#href#" class="fm-improve-programme-link" target="_fm" title="在 FM 播放">#name#</a>'.replace('#name#', name).replace('#href#', href);
 
             $name.html(rpl);
         });
