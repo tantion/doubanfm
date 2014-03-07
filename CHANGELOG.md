@@ -4,11 +4,12 @@ A chrome extension for Douban FM
 
 ## Change Log
 
-- v1.7.2 - March 6 2014
-   - Added search cache.
-   - Fixed new ads block.
-   - Added douban musician page fm play link.
-   - Added douban music page search song plugins.
+- v1.7.4 - March 7 2014
+   - Skip video advertisement. -- v1.7.4
+   - Added search cache. -- v1.7.3
+   - Fixed new ads block. -- v1.7.2
+   - Added douban musician page fm play link. -- v1.7.1
+   - Added douban music page search song plugins. -- v1.7.0
 
 - v1.6.0 - February 28 2014
    - Added grunt for project build tool.
