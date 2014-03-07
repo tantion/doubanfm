@@ -47,7 +47,6 @@ define(function(require, exports, module) {
     function initSongList() {
         var $tmpl = $('#song_list_tmpl'),
             tmpl = $tmpl.html(),
-            opened = false,
             repl = '';
 
         if (!$tmpl.length) {
@@ -74,14 +73,22 @@ define(function(require, exports, module) {
             }
 
             // 如果不这样的话，会提示 block popup
-            var fm = window.open('/', target);
+            var url = '';
+            var fm = null;
 
-            opened = false;
+            setTimeout(function () {
+                url = url ? url : '/';
+                fm = window.open(url, target);
+                fm.focus();
+            }, 300);
+
             dfd.done(function (link) {
-                if (!opened) {
-                    $link.attr('href', link);
+                $link.attr('href', link);
+                if (fm) {
                     fm.location.href = link;
                     fm = null;
+                } else {
+                    url = link;
                 }
             })
             .fail(function () {
