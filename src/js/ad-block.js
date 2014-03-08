@@ -16,6 +16,7 @@ define(function(require, exports, module) {
         if (window.DBR && !DBR._play_video) {
             DBR._play_video = DBR.play_video;
             DBR.play_video = function () {
+                window.console.log('play video', arguments);
                 setTimeout(function () {
                     DBR.swf().video_complete(100);
                 }, 100);
