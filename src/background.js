@@ -11,7 +11,7 @@
         for (var i = 0, len = headers.length; i < len; i += 1) {
             header = headers[i];
             if (header.name === o.name) {
-                header.name = o.value;
+                header.value = o.value;
                 finded = true;
             }
         }
