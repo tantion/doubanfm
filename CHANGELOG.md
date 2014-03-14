@@ -4,7 +4,8 @@ A chrome extension for Douban FM
 
 ## Change Log
 
-- v1.7.5 - March 10 2014
+- v1.7.7 - March 15 2014
+   - Fixed search result -- v1.7.7
    - Fixed background.js -- v1.7.5
    - Skip video advertisement. -- v1.7.4
    - Added search cache. -- v1.7.3
