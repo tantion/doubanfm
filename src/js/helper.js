@@ -141,6 +141,8 @@ define(function(require, exports, module) {
                                 });
                             }
                         });
+
+                        SEARCH_CACHE[key] = items;
                     } catch (e) {
                         // 可能是搜索太频繁，需要验证码
                         items = [{
@@ -151,7 +153,6 @@ define(function(require, exports, module) {
                         }];
                     }
 
-                    SEARCH_CACHE[key] = items;
                     dfd.resolve(items);
                 })
                 .fail(function () {

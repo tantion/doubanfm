@@ -43,7 +43,6 @@
     );
 
     // 跨域搜索微博请求，为了带登录信息
-    // 还需要在 manifest.json 中加入 login.sina.com.cn 的权限
     chrome.webRequest.onHeadersReceived.addListener(
         function(details) {
             var responseHeaders = details.responseHeaders;
@@ -61,7 +60,29 @@
                 responseHeaders: responseHeaders
             };
         },
-        {urls: ["http://s.weibo.com/*", "http://login.sina.com.cn/sso/login.php*"]},
+        {urls: ["http://s.weibo.com/*"]},
+        ["blocking", "responseHeaders"]
+    );
+
+    // 由于从定向跨域，暂时这样子处理
+    chrome.webRequest.onHeadersReceived.addListener(
+        function(details) {
+            var responseHeaders = details.responseHeaders;
+
+            extendHeaders(responseHeaders, {
+                name: 'Access-Control-Allow-Origin',
+                value: 'null'
+            });
+            extendHeaders(responseHeaders, {
+                name: 'Access-Control-Allow-Credentials',
+                value: 'true'
+            });
+
+            return {
+                responseHeaders: responseHeaders
+            };
+        },
+        {urls: ["http://login.sina.com.cn/sso/login.php*"]},
         ["blocking", "responseHeaders"]
     );
 })();

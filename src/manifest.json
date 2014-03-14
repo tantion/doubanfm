@@ -11,6 +11,7 @@
         "http://douban.fm/",
         "http://*.douban.com/",
         "http://weibo.com/",
+        "http://login.sina.com.cn/",
         "http://*.weibo.com/"
      ],
     "icons": {

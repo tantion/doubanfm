@@ -48,9 +48,10 @@ define(function(require, exports, module) {
                         $result.find('ul').html('');
                         $result.hide();
                     }
+                    resetResultPos($input, $result);
                 })
                 .fail(function () {
-
+                    resetResultPos($input, $result);
                 });
             }, 500);
         } else {
@@ -58,11 +59,20 @@ define(function(require, exports, module) {
         }
     }
 
+    function resetResultPos ($input, $result) {
+        var $inputForm = $input.closest('form'),
+            offset = $inputForm.offset();
+        $result.offset({
+            top: offset.top + $inputForm.outerHeight(),
+            left: offset.left
+        });
+    }
+
     function applySearchInput ($input) {
-        var $result = $('#search_suggest');
+        var $result = $('#search_suggest_music');
 
         if (!$result.length) {
-            $result = $('<div id="search_suggest"><ul></ul></div>').appendTo('body');
+            $result = $('<div id="search_suggest_music"><ul></ul></div>').appendTo('body');
         }
 
         $result.hide();
@@ -122,6 +132,12 @@ define(function(require, exports, module) {
             evt.preventDefault();
             searchKeyword($input, $result);
         });
+
+        $(window)
+        .on('load resize', function () {
+            resetResultPos($input, $result);
+        });
+
     }
 
     function init () {

@@ -51,6 +51,50 @@
     width: 15px;
 }
 
+#search_suggest_music {
+    background: #fff;
+    border: 1px solid #ddd;
+    position: absolute;
+    z-index: 98;
+    top: 32px;
+    border-top: 0 none;
+    width: 468px;
+    margin-left: -6px;
+    margin-top: 2px;
+}
+#search_suggest_music li {
+    border-bottom: 1px solid #eee;
+    overflow: hidden;
+}
+#search_suggest_music li.curr_item {
+    background: #efefef;
+}
+#search_suggest_music li a {
+    color: #999;
+    display: block;
+    overflow: hidden;
+    padding: 6px;
+    zoom: 1;
+}
+#search_suggest_music li a:hover {
+    background: #f9f9f9;
+    color: #999;
+}
+#search_suggest_music li div {
+    margin: 0;
+    zoom: 1;
+    overflow: hidden;
+}
+#search_suggest_music li img {
+    float: left;
+    margin-right: 8px;
+    margin-top: 3px;
+}
+#search_suggest_music li a em {
+    font-style: normal;
+    color: #369;
+}
+
 /* fm-programme */
 #songlist .fm-improve-programme-link {
     color: #333;
