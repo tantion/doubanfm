@@ -13,7 +13,11 @@ define(function(require, exports, module) {
             return;
         }
 
-        $('.song-item').each(function () {
+        $('.song-item')
+        .on('click', '.fm-improve-programme-link', function (evt) {
+            evt.stopPropagation();
+        })
+        .each(function () {
             var $song = $(this),
                 href = helper.fmLink($song.data('songid'), $song.data('ssid')),
                 $name = $song.find('span').eq(1),

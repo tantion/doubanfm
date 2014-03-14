@@ -101,5 +101,5 @@
 }
 #songlist .fm-improve-programme-link:hover {
     background-color: #37a;
-    color: #fff;
+    color: #fff !important;
 }
