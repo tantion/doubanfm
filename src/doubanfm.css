@@ -96,10 +96,12 @@
 }
 
 /* fm-programme */
-#songlist .fm-improve-programme-link {
+/* 你妹的优先级 */
+#songlist-content #songlist-wrapper #songlist .fm-improve-programme-link {
     color: #333;
 }
-#songlist .fm-improve-programme-link:hover {
-    background-color: #37a;
+#songlist-content #songlist-wrapper #songlist .singer a:hover,
+#songlist-content #songlist-wrapper #songlist .fm-improve-programme-link:hover {
+    background-color: #37a !important;
     color: #fff !important;
 }
