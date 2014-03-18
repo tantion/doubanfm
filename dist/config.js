@@ -1,1 +1,1 @@
-seajs.config({alias:{jquery:{src:"lib/jquery.js",exports:"noConfictJQuery"}},vars:{locale:"zh-cn"},map:[[/^(.*\/js\/.*\.(?:css|js))(?:.*)$/i,"$1?v1.7.8"]],plugins:["text","shim"],preload:[],debug:!0,charset:"utf-8"});
+seajs.config({alias:{jquery:{src:"lib/jquery.js",exports:"noConfictJQuery"}},vars:{locale:"zh-cn"},map:[[/^(.*\/js\/.*\.(?:css|js))(?:.*)$/i,"$1?v1.7.9"]],plugins:["text","shim"],preload:[],debug:!0,charset:"utf-8"});

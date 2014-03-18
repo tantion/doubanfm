@@ -4,7 +4,8 @@ A chrome extension for Douban FM
 
 ## Change Log
 
-- v1.7.8 - March 18 2014
+- v1.7.9 - March 18 2014
+   - Removed player-ad in fm-programme. -- v1.7.9
    - Fixed download file type error. -- v1.7.8
    - Fixed search result -- v1.7.7
    - Fixed background.js -- v1.7.5
