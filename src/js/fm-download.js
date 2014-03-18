@@ -6,7 +6,7 @@ define(function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery');
-    var $download = $('<a class="fm-improve-item fm-improve-download" download="">下载 MP3</a>');
+    var $download = $('<a class="fm-improve-item fm-improve-download" download="">下载音乐</a>');
     var $picture = $('<a class="fm-improve-item fm-improve-picture" dowload=""><img src=""><span>下载封面</span></a>');
     var hasInited = false;
 
@@ -17,9 +17,10 @@ define(function(require, exports, module) {
         }
 
         var pictrueExt = (song.picture.match(/(.*)\.(\w+)$/))[2],
+            songExt = (song.url.match(/(.*)\.(\w+)$/))[2],
             songName = song.title + ' - ' + song.artist,
-            pictureName = songName + '.' + pictrueExt,
-            fileName = songName + '.mp3';
+            pictureName = songName + '.' + (pictrueExt || 'jpg'),
+            fileName = songName + '.' + (songExt || 'mp3');
 
         $download
             .attr('href', song.url)
