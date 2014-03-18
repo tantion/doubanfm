@@ -16,11 +16,14 @@ define(function(require, exports, module) {
         $('.song-item').each(function () {
             var $song = $(this),
                 href = helper.fmLink($song.attr('id'), $song.data('ssid')),
-                $name = $song.find('.song-name'),
+                $name = $song.find('.song-name-short'),
                 name = $.trim($name.text()),
-                rpl = '<a href="#href#" target="_fm" title="在 FM 播放">#name#</a>'.replace('#name#', name).replace('#href#', href);
+                rpl = '<a href="#href#" class="fm-improve-musician-link" target="_fm" title="在 FM 播放">#name#</a>'.replace('#name#', name).replace('#href#', href);
 
             $name.html(rpl);
+        })
+        .on('click', '.fm-improve-musician-link', function (evt) {
+            evt.stopPropagation();
         });
     }
 

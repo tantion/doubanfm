@@ -110,3 +110,13 @@
 #player-ad #ad-wrapper {
     display: none !important;
 }
+
+/* fm-subject fm-musician */
+.song-item.highlight .song-name-short .fm-improve-musician-link,
+.song-item.highlight .song-name-short .fm-improve-subject-link {
+    color: #88c3a9;
+}
+.song-item.highlight .song-name-short .fm-improve-musician-link:hover,
+.song-item.highlight .song-name-short .fm-improve-subject-link:hover {
+    color: #fff;
+}
