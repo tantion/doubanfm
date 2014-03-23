@@ -1,4 +1,4 @@
-/*! douban-fm-improve - v1.7.10 - 2014-03-23
+/*! douban-fm-improve - v1.8.0 - 2014-03-23
 * https://github.com/tantion/doubanfm
 * Copyright (c) 2014 tantion; Licensed MIT */
 (function(global, undefined) {
@@ -12772,7 +12772,7 @@ define('js/fm-programme', ['jquery', 'js/helper'], function(require, exports, mo
 // fm search base on sina weibo
 // http://music.douban.com
 //
-define('js/search', ['jquery', 'js/helper'], function(require, exports, module) {
+define('js/fm-search', ['jquery', 'js/helper'], function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery'),
@@ -13183,7 +13183,7 @@ define('js/inject', [], function(require, exports, module) {
         document.body.appendChild(script);
     }
 
-    exports.injectScript = injectScript;
+    module.exports = injectScript;
 });
 
 //
@@ -13218,8 +13218,8 @@ define('js/main', ['jquery', 'lib/tipsy/jquery.tipsy.js', 'js/fm-mine', 'js/fm-s
     // 搜索插件
     require('js/fm-search').init();
 
-    inject('inject/ad-block'); // 移除广告
-    inject('inject/fm-download'); // 下载当前播放的音乐
+    inject('inject/ad-block.js'); // 移除广告
+    inject('inject/fm-download.js'); // 下载当前播放的音乐
 });
 
 //

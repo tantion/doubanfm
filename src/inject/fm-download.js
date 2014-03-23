@@ -2,10 +2,9 @@
 // fm download mp3 and album picture improve
 // http://douban.fm
 //
-define(function(require, exports, module) {
+(function($) {
     "use strict";
 
-    var $ = require('jquery');
     var $download = $('<a class="fm-improve-item fm-improve-download" download="">下载音乐</a>');
     var $picture = $('<a class="fm-improve-item fm-improve-picture" dowload=""><img src=""><span>下载封面</span></a>');
     var hasInited = false;
@@ -60,7 +59,6 @@ define(function(require, exports, module) {
         });
     }
 
-    module.exports = {
-        init: init
-    };
-});
+    init();
+
+})(window.jQuery);

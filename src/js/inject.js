@@ -23,5 +23,5 @@ define('js/inject', [], function(require, exports, module) {
         document.body.appendChild(script);
     }
 
-    exports.injectScript = injectScript;
+    module.exports = injectScript;
 });

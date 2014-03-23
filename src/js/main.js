@@ -30,6 +30,6 @@ define('js/main', ['jquery', 'lib/tipsy/jquery.tipsy.js', 'js/fm-mine', 'js/fm-s
     // 搜索插件
     require('js/fm-search').init();
 
-    inject('inject/ad-block'); // 移除广告
-    inject('inject/fm-download'); // 下载当前播放的音乐
+    inject('inject/ad-block.js'); // 移除广告
+    inject('inject/fm-download.js'); // 下载当前播放的音乐
 });

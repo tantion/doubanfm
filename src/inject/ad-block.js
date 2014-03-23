@@ -2,10 +2,8 @@
 // remove douban ads
 // http://douban.fm
 //
-define(function(require, exports, module) {
+(function($) {
     "use strict";
-
-    var $ = require('jquery');
 
     function removeBannerAd () {
         window.initBannerAd = window.disableBannerAd = window.enableBannerAd = function () {};
@@ -23,24 +21,24 @@ define(function(require, exports, module) {
         }
     }
 
-    module.exports = {
-        block: function () {
-            if (location.hostname === 'douban.fm' && location.pathname === '/') {
-                // Disabled Banner Ad
+    function block () {
+        if (location.hostname === 'douban.fm' && location.pathname === '/') {
+            // Disabled Banner Ad
+            removeBannerAd();
+            Do.ready('fm-bannerad', 'fm-bgad', function() {
+                window.disableBannerAd();
                 removeBannerAd();
-                Do.ready('fm-bannerad', 'fm-bgad', function() {
-                    window.disableBannerAd();
-                    removeBannerAd();
-                });
+            });
 
-                // Skip Video Ad
+            // Skip Video Ad
+            autoSkipVideoAd();
+            Do.ready('fm-player', function () {
                 autoSkipVideoAd();
-                Do.ready('fm-player', function () {
-                    autoSkipVideoAd();
-                });
-            }
+            });
         }
-    };
+    }
 
-});
+    block();
+
+})(window.jQuery);
 
