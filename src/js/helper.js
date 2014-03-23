@@ -1,7 +1,7 @@
 //
 // helpful function
 //
-define(function(require, exports, module) {
+define('js/helper', ['jquery'], function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery');

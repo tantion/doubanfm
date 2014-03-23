@@ -1,7 +1,7 @@
 //
-// bootstrap for script
+// inject script to document
 //
-(function () {
+define('js/inject', [], function(require, exports, module) {
     "use strict";
 
     function injectScript (src, options) {
@@ -23,9 +23,5 @@
         document.body.appendChild(script);
     }
 
-    // 注入模块管理 seajs
-    injectScript('seajs/sea.js', {
-        'data-config': 'config.js?v1.7.10',
-        'data-main': 'js/main.js'
-    });
-})();
+    exports.injectScript = injectScript;
+});

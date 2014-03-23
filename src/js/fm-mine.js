@@ -2,7 +2,7 @@
 // fm mine page improve
 // http://douban.fm/mine
 //
-define(function(require, exports, module) {
+define('js/fm-mine', ['jquery', 'js/helper'], function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery');
