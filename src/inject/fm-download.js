@@ -8,8 +8,8 @@ Do.ready(function() {
     "use strict";
 
     (function($) {
-        var $download = $('<a class="fm-improve-item fm-improve-download" download="">下载音乐</a>');
-        var $picture = $('<a class="fm-improve-item fm-improve-picture" dowload=""><img src=""><span>下载封面</span></a>');
+        var $download = $('<a class="fm-improve-item fm-improve-download">下载音乐</a>');
+        var $picture = $('<a class="fm-improve-item fm-improve-picture"><img src=""><span>下载封面</span></a>');
         var hasInited = false;
 
         function renderFMDownload (song) {
@@ -25,9 +25,12 @@ Do.ready(function() {
                 fileName = songName + '.' + (songExt || 'mp3');
 
             $download
+                .attr('data-title', song.title)
+                .attr('data-album', song.albumtitle)
+                .attr('data-artist', song.artist)
                 .attr('href', song.url)
                 .attr('download', fileName)
-                .attr('title', fileName);
+                .attr('title', songName);
 
             $picture
                 .attr('href', song.picture)
