@@ -12580,13 +12580,12 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
 // 第三方下载高品质 MP3
 // 百度音乐，展示无需权限下载，可能以后会被修复
 //
-define('js/fm-mine', function(require, exports, module) {
+define('js/fm-download-baidu', function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery');
 
     function init () {
-        console.log($);
     }
 
     module.exports = {
@@ -12598,7 +12597,7 @@ define('js/fm-mine', function(require, exports, module) {
 // fm mine page improve
 // http://douban.fm/mine
 //
-define('js/fm-mine', ['jquery', 'js/helper'], function(require, exports, module) {
+define('js/fm-mine', function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery');
@@ -12668,23 +12667,20 @@ define('js/fm-mine', ['jquery', 'js/helper'], function(require, exports, module)
                 return;
             }
 
-            // 如果不这样的话，会提示 block popup
-            var url = '';
-            var fm = null;
+            var fm = null,
+                url = '';
 
             setTimeout(function () {
                 url = url ? url : '/';
                 fm = window.open(url, target);
                 fm.focus();
-            }, 300);
+            }, 500);
 
             dfd.done(function (link) {
                 $link.attr('href', link);
+                url = link;
                 if (fm) {
                     fm.location.href = link;
-                    fm = null;
-                } else {
-                    url = link;
                 }
             })
             .fail(function () {
@@ -12721,7 +12717,7 @@ define('js/fm-mine', ['jquery', 'js/helper'], function(require, exports, module)
 // music musician page improve
 // http://music.douban.com/musician/:id
 //
-define('js/fm-musician', ['jquery', 'js/helper'], function(require, exports, module) {
+define('js/fm-musician', function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery'),
@@ -12755,7 +12751,7 @@ define('js/fm-musician', ['jquery', 'js/helper'], function(require, exports, mod
 // music programme page improve
 // http://music.douban.com/programme/:id
 //
-define('js/fm-programme', ['jquery', 'js/helper'], function(require, exports, module) {
+define('js/fm-programme', function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery'),
@@ -12790,7 +12786,7 @@ define('js/fm-programme', ['jquery', 'js/helper'], function(require, exports, mo
 // fm search base on sina weibo
 // http://music.douban.com
 //
-define('js/fm-search', ['jquery', 'js/helper'], function(require, exports, module) {
+define('js/fm-search', function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery'),
@@ -12977,7 +12973,7 @@ define('js/fm-search', ['jquery', 'js/helper'], function(require, exports, modul
 // music subject page improve
 // http://music.douban.com/subject/:id
 //
-define('js/fm-subject', ['jquery', 'js/helper'], function(require, exports, module) {
+define('js/fm-subject', function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery'),
@@ -13010,7 +13006,7 @@ define('js/fm-subject', ['jquery', 'js/helper'], function(require, exports, modu
 //
 // helpful function
 //
-define('js/helper', ['jquery'], function(require, exports, module) {
+define('js/helper', function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery');
@@ -13179,7 +13175,7 @@ define('js/helper', ['jquery'], function(require, exports, module) {
 //
 // inject script to document
 //
-define('js/inject', [], function(require, exports, module) {
+define('js/inject', function(require, exports, module) {
     "use strict";
 
     function injectScript (src, options) {
@@ -13209,9 +13205,7 @@ define('js/inject', [], function(require, exports, module) {
 //
 
 // 所有模块都通过 define 来定义
-define('js/main', ['jquery', 'lib/tipsy/jquery.tipsy.js', 'js/fm-mine', 'js/fm-subject', 'js/fm-programme',
-       'js/fm-musician', 'js/fm-search', 'js/inject'],
-    function(require, exports, module) {
+define('js/main', function(require, exports, module) {
     "use strict";
 
     // 通过 require 引入依赖

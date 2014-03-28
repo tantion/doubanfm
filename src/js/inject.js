@@ -1,7 +1,7 @@
 //
 // inject script to document
 //
-define('js/inject', [], function(require, exports, module) {
+define('js/inject', function(require, exports, module) {
     "use strict";
 
     function injectScript (src, options) {

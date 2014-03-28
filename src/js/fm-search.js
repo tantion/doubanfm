@@ -2,7 +2,7 @@
 // fm search base on sina weibo
 // http://music.douban.com
 //
-define('js/fm-search', ['jquery', 'js/helper'], function(require, exports, module) {
+define('js/fm-search', function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery'),
