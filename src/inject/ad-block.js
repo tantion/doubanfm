@@ -2,7 +2,7 @@
 // remove douban ads
 // http://douban.fm
 //
-(function($) {
+(function() {
     "use strict";
 
     function removeBannerAd () {
@@ -40,5 +40,4 @@
 
     block();
 
-})(window.jQuery);
-
+})();
