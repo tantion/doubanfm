@@ -6,6 +6,7 @@ define('js/fm-download-baidu', function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery'),
+        helper = require('js/helper'),
         cache = require('js/cache').newInstance();
 
     function match (s1, s2) {
@@ -35,7 +36,7 @@ define('js/fm-download-baidu', function(require, exports, module) {
             songId;
 
         $.each(songs, function (i, s) {
-            if (match(s.title, title) && match(s.author, artist)) {
+            if (match(s.title, title) && (match(s.author, artist) || match(s.title, artist))) {
                 if (!good) {
                     good = s;
                 }
@@ -56,8 +57,57 @@ define('js/fm-download-baidu', function(require, exports, module) {
         return songId;
     }
 
+    // 找出最合适的那条下载链接，
+    // MP3 格式，比特率 192 - 256 kbs 这样
+    function whichUrl (urls) {
+        var url = null;
+        $.each(urls, function (i, u) {
+            var kbs = u.file_bitrate;
+            if (u.file_extension === 'mp3' && kbs >= 128) {
+                if (kbs > 256) {
+                    if (!url) {
+                        url = u.file_link;
+                    }
+                } else {
+                    url = u.file_link;
+                }
+            }
+        });
+        if (!url && urls.length && urls[0].file_extension === 'mp3') {
+            url = urls[0].file_link;
+        }
+        return url;
+    }
+
     function fetchSongUrl (songId) {
-        var dfd = new $.Deferred();
+        var dfd = new $.Deferred(),
+            url = 'http://tingapi.ting.baidu.com/v1/restserver/ting?from=web&version=4.5.4&method=baidu.ting.song.getInfos&format=json&songid=#songId#';
+
+        url = url.replace('#songId#', songId);
+
+        $.ajax({
+            type: 'get',
+            url: url,
+            dataType: 'json',
+            timeout: 30 * 1000
+        })
+        .done(function (data) {
+            try {
+                var urls = data.songurl.url,
+                    url;
+                url = whichUrl(urls);
+                if (url) {
+                    dfd.resolve(url);
+                } else {
+                    dfd.reject();
+                }
+            } catch (e) {
+                dfd.reject();
+            }
+        })
+        .fail(function () {
+            dfd.reject();
+        });
 
         return dfd.promise();
     }
@@ -136,7 +186,7 @@ define('js/fm-download-baidu', function(require, exports, module) {
                 if (title && artist) {
                     evt.preventDefault();
 
-                    search({title: title, artist: artist, album: album})
+                    search({title: helper.seperateZhCN(title), artist: artist, album: album})
                     .done(function (url) {
                         chrome.runtime.sendMessage({
                             action: 'downloadSong',
