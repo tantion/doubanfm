@@ -2,7 +2,7 @@
 // fm mine page improve
 // http://douban.fm/mine
 //
-define('js/fm-mine', ['jquery', 'js/helper'], function(require, exports, module) {
+define('js/fm-mine', function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery');
@@ -72,23 +72,20 @@ define('js/fm-mine', ['jquery', 'js/helper'], function(require, exports, module)
                 return;
             }
 
-            // 如果不这样的话，会提示 block popup
-            var url = '';
-            var fm = null;
+            var fm = null,
+                url = '';
 
             setTimeout(function () {
                 url = url ? url : '/';
                 fm = window.open(url, target);
                 fm.focus();
-            }, 300);
+            }, 500);
 
             dfd.done(function (link) {
                 $link.attr('href', link);
+                url = link;
                 if (fm) {
                     fm.location.href = link;
-                    fm = null;
-                } else {
-                    url = link;
                 }
             })
             .fail(function () {
