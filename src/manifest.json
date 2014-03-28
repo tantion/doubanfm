@@ -6,13 +6,10 @@
     "version": "1.8.0",
 
     "permissions": [
-        "webRequest",
-        "webRequestBlocking",
-        "http://douban.fm/",
-        "http://*.douban.com/",
-        "http://weibo.com/",
-        "http://login.sina.com.cn/",
-        "http://*.weibo.com/"
+        "<all_urls>",
+        "tabs",
+        "webNavigation",
+        "downloads"
      ],
     "icons": {
         "128": "icon.png",
