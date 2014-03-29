@@ -12635,7 +12635,7 @@ define('js/fm-download-baidu', function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery'),
-        helper = require('js/helper'),
+        translate = require('js/translate'),
         cache = require('js/cache').newInstance();
 
     function match (s1, s2) {
@@ -12809,13 +12809,19 @@ define('js/fm-download-baidu', function(require, exports, module) {
             .on('click', '.fm-improve-download', function (evt) {
                 var $elem = $(this),
                     title = $elem.attr('data-title'),
+                    titleZh = translate.seperateZh(title),
                     artist = $elem.attr('data-artist'),
+                    artistZh = translate.toZh(artist),
                     album = $elem.attr('data-album');
 
                 if (title && artist) {
                     evt.preventDefault();
 
-                    search({title: helper.seperateZhCN(title), artist: artist, album: album})
+                    search({
+                        title: titleZh,
+                        artist: (titleZh !== title) ? artistZh : artist,
+                        album: album
+                    })
                     .done(function (url) {
                         chrome.runtime.sendMessage({
                             action: 'downloadSong',
@@ -13417,16 +13423,6 @@ define('js/helper', function(require, exports, module) {
             }
 
             return dfd.promise();
-        },
-
-        seperateZhCN: function (title) {
-            var matches = title.match(/^([\u4E00-\u9FA5]{2,}) ([^\u4E00-\u9FA5]{4,})$/);
-
-            if (matches && matches.length > 1) {
-                title = matches[1] ? matches[1] : title;
-            }
-
-            return title;
         }
     };
 
@@ -13493,6 +13489,43 @@ define('js/main', function(require, exports, module) {
 
     inject('inject/ad-block.js'); // 移除广告
     inject('inject/fm-download.js'); // 下载当前播放的音乐
+});
+
+//
+// 针对于搜索对于英文的搜索不准确，需要将对应的英文对应为中文
+//
+define('js/translate', function (require, exports, module) {
+    "use strict";
+
+    var maps = {
+        'richard clayderman': '理查德·克莱德曼'
+    };
+
+    module.exports = {
+        containsZh: function (str) {
+            if (str.match(/[\u4E00-\u9FA5]+/)) {
+                return true;
+            }
+            return false;
+        },
+        seperateZh: function (title) {
+            var matches = title.match(/^([\u4E00-\u9FA5]{2,}) ([^\u4E00-\u9FA5]{4,})$/);
+
+            if (matches && matches.length > 1) {
+                title = matches[1] ? matches[1] : title;
+            }
+
+            return title;
+        },
+        toZh: function (en) {
+            var key = en.toLowerCase();
+            if (maps.hasOwnProperty(key)) {
+                en = maps[key];
+            }
+            return en;
+        }
+    };
+
 });
 
 //

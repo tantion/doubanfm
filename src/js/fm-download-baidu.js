@@ -6,7 +6,7 @@ define('js/fm-download-baidu', function(require, exports, module) {
     "use strict";
 
     var $ = require('jquery'),
-        helper = require('js/helper'),
+        translate = require('js/translate'),
         cache = require('js/cache').newInstance();
 
     function match (s1, s2) {
@@ -180,13 +180,19 @@ define('js/fm-download-baidu', function(require, exports, module) {
             .on('click', '.fm-improve-download', function (evt) {
                 var $elem = $(this),
                     title = $elem.attr('data-title'),
+                    titleZh = translate.seperateZh(title),
                     artist = $elem.attr('data-artist'),
+                    artistZh = translate.toZh(artist),
                     album = $elem.attr('data-album');
 
                 if (title && artist) {
                     evt.preventDefault();
 
-                    search({title: helper.seperateZhCN(title), artist: artist, album: album})
+                    search({
+                        title: titleZh,
+                        artist: (titleZh !== title) ? artistZh : artist,
+                        album: album
+                    })
                     .done(function (url) {
                         chrome.runtime.sendMessage({
                             action: 'downloadSong',

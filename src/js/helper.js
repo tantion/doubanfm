@@ -161,16 +161,6 @@ define('js/helper', function(require, exports, module) {
             }
 
             return dfd.promise();
-        },
-
-        seperateZhCN: function (title) {
-            var matches = title.match(/^([\u4E00-\u9FA5]{2,}) ([^\u4E00-\u9FA5]{4,})$/);
-
-            if (matches && matches.length > 1) {
-                title = matches[1] ? matches[1] : title;
-            }
-
-            return title;
         }
     };
 
