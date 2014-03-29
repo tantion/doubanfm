@@ -12636,7 +12636,9 @@ define('js/fm-download-baidu', function(require, exports, module) {
 
     var $ = require('jquery'),
         translate = require('js/translate'),
-        cache = require('js/cache').newInstance();
+        Cache = require('js/cache'),
+        songCache = Cache.newInstance(),
+        urlCache = Cache.newInstance();
 
     function match (s1, s2) {
         var flag = false;
@@ -12712,33 +12714,39 @@ define('js/fm-download-baidu', function(require, exports, module) {
 
     function fetchSongUrl (songId) {
         var dfd = new $.Deferred(),
+            curl = urlCache.get(songId),
             url = 'http://tingapi.ting.baidu.com/v1/restserver/ting?from=web&version=4.5.4&method=baidu.ting.song.getInfos&format=json&songid=#songId#';
 
-        url = url.replace('#songId#', songId);
+        if (curl) {
+            dfd.resolve(curl);
+        } else {
+            url = url.replace('#songId#', songId);
 
-        $.ajax({
-            type: 'get',
-            url: url,
-            dataType: 'json',
-            timeout: 30 * 1000
-        })
-        .done(function (data) {
-            try {
-                var urls = data.songurl.url,
-                    url;
-                url = whichUrl(urls);
-                if (url) {
-                    dfd.resolve(url);
-                } else {
+            $.ajax({
+                type: 'get',
+                url: url,
+                dataType: 'json',
+                timeout: 30 * 1000
+            })
+            .done(function (data) {
+                try {
+                    var urls = data.songurl.url,
+                        fileUrl;
+                    fileUrl = whichUrl(urls);
+                    if (fileUrl) {
+                        urlCache.set(songId, fileUrl);
+                        dfd.resolve(fileUrl);
+                    } else {
+                        dfd.reject();
+                    }
+                } catch (e) {
                     dfd.reject();
                 }
-            } catch (e) {
+            })
+            .fail(function () {
                 dfd.reject();
-            }
-        })
-        .fail(function () {
-            dfd.reject();
-        });
+            });
+        }
 
         return dfd.promise();
     }
@@ -12746,46 +12754,63 @@ define('js/fm-download-baidu', function(require, exports, module) {
     function searchSongInfo (song) {
         var dfd = new $.Deferred(),
             url = 'http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=4.5.4&method=baidu.ting.search.merge&format=json&query=#keyword#&page_no=1&page_size=10&type=-1&data_source=0&use_cluster=1',
-            keyword = song.title + ' - ' + song.artist;
+            keyword = song.title + ' - ' + song.artist,
+            csongId = songCache.get(keyword);
 
         url = url.replace('#keyword#', encodeURIComponent(keyword));
 
-        $.ajax({
-            url: url,
-            type: 'get',
-            dataType: 'json',
-            timeout: 30 * 1000
-        })
-        .done(function (data) {
-            try {
-                var songs = data.result.song_info.song_list,
-                    songId;
-                if (songs) {
-                    songId = whichSong(songs, song);
-                    if (songId) {
-                        dfd.resolve(songId);
+        if (csongId) {
+            dfd.resolve(csongId);
+        } else {
+            $.ajax({
+                url: url,
+                type: 'get',
+                dataType: 'json',
+                timeout: 30 * 1000
+            })
+            .done(function (data) {
+                try {
+                    var songs = data.result.song_info.song_list,
+                        songId;
+                    if (songs) {
+                        songId = whichSong(songs, song);
+                        if (songId) {
+                            songCache.set(keyword, songId);
+                            dfd.resolve(songId);
+                        } else {
+                            dfd.reject();
+                        }
                     } else {
                         dfd.reject();
                     }
-                } else {
+                } catch (e) {
                     dfd.reject();
                 }
-            } catch (e) {
+            })
+            .fail(function () {
                 dfd.reject();
-            }
-        })
-        .fail(function () {
-            dfd.reject();
-        });
+            });
+        }
 
         return dfd.promise();
+    }
+
+    // 针对中英混合的情况做一下统一处理
+    function fixedSong (song) {
+        var title = song.title,
+            titleZh = translate.seperateZh(title);
+        if (titleZh !== title) {
+            song.title = titleZh;
+            song.artist = translate.toZh(song.artist);
+        }
+        return song;
     }
 
     function search (song) {
         var dfd = new $.Deferred();
 
         if (song && song.title) {
-            searchSongInfo(song)
+            searchSongInfo(fixedSong(song))
             .done(function (songId) {
                 fetchSongUrl(songId)
                 .done(function (url) {
@@ -12811,17 +12836,15 @@ define('js/fm-download-baidu', function(require, exports, module) {
             .on('click', '.fm-improve-download', function (evt) {
                 var $elem = $(this),
                     title = $elem.attr('data-title'),
-                    titleZh = translate.seperateZh(title),
                     artist = $elem.attr('data-artist'),
-                    artistZh = translate.toZh(artist),
                     album = $elem.attr('data-album');
 
                 if (title && artist) {
                     evt.preventDefault();
 
                     search({
-                        title: titleZh,
-                        artist: (titleZh !== title) ? artistZh : artist,
+                        title: title,
+                        artist: artist,
                         album: album
                     })
                     .done(function (url) {
@@ -12848,6 +12871,7 @@ define('js/fm-download-baidu', function(require, exports, module) {
     }
 
     module.exports = {
+        search: search,
         init: init
     };
 });
