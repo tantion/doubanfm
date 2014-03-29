@@ -12644,6 +12644,8 @@ define('js/fm-download-baidu', function(require, exports, module) {
         s1 = '' + s1;
         s2 = '' + s2;
 
+        s1 = s1.replace(/<\/?em>/ig, '');
+
         if (s1.toLowerCase().match(s2.toLowerCase())) {
             flag = true;
         } else {
