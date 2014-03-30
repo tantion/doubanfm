@@ -26,6 +26,7 @@ module.exports = function(grunt) {
           'src/lib/douban/dialog.js',
           'src/lib/tipsy/jquery.tipsy.js',
           'src/js/*.js',
+          'src/seajs-alias.js',
           'src/app.js'
         ],
         dest: 'src/bootstrap.js'
@@ -38,11 +39,23 @@ module.exports = function(grunt) {
         ],
         dest: 'src/bootstrap.css'
       },
+      appseajs: {
+        src: [
+          'src/seajs/sea-debug.js',
+          'src/lib/*.js',
+          'src/lib/tipsy/jquery.tipsy.js',
+          'src/js/*.js',
+          'src/seajs-alias.js',
+          'src/app/seajs-main.js'
+        ],
+        dest: 'src/angular-seajs.js'
+      },
       appjs: {
         src: [
           'src/angular/ui/ui-bootstrap-tpls-0.10.0.js',
           'src/app/main.js',
-          'src/app/**/*.js'
+          'src/app/**/*.js',
+          '!src/app/seajs-main.js'
         ],
         dest: 'src/angular-app.js'
       },
@@ -95,6 +108,7 @@ module.exports = function(grunt) {
         src: [
           'src/js/**/*.js',
           'src/app/**/*.js',
+          'src/seajs-alias.js',
           'src/app.js'
         ]
       },
@@ -169,6 +183,10 @@ module.exports = function(grunt) {
       appjs: {
         files: '<%= concat.appjs.src %>',
         tasks: ['concat:appjs']
+      },
+      appseajs: {
+        files: '<%= concat.appseajs.src %>',
+        tasks: ['concat:appseajs']
       }
     }
   });

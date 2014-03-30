@@ -69,7 +69,7 @@ angular
                 url = '';
 
             if (apiUrl) {
-                url = apiUrl + '&start=' + page * limit;
+                url = apiUrl + '&start=' + (page - 1) * limit;
                 defer.resolve(url);
             } else {
                 $q.all([
@@ -84,7 +84,7 @@ angular
 
                     if (ck) {
                         apiUrl = 'http://douban.fm/j/play_record?ck=' + ck + '&spbid=' + encodeURIComponent(sp + bid) + '&type=liked';
-                        url = apiUrl + '&start=' + page * limit;
+                        url = apiUrl + '&start=' + (page - 1) * limit;
                         defer.resolve(url);
                     } else {
                         defer.reject();
@@ -96,12 +96,12 @@ angular
 
             return defer.promise;
         },
-        rethot: function (page, limit) {
+        rethot: function (page) {
             var defer = $q.defer();
 
             $q.all([
                 getTabId(),
-                mine.getApiUrl(page, limit)
+                mine.getApiUrl(page, 15)
             ])
             .then(function (args) {
                 var tabId = args[0],

@@ -8,18 +8,24 @@
 <body>
 <div class="container" ng-controller="RethotController">
     <div class="page-header">
-        <h3>加心歌曲列表</h3>
+        <h3>加心歌曲列表 <small>豆瓣FM音乐助手</small></h3>
     </div>
     <alert ng-show="alert.msg" type="alert.type" close="alert.msg=''">{{alert.msg}}</alert>
+    <div class="alert alert-info" ng-show="!status.loaded || status.error" ng-class="{'alert-danger': status.error}">
+        <span ng-show="!status.loaded">正在加载数据...</span>
+        <span ng-show="status.error">加载失败，需要先 <a href="http://douban.fm/common_login?redir=/mine" target="_blank">登录豆瓣帐号</a></span>
+    </div>
     <div class="nav fm-improve-action-nav">
         <button type="button" class="btn btn-default">下载选中歌曲</button>
     </div>
+    <pagination total-items="data.total" page="page" max-size="10" items-per-page="15" class="pagination-sm fm-improve-pagination" on-select-page="loadRethot(page)"
+        boundary-links="true" rotate="false" previous-text="上一页" next-text="下一页" first-text="首页" last-text="尾页"></pagination>
     <table class="table table-striped">
         <thead>
             <tr>
                 <th width="80px">
                     <label class="checkbox-inline">
-                        <input type="checkbox" id="inlineCheckbox1" value="option1"> <strong>全选</strong>
+                        <input type="checkbox" ng-model="allChecked"> <strong>全选</strong>
                     </label>
                 </th>
                 <th>歌曲</th>
@@ -28,13 +34,15 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
+            <tr ng-repeat="song in data.songs">
                 <td>
                     <label class="checkbox-inline">
-                        <input type="checkbox" id="inlineCheckbox1" value="option1"> 1
+                        <input type="checkbox" ng-model="song.checked"> {{$index + data.start + 1}}
                     </label>
                 </td>
-                <td>Mark</td>
+                <td>
+                    {{song.title}} - {{song.artist}}
+                </td>
                 <td>
                     <button type="button" class="btn btn-default btn-xs">下载</button>
                     <button type="button" class="btn btn-default btn-xs">取消</button>
@@ -50,8 +58,10 @@
             </tr>
       </tbody>
     </table>
+    <pagination total-items="data.total" page="page" max-size="10" items-per-page="15" class="pagination-sm fm-improve-pagination" on-select-page="loadRethot(page)"
+        boundary-links="true" rotate="false" previous-text="上一页" next-text="下一页" first-text="首页" last-text="尾页"></pagination>
 </div>
-<script src="lib/jquery.js"></script>
+<script src="angular-seajs.js"></script>
 <script src="angular/angular.js"></script>
 <script src="angular-app.js"></script>
 </body>

@@ -4,6 +4,11 @@
 .fm-improve-action-nav {
     margin-bottom: 10px;
 }
+.fm-improve-pagination {
+    margin: 5px 0;
+}
+
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
 #fm-bg {
     background-image: none !important;
