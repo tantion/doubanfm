@@ -53,6 +53,7 @@ module.exports = function(grunt) {
       appjs: {
         src: [
           'src/angular/ui/ui-bootstrap-tpls-0.10.0.js',
+          'src/angular/ngStorage.js',
           'src/app/main.js',
           'src/app/**/*.js',
           '!src/app/seajs-main.js'

@@ -1,4 +1,4 @@
-/*! douban-fm-improve - v1.8.0 - 2014-03-30
+/*! douban-fm-improve - v1.8.0 - 2014-03-31
 * https://github.com/tantion/doubanfm
 * Copyright (c) 2014 tantion; Licensed MIT */
 angular.module("ui.bootstrap", ["ui.bootstrap.tpls", "ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.bindHtml","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.position","ui.bootstrap.datepicker","ui.bootstrap.dropdownToggle","ui.bootstrap.modal","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
@@ -3672,15 +3672,122 @@ angular.module("template/typeahead/typeahead-popup.html", []).run(["$templateCac
     "</ul>");
 }]);
 
+'use strict';
+
+(function() {
+
+    /**
+     * @ngdoc overview
+     * @name ngStorage
+     */
+
+    angular.module('ngStorage', []).
+
+    /**
+     * @ngdoc object
+     * @name ngStorage.$localStorage
+     * @requires $rootScope
+     * @requires $window
+     */
+
+    factory('$localStorage', _storageFactory('localStorage')).
+
+    /**
+     * @ngdoc object
+     * @name ngStorage.$sessionStorage
+     * @requires $rootScope
+     * @requires $window
+     */
+
+    factory('$sessionStorage', _storageFactory('sessionStorage'));
+
+    function _storageFactory(storageType) {
+        return [
+            '$rootScope',
+            '$window',
+            '$log',
+
+            function(
+                $rootScope,
+                $window,
+                $log
+            ){
+                // #9: Assign a placeholder object if Web Storage is unavailable to prevent breaking the entire AngularJS app
+                var webStorage = $window[storageType] || ($log.warn('This browser does not support Web Storage!'), {}),
+                    $storage = {
+                        $default: function(items) {
+                            for (var k in items) {
+                                angular.isDefined($storage[k]) || ($storage[k] = items[k]);
+                            }
+
+                            return $storage;
+                        },
+                        $reset: function(items) {
+                            for (var k in $storage) {
+                                '$' === k[0] || delete $storage[k];
+                            }
+
+                            return $storage.$default(items);
+                        }
+                    },
+                    _last$storage,
+                    _debounce;
+
+                for (var i = 0, k; i < webStorage.length; i++) {
+                    // #8, #10: `webStorage.key(i)` may be an empty string (or throw an exception in IE9 if `webStorage` is empty)
+                    (k = webStorage.key(i)) && 'ngStorage-' === k.slice(0, 10) && ($storage[k.slice(10)] = angular.fromJson(webStorage.getItem(k)));
+                }
+
+                _last$storage = angular.copy($storage);
+
+                $rootScope.$watch(function() {
+                    _debounce || (_debounce = setTimeout(function() {
+                        _debounce = null;
+
+                        if (!angular.equals($storage, _last$storage)) {
+                            angular.forEach($storage, function(v, k) {
+                                angular.isDefined(v) && '$' !== k[0] && webStorage.setItem('ngStorage-' + k, angular.toJson(v));
+
+                                delete _last$storage[k];
+                            });
+
+                            for (var k in _last$storage) {
+                                webStorage.removeItem('ngStorage-' + k);
+                            }
+
+                            _last$storage = angular.copy($storage);
+                        }
+                    }, 100));
+                });
+
+                // #6: Use `$window.addEventListener` instead of `angular.element` to avoid the jQuery-specific `event.originalEvent`
+                'localStorage' === storageType && $window.addEventListener && $window.addEventListener('storage', function(event) {
+                    if ('ngStorage-' === event.key.slice(0, 10)) {
+                        event.newValue ? $storage[event.key.slice(10)] = angular.fromJson(event.newValue) : delete $storage[event.key.slice(10)];
+
+                        _last$storage = angular.copy($storage);
+
+                        $rootScope.$apply();
+                    }
+                });
+
+                return $storage;
+            }
+        ];
+    }
+
+})();
+
 
 angular
 .module('fmApp', [
+    'ngStorage',
     'ui.bootstrap'
 ]);
 
 angular
 .module('fmApp')
-.controller('RethotController', ['$scope', 'mine', function ($scope, mine) {
+.controller('RethotController', ['$scope', 'mine', 'baidu', 'download', function ($scope, mine, baidu, download) {
     "use strict";
 
     $scope.alert = {};
@@ -3704,6 +3811,12 @@ angular
         .then(function (data) {
             $scope.data = data;
 
+            angular.forEach(data.songs, function (song, key) {
+                download.findItem(song.id)
+                .then(function (item) {
+                    download.updateStatus(song, item);
+                });
+            });
             detectAllChecked($scope.allChecked);
 
             $scope.status.error = false;
@@ -3716,6 +3829,33 @@ angular
         });
     };
 
+    $scope.downloadSong = function (song) {
+        baidu.search({
+            title: song.title,
+            artist: song.artist,
+            album: song.subject_title
+        })
+        .then(function (url) {
+            song.url = url;
+            chrome.downloads.download({
+                filename: song.title + ' - ' + song.artist + '.mp3',
+                url: url
+            }, function (downloadId) {
+                download.add(song, downloadId);
+                song.downloadId = downloadId;
+            });
+        }, function () {
+            song.error = true;
+        });
+    };
+
+    chrome.downloads.onChanged.addListener(function (delta) {
+        download.findSong($scope.data.songs, delta.id)
+        .then(function (song) {
+            download.updateStatus(song, delta);
+        });
+    });
+
     $scope.$watch('allChecked', function (checked) {
         detectAllChecked(checked);
     });
@@ -3723,6 +3863,152 @@ angular
     $scope.loadRethot(1);
 
 }]);
+
+angular
+.module('fmApp')
+.factory('baidu', ['$q', function ($q) {
+    "use strict";
+
+    var bm = null;
+
+    function requireBM () {
+        var defer = $q.defer();
+
+        if (bm) {
+            defer.resolve(bm);
+        } else {
+            seajs.use('js/fm-download-baidu', function (b) {
+                bm = b;
+                defer.resolve(bm);
+            });
+        }
+
+        return defer.promise;
+    }
+
+    var baidu = {
+        search: function (song) {
+            var defer = $q.defer();
+
+            requireBM()
+            .then(function (bm) {
+                bm.search(song)
+                .done(function (url) {
+                    defer.resolve(url);
+                })
+                .fail(function () {
+                    defer.reject();
+                });
+            }, function () {
+                defer.reject();
+            });
+
+            return defer.promise;
+        }
+    };
+
+    return baidu;
+}]);
+
+angular
+.module('fmApp')
+.factory('download', ['$localStorage', '$q', function ($localStorage, $q) {
+    "use strict";
+
+    function itemStatus (item) {
+        var status = {},
+            ss;
+
+        if (item.state) {
+            if (angular.isObject(item.state)) {
+                ss = item.state.current;
+            } else {
+                ss = item.state;
+            }
+            if (ss === 'complete') {
+                status.isCompleted = true;
+            } else if (ss === 'pause') {
+                status.isPaused = true;
+            }
+        }
+
+        status.downloadId = item.id;
+
+        return status;
+    }
+
+    var api = {
+        add: function (song, downloadId) {
+            var songId = '' + song.id;
+            if (songId && downloadId) {
+                $localStorage[songId] = {
+                    downloadId: downloadId,
+                    title: song.title,
+                    artist: song.artist
+                };
+                $localStorage['did-' + downloadId] = song.id;
+            }
+        },
+        updateStatus: function (song, delta) {
+            var status = itemStatus(delta);
+            angular.extend(song, status);
+        },
+        findItem: function (songId) {
+            songId =  '' + songId;
+
+            var defer = $q.defer(),
+                item = $localStorage[songId],
+                downloadId = item ? item .downloadId : '';
+
+            if (downloadId) {
+                chrome.downloads.search({
+                    id: downloadId,
+                    query: [item.title, item.artist]
+                }, function (items) {
+                    if (items && items.length) {
+                        defer.resolve(items[0]);
+                    } else {
+                        defer.reject();
+                    }
+                });
+            }
+
+            return defer.promise;
+        },
+        findSong: function (songs, downloadId) {
+            var songId = $localStorage['did-' + downloadId],
+                defer = $q.defer(),
+                song = null;
+
+            if (songId) {
+                for (var i = 0, len = songs.length; i < len; i += 1) {
+                    if (songs[i].id === songId) {
+                        song = songs[i];
+                        break;
+                    }
+                }
+            }
+
+            if (song) {
+                chrome.downloads.search({
+                    id: downloadId,
+                    query: [song.title, song.artist]
+                }, function (items) {
+                    if (items && items.length) {
+                        defer.resolve(song);
+                    } else {
+                        defer.reject();
+                    }
+                });
+            }
+
+            return defer.promise;
+        }
+    };
+
+    return api;
+}]);
+
 
 angular
 .module('fmApp')

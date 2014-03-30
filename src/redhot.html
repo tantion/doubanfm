@@ -44,22 +44,22 @@
                     {{song.title}} - {{song.artist}}
                 </td>
                 <td>
-                    <button type="button" class="btn btn-default btn-xs">下载</button>
-                    <button type="button" class="btn btn-default btn-xs">取消</button>
-                    <button type="button" class="btn btn-default btn-xs">恢复</button>
-                    <button type="button" class="btn btn-default btn-xs">暂停</button>
+                    <button type="button" class="btn btn-default btn-xs" ng-click="downloadSong(song)" ng-show="song.isCompleted || !song.downloadId">下载</button>
+                    <button type="button" class="btn btn-default btn-xs" ng-show="!song.isCompleted && !song.isPaused && song.downloadId">暂停</button>
+                    <button type="button" class="btn btn-default btn-xs" ng-show="!song.isCompleted && song.isPaused && song.downloadId">恢复</button>
                 </td>
                 <td>
-                    <span class="label label-default">已暂停 80%</span>
-                    <span class="label label-info">正在下载 90%</span>
-                    <span class="label label-success">下载完成</span>
-                    <span class="label label-danger">没有找到资源</span>
+                    <span class="label label-default" ng-show="!song.isCompleted && song.isPaused && song.downloadId">已暂停</span>
+                    <span class="label label-info" ng-show="!song.error && !song.isCompleted && !song.isPaused && song.downloadId">正在下载</span>
+                    <span class="label label-success" ng-show="song.isCompleted">下载完成</span>
+                    <span class="label label-danger" ng-show="song.error">没有找到资源</span>
                 </td>
             </tr>
       </tbody>
     </table>
     <pagination total-items="data.total" page="page" max-size="10" items-per-page="15" class="pagination-sm fm-improve-pagination" on-select-page="loadRethot(page)"
         boundary-links="true" rotate="false" previous-text="上一页" next-text="下一页" first-text="首页" last-text="尾页"></pagination>
+    <footer>&nbsp;</footer>
 </div>
 <script src="angular-seajs.js"></script>
 <script src="angular/angular.js"></script>
