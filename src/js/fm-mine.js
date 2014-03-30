@@ -16,7 +16,7 @@ define('js/fm-mine', function(require, exports, module) {
             href = cacheMap[id],
             dfd = new $.Deferred();
 
-        if (id) {
+        if (id && album.match(/http:\/\/music\.douban\.com\/subject\/\d+\//i)) {
             if (href) {
                 dfd.resolve(href);
             } else {
@@ -73,12 +73,15 @@ define('js/fm-mine', function(require, exports, module) {
             }
 
             var fm = null,
+                error = false,
                 url = '';
 
             setTimeout(function () {
-                url = url ? url : '/';
-                fm = window.open(url, target);
-                fm.focus();
+                if (!error) {
+                    url = url ? url : '/';
+                    fm = window.open(url, target);
+                    fm.focus();
+                }
             }, 500);
 
             dfd.done(function (link) {
@@ -89,6 +92,7 @@ define('js/fm-mine', function(require, exports, module) {
                 }
             })
             .fail(function () {
+                error = true;
                 $link.attr('title', '找不到播放链接');
             });
         });
