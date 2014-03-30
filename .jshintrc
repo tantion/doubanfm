@@ -115,6 +115,7 @@
         "define",
         "seajs",
         "chrome",
+        "angular",
         "Do"
         //"exampleVar",
         //"anotherCoolGlobal",

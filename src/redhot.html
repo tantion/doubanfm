@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html ng-app="fmApp">
+<head>
+<meta charset="UTF-8">
+<title>批量下载豆瓣红心频道的歌曲</title>
+<link rel="stylesheet" href="angular-app.css">
+</head>
+<body>
+<div class="container" ng-controller="RethotController">
+    <div class="page-header">
+        <h3>加心歌曲列表</h3>
+    </div>
+    <alert ng-show="alert.msg" type="alert.type" close="alert.msg=''">{{alert.msg}}</alert>
+    <div class="nav fm-improve-action-nav">
+        <button type="button" class="btn btn-default">下载选中歌曲</button>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th width="80px">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox1" value="option1"> <strong>全选</strong>
+                    </label>
+                </th>
+                <th>歌曲</th>
+                <th width="100px">操作</th>
+                <th width="200px">状态</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox1" value="option1"> 1
+                    </label>
+                </td>
+                <td>Mark</td>
+                <td>
+                    <button type="button" class="btn btn-default btn-xs">下载</button>
+                    <button type="button" class="btn btn-default btn-xs">取消</button>
+                    <button type="button" class="btn btn-default btn-xs">恢复</button>
+                    <button type="button" class="btn btn-default btn-xs">暂停</button>
+                </td>
+                <td>
+                    <span class="label label-default">已暂停 80%</span>
+                    <span class="label label-info">正在下载 90%</span>
+                    <span class="label label-success">下载完成</span>
+                    <span class="label label-danger">没有找到资源</span>
+                </td>
+            </tr>
+      </tbody>
+    </table>
+</div>
+<script src="lib/jquery.js"></script>
+<script src="angular/angular.js"></script>
+<script src="angular-app.js"></script>
+</body>
+</html>

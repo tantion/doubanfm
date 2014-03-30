@@ -14,12 +14,14 @@ define('js/main', function(require, exports, module) {
             require('js/fm-programme'), // 为 music.douban.com/programme/:id 页面添加在FM播放的链接功能
             require('js/fm-musician'), // 为 music.douban.com/musician/:id 页面添加在FM播放的链接功能
             require('js/fm-search'), // 搜索插件
-            require('js/fm-download-baidu') // 百度音乐下载 MP3
+            require('js/fm-download-baidu'), // 百度音乐下载 MP3
+            require('js/batch-download') // 批量下载入口
         ],
         inject = require('js/inject');
 
     // 加载 jquery 插件
     require('lib/tipsy/jquery.tipsy.js')($);
+    require('jquery.cookie')($);
 
     // 启用插件
     $.each(plugins, function (key, plugin) {

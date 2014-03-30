@@ -37,6 +37,21 @@ module.exports = function(grunt) {
           'src/lib/douban/dialog.css'
         ],
         dest: 'src/bootstrap.css'
+      },
+      appjs: {
+        src: [
+          'src/angular/ui/ui-bootstrap-tpls-0.10.0.js',
+          'src/app/main.js',
+          'src/app/**/*.js'
+        ],
+        dest: 'src/angular-app.js'
+      },
+      appcss: {
+        src: [
+          'src/bootstrap/css/bootstrap.css',
+          'src/css/angular-app.css'
+        ],
+        dest: 'src/angular-app.css'
       }
     },
     replace: {
@@ -79,11 +94,15 @@ module.exports = function(grunt) {
       dev: {
         src: [
           'src/js/**/*.js',
+          'src/app/**/*.js',
           'src/app.js'
         ]
       },
       dist: {
-        src: 'dist/js/**/*.js'
+        src: [
+          'dist/js/**/*.js',
+          'dist/app/**/*.js'
+        ]
       }
     },
     uglify: {
@@ -142,6 +161,14 @@ module.exports = function(grunt) {
       js: {
         files: '<%= concat.js.src %>',
         tasks: ['concat:js']
+      },
+      appcss: {
+        files: '<%= concat.appcss.src %>',
+        tasks: ['concat:appcss']
+      },
+      appjs: {
+        files: '<%= concat.appjs.src %>',
+        tasks: ['concat:appjs']
       }
     }
   });

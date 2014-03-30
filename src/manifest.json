@@ -9,6 +9,7 @@
         "<all_urls>",
         "tabs",
         "webNavigation",
+        "cookies",
         "downloads"
      ],
     "icons": {
@@ -19,7 +20,8 @@
     },
     "web_accessible_resources": [
         "inject/*.*",
-        "images/*.*"
+        "images/*.*",
+        "*.html"
     ],
     "background": {
         "persistent": false,

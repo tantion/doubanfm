@@ -5,7 +5,7 @@
 
 ((function (factory) {
     if (typeof define === 'function') {
-        define('lib/tipsy/jquery.tipsy.js', ['jquery'], function (require, exports, module){
+        define('lib/tipsy/jquery.tipsy.js', function (require, exports, module){
             module.exports = factory;
         });
     } else {

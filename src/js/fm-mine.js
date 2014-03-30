@@ -108,9 +108,50 @@ define('js/fm-mine', function(require, exports, module) {
         $tmpl.html(tmpl);
     }
 
+    function requestRethot (url) {
+        var dfd = new $.Deferred();
+
+        $.ajax({
+            type: 'get',
+            url: url,
+            dataType: 'json',
+            timeout: 30 * 1000
+        })
+        .done(function (data) {
+            if (data && data.song_type === 'liked') {
+                dfd.resolve(data);
+            } else {
+                dfd.reject();
+            }
+        })
+        .fail(function () {
+            dfd.reject();
+        });
+
+        return dfd.promise();
+    }
+
+    function initListener () {
+        chrome.runtime.onMessage.addListener(function (msg, sender, sendRespone) {
+
+            requestRethot(msg.url)
+            .done(function (data) {
+                sendRespone(data);
+            })
+            .fail(function () {
+                sendRespone();
+            });
+
+            return true;
+        });
+    }
+
     function init() {
-        initChannelList();
-        initSongList();
+        if (location.href.match(/douban\.fm\/mine/i)) {
+            initChannelList();
+            initSongList();
+            initListener();
+        }
     }
 
     module.exports = {

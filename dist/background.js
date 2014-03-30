@@ -1,0 +1,1 @@
+function downloadSong(a,b){"use strict";chrome.downloads.download({url:b,filename:a})}chrome.runtime.onMessage.addListener(function(a){"use strict";var b=a.action,c=a.data;switch(b){case"downloadSong":downloadSong(c.filename,c.url)}});

@@ -1,4 +1,4 @@
-/*! douban-fm-improve - v1.8.0 - 2014-03-29
+/*! douban-fm-improve - v1.8.0 - 2014-03-30
 * https://github.com/tantion/doubanfm
 * Copyright (c) 2014 tantion; Licensed MIT */
 (function(global, undefined) {
@@ -1874,6 +1874,131 @@ seajs.config = function(configData) {
     }
 
 }());
+
+/*!
+ * jQuery Cookie Plugin v1.4.0
+ * https://github.com/carhartl/jquery-cookie
+ *
+ * Copyright 2013 Klaus Hartl
+ * Released under the MIT license
+ */
+(function (factory) {
+	if (typeof define === 'function') {
+        if (define.amd) {
+            // AMD
+            define(['jquery'], factory);
+        } else {
+            // CMD
+            define('jquery.cookie', function (require, exports, module){
+                module.exports = factory;
+            });
+        }
+	} else if (typeof exports === 'object') {
+		// CommonJS
+		factory(require('jquery'));
+	} else {
+		// Browser globals
+		factory(jQuery);
+	}
+}(function ($) {
+
+	var pluses = /\+/g;
+
+	function encode(s) {
+		return config.raw ? s : encodeURIComponent(s);
+	}
+
+	function decode(s) {
+		return config.raw ? s : decodeURIComponent(s);
+	}
+
+	function stringifyCookieValue(value) {
+		return encode(config.json ? JSON.stringify(value) : String(value));
+	}
+
+	function parseCookieValue(s) {
+		if (s.indexOf('"') === 0) {
+			// This is a quoted cookie as according to RFC2068, unescape...
+			s = s.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+		}
+
+		try {
+			// Replace server-side written pluses with spaces.
+			// If we can't decode the cookie, ignore it, it's unusable.
+			// If we can't parse the cookie, ignore it, it's unusable.
+			s = decodeURIComponent(s.replace(pluses, ' '));
+			return config.json ? JSON.parse(s) : s;
+		} catch(e) {}
+	}
+
+	function read(s, converter) {
+		var value = config.raw ? s : parseCookieValue(s);
+		return $.isFunction(converter) ? converter(value) : value;
+	}
+
+	var config = $.cookie = function (key, value, options) {
+
+		// Write
+
+		if (value !== undefined && !$.isFunction(value)) {
+			options = $.extend({}, config.defaults, options);
+
+			if (typeof options.expires === 'number') {
+				var days = options.expires, t = options.expires = new Date();
+				t.setTime(+t + days * 864e+5);
+			}
+
+			return (document.cookie = [
+				encode(key), '=', stringifyCookieValue(value),
+				options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
+				options.path    ? '; path=' + options.path : '',
+				options.domain  ? '; domain=' + options.domain : '',
+				options.secure  ? '; secure' : ''
+			].join(''));
+		}
+
+		// Read
+
+		var result = key ? undefined : {};
+
+		// To prevent the for loop in the first place assign an empty array
+		// in case there are no cookies at all. Also prevents odd result when
+		// calling $.cookie().
+		var cookies = document.cookie ? document.cookie.split('; ') : [];
+
+		for (var i = 0, l = cookies.length; i < l; i++) {
+			var parts = cookies[i].split('=');
+			var name = decode(parts.shift());
+			var cookie = parts.join('=');
+
+			if (key && key === name) {
+				// If second argument (value) is a function it's a converter...
+				result = read(cookie, value);
+				break;
+			}
+
+			// Prevent storing a cookie that we couldn't decode.
+			if (!key && (cookie = read(cookie)) !== undefined) {
+				result[name] = cookie;
+			}
+		}
+
+		return result;
+	};
+
+	config.defaults = {};
+
+	$.removeCookie = function (key, options) {
+		if ($.cookie(key) === undefined) {
+			return false;
+		}
+
+		// Must not alter options, thus extending a fresh object...
+		$.cookie(key, '', $.extend({}, options, { expires: -1 }));
+		return !$.cookie(key);
+	};
+
+}));
 
 /*!
  * jQuery JavaScript Library v1.9.1
@@ -12316,7 +12441,7 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
 
 ((function (factory) {
     if (typeof define === 'function') {
-        define('lib/tipsy/jquery.tipsy.js', ['jquery'], function (require, exports, module){
+        define('lib/tipsy/jquery.tipsy.js', function (require, exports, module){
             module.exports = factory;
         });
     } else {
@@ -12575,6 +12700,38 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
 	};
     
 }));
+
+//
+// 为批量下载添加入口链接
+//
+define('js/batch-download', function (require, exports, module) {
+    "use strict";
+
+    var $ = require('jquery');
+
+    function injectRethot () {
+        if (!location.href.match(/douban\.fm\/mine/i)) {
+            return;
+        }
+
+        var $tmpl = $('#song_tip_tmpl'),
+            tmpl = $tmpl.html(),
+            href = chrome.extension.getURL('redhot.html'),
+            repl = '我的红心兆赫</a>收听；或者批量<a href="' + href + '" target="_blank">下载红心兆赫</a>';
+
+        tmpl = tmpl.replace('我的红心兆赫</a>收听', repl);
+
+        $tmpl.html(tmpl);
+    }
+
+    function init () {
+        injectRethot();
+    }
+
+    module.exports = {
+        init: init
+    };
+});
 
 //
 // 简单内存缓存
@@ -12986,9 +13143,50 @@ define('js/fm-mine', function(require, exports, module) {
         $tmpl.html(tmpl);
     }
 
+    function requestRethot (url) {
+        var dfd = new $.Deferred();
+
+        $.ajax({
+            type: 'get',
+            url: url,
+            dataType: 'json',
+            timeout: 30 * 1000
+        })
+        .done(function (data) {
+            if (data && data.song_type === 'liked') {
+                dfd.resolve(data);
+            } else {
+                dfd.reject();
+            }
+        })
+        .fail(function () {
+            dfd.reject();
+        });
+
+        return dfd.promise();
+    }
+
+    function initListener () {
+        chrome.runtime.onMessage.addListener(function (msg, sender, sendRespone) {
+
+            requestRethot(msg.url)
+            .done(function (data) {
+                sendRespone(data);
+            })
+            .fail(function () {
+                sendRespone();
+            });
+
+            return true;
+        });
+    }
+
     function init() {
-        initChannelList();
-        initSongList();
+        if (location.href.match(/douban\.fm\/mine/i)) {
+            initChannelList();
+            initSongList();
+            initListener();
+        }
     }
 
     module.exports = {
@@ -13499,12 +13697,14 @@ define('js/main', function(require, exports, module) {
             require('js/fm-programme'), // 为 music.douban.com/programme/:id 页面添加在FM播放的链接功能
             require('js/fm-musician'), // 为 music.douban.com/musician/:id 页面添加在FM播放的链接功能
             require('js/fm-search'), // 搜索插件
-            require('js/fm-download-baidu') // 百度音乐下载 MP3
+            require('js/fm-download-baidu'), // 百度音乐下载 MP3
+            require('js/batch-download') // 批量下载入口
         ],
         inject = require('js/inject');
 
     // 加载 jquery 插件
     require('lib/tipsy/jquery.tipsy.js')($);
+    require('jquery.cookie')($);
 
     // 启用插件
     $.each(plugins, function (key, plugin) {
