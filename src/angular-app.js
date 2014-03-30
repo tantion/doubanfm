@@ -3963,6 +3963,7 @@ angular
             if (downloadId) {
                 chrome.downloads.search({
                     id: downloadId,
+                    exists: true,
                     query: [item.title, item.artist]
                 }, function (items) {
                     if (items && items.length) {
@@ -3992,6 +3993,7 @@ angular
             if (song) {
                 chrome.downloads.search({
                     id: downloadId,
+                    exists: true,
                     query: [song.title, song.artist]
                 }, function (items) {
                     if (items && items.length) {
