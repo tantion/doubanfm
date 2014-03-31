@@ -3825,7 +3825,9 @@ angular
             angular.forEach(data.songs, function (song, key) {
                 download.findItem(song.id)
                 .then(function (item) {
+                    console.log(item);
                     download.updateStatus(song, item);
+                    console.log(song);
                 });
             });
             detectAllChecked($scope.allChecked);
@@ -3888,6 +3890,7 @@ angular
     };
 
     chrome.downloads.onChanged.addListener(function (delta) {
+        console.log(delta);
         download.findSong($scope.data.songs, delta.id)
         .then(function (song) {
             download.updateStatus(song, delta);
@@ -4096,19 +4099,127 @@ angular
     "use strict";
 
     function itemStatus (item) {
-        var status = {},
-            ss;
+        var status = {};
 
-        if (item.state) {
-            if (angular.isObject(item.state)) {
-                ss = item.state.current;
-            } else {
-                ss = item.state;
-            }
-            if (ss === 'complete') {
+        // download item
+        if (item.startTime) {
+            // 完成
+            if (item.state === 'complete') {
+                status.isReady = true;
                 status.isCompleted = true;
-            } else if (ss === 'pause') {
-                status.isPaused = true;
+                status.isPaused = false;
+                status.isDownloading = false;
+                status.isInterrupted = false;
+            }
+            // 中断
+            else if (item.state === 'interrupted') {
+                status.isReady = true;
+                status.isCompleted = false;
+                status.isPaused = false;
+                status.isDownloading = false;
+                status.isInterrupted = true;
+            }
+            // 下载
+            else if (item.state === 'in_progress') {
+                // 暂停
+                if (item.paused) {
+                    if (item.canResume) {
+                        status.isReady = false;
+                        status.isCompleted = false;
+                        status.isPaused = true;
+                        status.isDownloading = false;
+                        status.isInterrupted = false;
+                    }
+                    // 准备
+                    else {
+                        status.isReady = true;
+                        status.isCompleted = false;
+                        status.isPaused = false;
+                        status.isDownloading = false;
+                        status.isInterrupted = false;
+                    }
+                }
+                // 正在下载
+                else {
+                    status.isReady = false;
+                    status.isCompleted = false;
+                    status.isPaused = false;
+                    status.isDownloading = true;
+                    status.isInterrupted = false;
+                }
+            }
+            // 准备
+            else {
+                status.isReady = true;
+                status.isCompleted = false;
+                status.isPaused = false;
+                status.isDownloading = false;
+                status.isInterrupted = false;
+            }
+        }
+        // update delta
+        else {
+            // 完成
+            if (item.state && item.state.current === 'complete') {
+                status.isReady = true;
+                status.isCompleted = true;
+                status.isPaused = false;
+                status.isDownloading = false;
+                status.isInterrupted = false;
+            }
+            // 中断
+            else if (item.error) {
+                status.isReady = true;
+                status.isCompleted = false;
+                status.isPaused = false;
+                status.isDownloading = false;
+                status.isInterrupted = true;
+            }
+            // 暂停或恢复
+            else if (item.paused) {
+                // 暂停
+                if (item.paused.current) {
+                    if (item.canResume.current) {
+                        status.isReady = false;
+                        status.isCompleted = false;
+                        status.isPaused = true;
+                        status.isDownloading = false;
+                        status.isInterrupted = false;
+                    }
+                    // 准备
+                    else {
+                        status.isReady = true;
+                        status.isCompleted = false;
+                        status.isPaused = false;
+                        status.isDownloading = false;
+                        status.isInterrupted = false;
+                    }
+                }
+                // 恢复
+                // 正在下载
+                else {
+                    status.isReady = false;
+                    status.isCompleted = false;
+                    status.isPaused = false;
+                    status.isDownloading = true;
+                    status.isInterrupted = false;
+                }
+            }
+            // 开始下载
+            else if (item.filename) {
+                status.isReady = false;
+                status.isCompleted = false;
+                status.isPaused = false;
+                status.isDownloading = true;
+                status.isInterrupted = false;
+            }
+            // 准备
+            else {
+                status.isReady = true;
+                status.isCompleted = false;
+                status.isPaused = false;
+                status.isDownloading = false;
+                status.isInterrupted = false;
             }
         }
 

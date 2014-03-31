@@ -47,13 +47,13 @@
                     {{song.title}} - {{song.artist}}
                 </td>
                 <td>
-                    <button type="button" class="btn btn-default btn-xs" ng-click="downloadSong(song)" ng-show="song.isCompleted || !song.downloadId">下载</button>
-                    <button type="button" class="btn btn-default btn-xs" ng-click="pauseDownload(song)" ng-show="!song.isCompleted && !song.isPaused && song.downloadId">暂停</button>
-                    <button type="button" class="btn btn-default btn-xs" ng-click="resumeDownload(song)" ng-show="!song.isCompleted && song.isPaused && song.downloadId">恢复</button>
+                    <button type="button" class="btn btn-default btn-xs" ng-click="downloadSong(song)" ng-show="song.isReady || !song.downloadId">下载</button>
+                    <button type="button" class="btn btn-default btn-xs" ng-click="pauseDownload(song)" ng-show="song.isDownloading">暂停</button>
+                    <button type="button" class="btn btn-default btn-xs" ng-click="resumeDownload(song)" ng-show="song.isPaused">恢复</button>
                 </td>
                 <td>
-                    <span class="label label-default" ng-show="!song.isCompleted && song.isPaused && song.downloadId">已暂停</span>
-                    <span class="label label-info" ng-show="!song.error && !song.isCompleted && !song.isPaused && song.downloadId">正在下载</span>
+                    <span class="label label-default" ng-show="song.isPaused">已暂停</span>
+                    <span class="label label-info" ng-show="song.isDownloading">正在下载</span>
                     <span class="label label-success" ng-show="song.isCompleted">下载完成</span>
                     <span class="label label-danger" ng-show="song.error">没有找到资源</span>
                 </td>

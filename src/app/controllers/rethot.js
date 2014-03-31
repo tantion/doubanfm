@@ -28,7 +28,9 @@ angular
             angular.forEach(data.songs, function (song, key) {
                 download.findItem(song.id)
                 .then(function (item) {
+                    console.log(item);
                     download.updateStatus(song, item);
+                    console.log(song);
                 });
             });
             detectAllChecked($scope.allChecked);
@@ -91,6 +93,7 @@ angular
     };
 
     chrome.downloads.onChanged.addListener(function (delta) {
+        console.log(delta);
         download.findSong($scope.data.songs, delta.id)
         .then(function (song) {
             download.updateStatus(song, delta);
