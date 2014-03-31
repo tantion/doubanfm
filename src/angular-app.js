@@ -3783,11 +3783,17 @@ angular
 .module('fmApp', [
     'ngStorage',
     'ui.bootstrap'
-]);
+])
+.factory('_', function () {
+    "use strict";
+
+    return window._;
+});
 
 angular
 .module('fmApp')
-.controller('RethotController', ['$scope', 'mine', 'baidu', 'download', function ($scope, mine, baidu, download) {
+.controller('RethotController', ['$scope', 'mine', 'baidu', 'download', '$modal', '_',
+    function ($scope, mine, baidu, download, $modal, _) {
     "use strict";
 
     $scope.alert = {};
@@ -3848,6 +3854,22 @@ angular
             song.error = true;
         });
     };
+    $scope.pauseDownload = function (song) {
+        var downloadId = song.downloadId;
+        if (downloadId) {
+            chrome.downloads.pause(downloadId, function () {
+                song.isPaused = true;
+            });
+        }
+    };
+    $scope.resumeDownload = function (song) {
+        var downloadId = song.downloadId;
+        if (downloadId) {
+            chrome.downloads.resume(downloadId, function () {
+                song.isPaused = false;
+            });
+        }
+    };
 
     chrome.downloads.onChanged.addListener(function (delta) {
         download.findSong($scope.data.songs, delta.id)
@@ -3856,12 +3878,48 @@ angular
         });
     });
 
+    $scope.openUrlModal = function () {
+        var modalInstance = $modal.open({
+            templateUrl: 'partails/song-url.html',
+            controller: 'SongUrlController',
+            resolve: {
+                items: function () {
+                    return $scope.items;
+                }
+            }
+        });
+
+        modalInstance.result.then(function () {
+        }, function () {
+        });
+    };
+
+    $scope.$watch('data.songs', function (songs) {
+        $scope.hasChecked = _.some(_.pluck(songs, 'checked'));
+    }, true);
     $scope.$watch('allChecked', function (checked) {
         detectAllChecked(checked);
     });
 
     $scope.loadRethot(1);
 
+}]);
+
+angular
+.module('fmApp')
+.controller('SongUrlController', ['$scope', '$modalInstance', 'items',
+    function ($scope, $modalInstance, items) {
+    "use strict";
+
+    $scope.items = items;
+
+    $scope.ok = function () {
+        $modalInstance.close();
+    };
+
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+    };
 }]);
 
 angular

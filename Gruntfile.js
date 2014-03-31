@@ -62,7 +62,6 @@ module.exports = function(grunt) {
       },
       appcss: {
         src: [
-          'src/bootstrap/css/bootstrap.css',
           'src/css/angular-app.css'
         ],
         dest: 'src/angular-app.css'
