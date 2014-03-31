@@ -32,28 +32,36 @@
                     </label>
                 </th>
                 <th>歌曲</th>
-                <th width="100px">操作</th>
-                <th width="200px">状态</th>
+                <th>歌手</th>
+                <th>专辑</th>
+                <th width="60px">操作</th>
+                <th width="120px">状态</th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="song in data.songs">
+            <tr ng-repeat="song in data.songs" ng-click="toggleChecked($event, song)">
                 <td>
                     <label class="checkbox-inline">
                         <input type="checkbox" ng-model="song.checked"> {{$index + data.start + 1}}
                     </label>
                 </td>
-                <td ng-click="song.checked = !song.checked">
-                    {{song.title}} - {{song.artist}}
+                <td>
+                    <a href="" ng-href="{{song.fmLink}}" ng-click="playInFM($event, song)" target="_fm" title="{{noFMLink ? '找不到播放链接' : '在 FM 中播放该首歌'}}">{{song.title}}</a>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-default btn-xs" ng-click="downloadSong(song)" ng-show="song.isCompleted || !song.downloadId">下载</button>
-                    <button type="button" class="btn btn-default btn-xs" ng-click="pauseDownload(song)" ng-show="!song.isCompleted && !song.isPaused && song.downloadId">暂停</button>
-                    <button type="button" class="btn btn-default btn-xs" ng-click="resumeDownload(song)" ng-show="!song.isCompleted && song.isPaused && song.downloadId">恢复</button>
+                    <a href="http://music.douban.com/search?q={{song.artist}}" target="_blank">{{song.artist}}</a>
                 </td>
                 <td>
-                    <span class="label label-default" ng-show="!song.isCompleted && song.isPaused && song.downloadId">已暂停</span>
-                    <span class="label label-info" ng-show="!song.error && !song.isCompleted && !song.isPaused && song.downloadId">正在下载</span>
+                    <a href="{{song.path}}" target="_blank">{{song.subject_title}}</a>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-default btn-xs" ng-click="downloadSong(song)" ng-show="song.isReady || !song.downloadId">下载</button>
+                    <button type="button" class="btn btn-default btn-xs" ng-click="pauseDownload(song)" ng-show="song.isDownloading">暂停</button>
+                    <button type="button" class="btn btn-default btn-xs" ng-click="resumeDownload(song)" ng-show="song.isPaused">恢复</button>
+                </td>
+                <td>
+                    <span class="label label-default" ng-show="song.isPaused">已暂停</span>
+                    <span class="label label-info" ng-show="song.isDownloading">正在下载</span>
                     <span class="label label-success" ng-show="song.isCompleted">下载完成</span>
                     <span class="label label-danger" ng-show="song.error">没有找到资源</span>
                 </td>
