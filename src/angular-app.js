@@ -3919,6 +3919,7 @@ angular
     };
 
     $scope.playInFM = function ($event, song) {
+        $event.preventDefault();
         seajs.use('js/fm-mine', function (fm) {
             fm.findFMLink(song.id, song.path)
             .done(function (url) {
@@ -3929,7 +3930,6 @@ angular
                 song.noFMLink = true;
             });
         });
-        return false;
     };
 
     $scope.toggleChecked = function ($event, song) {
