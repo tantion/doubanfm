@@ -1,6 +1,6 @@
 angular
 .module('fmApp')
-.factory('baidu', ['$q', function ($q) {
+.factory('baidu', ['$q', 'async', '$timeout', function ($q, async, $timeout) {
     "use strict";
 
     var bm = null;
@@ -35,6 +35,41 @@ angular
                 });
             }, function () {
                 defer.reject();
+            });
+
+            return defer.promise;
+        },
+        searchSongs: function (songs, delay) {
+            var defer = $q.defer();
+
+            delay = delay || 1000;
+
+            requireBM()
+            .then(function (bm) {
+                async.eachSeries(songs, function (song, callback) {
+                    defer.notify(song);
+                    bm.search(song)
+                    .done(function (url) {
+                        defer.notify(url);
+                    })
+                    .fail(function () {
+                        defer.notify();
+                    })
+                    .always(function () {
+                        // 为了防止并发而被发现
+                        $timeout(function () {
+                            callback();
+                        }, delay);
+                    });
+                }, function (err) {
+                    if (err) {
+                        defer.reject();
+                    } else {
+                        defer.resolve();
+                    }
+                });
+            }, function () {
+                defer.rejcet();
             });
 
             return defer.promise;

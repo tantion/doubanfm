@@ -7,6 +7,7 @@
 
     "permissions": [
         "<all_urls>",
+        "clipboardWrite",
         "tabs",
         "webNavigation",
         "cookies",

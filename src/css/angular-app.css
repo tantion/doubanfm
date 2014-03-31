@@ -4,5 +4,26 @@
 .fm-improve-pagination {
     margin: 5px 0;
 }
+.fm-improve-info-label {
+    font-size: 12px;
+    line-height: 1.5em;
+    margin-top: 5px;
+}
+.fm-improve-info-bar {
+    padding-left: 40px;
+}
+.fm-improve-info-bar .label {
+    font-size: 12px;
+}
 
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+#copy-clipboard-tmp {
+    position: absolute;
+    z-index: -10;
+    left: -100px;
+    top: -100px;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+}

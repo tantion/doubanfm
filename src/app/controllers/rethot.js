@@ -1,7 +1,7 @@
 angular
 .module('fmApp')
-.controller('RethotController', ['$scope', 'mine', 'baidu', 'download', '$modal', '_',
-    function ($scope, mine, baidu, download, $modal, _) {
+.controller('RethotController', ['$scope', 'mine', 'baidu', 'download', '$modal', '_', 'async', '$timeout',
+    function ($scope, mine, baidu, download, $modal, _, async, $timeout) {
     "use strict";
 
     $scope.alert = {};
@@ -62,6 +62,17 @@ angular
             song.error = true;
         });
     };
+    $scope.downloadSongs = function () {
+        $scope.downloadProcess = true;
+        async.eachSeries($scope.songs, function (song, callback) {
+            $scope.downloadSong(song);
+            $timeout(function () {
+                callback();
+            }, 3000);
+        }, function () {
+            $scope.downloadProcess = false;
+        });
+    };
     $scope.pauseDownload = function (song) {
         var downloadId = song.downloadId;
         if (downloadId) {
@@ -91,8 +102,16 @@ angular
             templateUrl: 'partails/song-url.html',
             controller: 'SongUrlController',
             resolve: {
-                items: function () {
-                    return $scope.items;
+                songs: function () {
+                    var songs = angular.copy($scope.songs);
+                    songs = _.map(songs, function (song) {
+                        return {
+                            title: song.title,
+                            artist: song.artist,
+                            album: song.subject_title
+                        };
+                    });
+                    return songs;
                 }
             }
         });
@@ -103,7 +122,9 @@ angular
     };
 
     $scope.$watch('data.songs', function (songs) {
-        $scope.hasChecked = _.some(_.pluck(songs, 'checked'));
+        $scope.songs = _.filter(songs, function (song) {
+            return song.checked;
+        });
     }, true);
     $scope.$watch('allChecked', function (checked) {
         detectAllChecked(checked);

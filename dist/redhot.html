@@ -17,7 +17,9 @@
         <span ng-show="status.error">加载失败，需要先 <a href="http://douban.fm/common_login?redir=/mine" target="_blank">登录豆瓣帐号</a></span>
     </div>
     <div class="fm-improve-action-nav">
-        <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-cloud-download"></span> 下载选中歌曲</button>
+        <button type="button" ng-disabled="!songs.length || downloadProcess" class="btn btn-default" ng-click="downloadSongs()"><span class="glyphicon glyphicon-cloud-download"></span> 下载选中歌曲</button>
+        <span>&nbsp;</span>
+        <button type="button" ng-disabled="!songs.length" class="btn btn-default" ng-click="openUrlModal()"><span class="glyphicon glyphicon-th-list"></span> 选中歌曲的地址</button>
     </div>
     <pagination total-items="data.total" page="page" max-size="10" items-per-page="15" class="pagination-sm fm-improve-pagination" on-select-page="loadRethot(page)"
         boundary-links="true" rotate="false" previous-text="上一页" next-text="下一页" first-text="首页" last-text="尾页"></pagination>
@@ -41,7 +43,7 @@
                         <input type="checkbox" ng-model="song.checked"> {{$index + data.start + 1}}
                     </label>
                 </td>
-                <td>
+                <td ng-click="song.checked = !song.checked">
                     {{song.title}} - {{song.artist}}
                 </td>
                 <td>
@@ -61,7 +63,7 @@
     <pagination total-items="data.total" page="page" max-size="10" items-per-page="15" class="pagination-sm fm-improve-pagination" on-select-page="loadRethot(page)"
         boundary-links="true" rotate="false" previous-text="上一页" next-text="下一页" first-text="首页" last-text="尾页"></pagination>
     <footer>&nbsp;</footer>
-</div>
+</script>
 <script src="angular-seajs.js"></script>
 <script src="angular/angular.js"></script>
 <script src="angular-app.js"></script>

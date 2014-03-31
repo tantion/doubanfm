@@ -8,4 +8,9 @@ angular
     "use strict";
 
     return window._;
+})
+.factory('async', function () {
+    "use strict";
+
+    return window.async;
 });

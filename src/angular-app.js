@@ -3788,12 +3788,17 @@ angular
     "use strict";
 
     return window._;
+})
+.factory('async', function () {
+    "use strict";
+
+    return window.async;
 });
 
 angular
 .module('fmApp')
-.controller('RethotController', ['$scope', 'mine', 'baidu', 'download', '$modal', '_',
-    function ($scope, mine, baidu, download, $modal, _) {
+.controller('RethotController', ['$scope', 'mine', 'baidu', 'download', '$modal', '_', 'async', '$timeout',
+    function ($scope, mine, baidu, download, $modal, _, async, $timeout) {
     "use strict";
 
     $scope.alert = {};
@@ -3854,6 +3859,17 @@ angular
             song.error = true;
         });
     };
+    $scope.downloadSongs = function () {
+        $scope.downloadProcess = true;
+        async.eachSeries($scope.songs, function (song, callback) {
+            $scope.downloadSong(song);
+            $timeout(function () {
+                callback();
+            }, 3000);
+        }, function () {
+            $scope.downloadProcess = false;
+        });
+    };
     $scope.pauseDownload = function (song) {
         var downloadId = song.downloadId;
         if (downloadId) {
@@ -3883,8 +3899,16 @@ angular
             templateUrl: 'partails/song-url.html',
             controller: 'SongUrlController',
             resolve: {
-                items: function () {
-                    return $scope.items;
+                songs: function () {
+                    var songs = angular.copy($scope.songs);
+                    songs = _.map(songs, function (song) {
+                        return {
+                            title: song.title,
+                            artist: song.artist,
+                            album: song.subject_title
+                        };
+                    });
+                    return songs;
                 }
             }
         });
@@ -3895,7 +3919,9 @@ angular
     };
 
     $scope.$watch('data.songs', function (songs) {
-        $scope.hasChecked = _.some(_.pluck(songs, 'checked'));
+        $scope.songs = _.filter(songs, function (song) {
+            return song.checked;
+        });
     }, true);
     $scope.$watch('allChecked', function (checked) {
         detectAllChecked(checked);
@@ -3907,14 +3933,44 @@ angular
 
 angular
 .module('fmApp')
-.controller('SongUrlController', ['$scope', '$modalInstance', 'items',
-    function ($scope, $modalInstance, items) {
+.controller('SongUrlController', ['$scope', '$modalInstance', 'songs', '$timeout', 'copy', 'baidu',
+    function ($scope, $modalInstance, songs, $timeout, copy, baidu) {
     "use strict";
 
-    $scope.items = items;
+    $scope.songs = songs;
+    $scope.urls = [];
+    $scope.status = {};
 
-    $scope.ok = function () {
-        $modalInstance.close();
+    baidu.searchSongs(songs)
+    .then(function () {
+        $scope.status.fail = false;
+        $scope.status.done = true;
+        $timeout(function () {
+            $scope.status = {};
+        }, 1500);
+    }, function () {
+        $scope.status.done = false;
+        $scope.status.fail = true;
+    }, function (n) {
+        if (n) {
+            if (angular.isObject(n)) {
+                $scope.status.msg = '正在搜索 "' + n.title + ' - ' + n.artist + '"';
+            } else {
+                $scope.urls.push(n);
+            }
+        } else {
+            $scope.status.msg = '没找到地址';
+        }
+    });
+
+    $scope.copy = function () {
+        copy($scope.urls.join('\n'))
+        .then(function () {
+            $scope.copyResolve = '复制成功';
+            $timeout(function () {
+                $scope.copyResolve = '';
+            }, 1000);
+        });
     };
 
     $scope.cancel = function () {
@@ -3924,7 +3980,7 @@ angular
 
 angular
 .module('fmApp')
-.factory('baidu', ['$q', function ($q) {
+.factory('baidu', ['$q', 'async', '$timeout', function ($q, async, $timeout) {
     "use strict";
 
     var bm = null;
@@ -3962,10 +4018,69 @@ angular
             });
 
             return defer.promise;
+        },
+        searchSongs: function (songs, delay) {
+            var defer = $q.defer();
+
+            delay = delay || 1000;
+
+            requireBM()
+            .then(function (bm) {
+                async.eachSeries(songs, function (song, callback) {
+                    defer.notify(song);
+                    bm.search(song)
+                    .done(function (url) {
+                        defer.notify(url);
+                    })
+                    .fail(function () {
+                        defer.notify();
+                    })
+                    .always(function () {
+                        // 为了防止并发而被发现
+                        $timeout(function () {
+                            callback();
+                        }, delay);
+                    });
+                }, function (err) {
+                    if (err) {
+                        defer.reject();
+                    } else {
+                        defer.resolve();
+                    }
+                });
+            }, function () {
+                defer.rejcet();
+            });
+
+            return defer.promise;
         }
     };
 
     return baidu;
+}]);
+
+// require clipboardWrite permission
+angular
+.module('fmApp')
+.factory('copy', ['$q', function ($q) {
+    "use strict";
+
+    return function (text) {
+        var $tmp = angular.element('#copy-clipboard-tmp'),
+            defer = $q.defer();
+
+        if (!$tmp.length) {
+            $tmp = angular.element('<textarea id="copy-clipboard-tmp" />').appendTo('body');
+        }
+
+        $tmp.val(text);
+        $tmp[0].select();
+        document.execCommand('copy');
+
+        defer.resolve();
+
+        return defer.promise;
+    };
 }]);
 
 angular
