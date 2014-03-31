@@ -14390,10 +14390,8 @@ define('js/fm-mine', function(require, exports, module) {
 
     var cacheMap = {};
 
-    function getLinkDefer ($link) {
-        var id = $link.data('id'),
-            album = $link.data('album'),
-            href = cacheMap[id],
+    function findFMLink (id, album) {
+        var href = cacheMap[id],
             dfd = new $.Deferred();
 
         if (id && album.match(/http:\/\/music\.douban\.com\/subject\/\d+\//i)) {
@@ -14423,6 +14421,39 @@ define('js/fm-mine', function(require, exports, module) {
         return dfd.promise();
     }
 
+    function playInFM (id, album, target) {
+        var fm = null,
+            dfd = new $.Deferred(),
+            error = false,
+            url = '';
+
+        target = target || '_fm';
+
+        // 防止弹出窗口
+        setTimeout(function () {
+            if (!error) {
+                url = url ? url : '/';
+                fm = window.open(url, target);
+                fm.focus();
+            }
+        }, 500);
+
+        findFMLink(id, album)
+        .done(function (link) {
+            url = link;
+            if (fm) {
+                fm.location.href = link;
+            }
+            dfd.resolve(link);
+        })
+        .fail(function () {
+            error = true;
+            dfd.reject();
+        });
+
+        return dfd.promise();
+    }
+
     // 添加在 FM 播放的链接
     function initSongList() {
         var $tmpl = $('#song_list_tmpl'),
@@ -14439,41 +14470,25 @@ define('js/fm-mine', function(require, exports, module) {
         $tmpl.html(tmpl);
 
         $('#record_viewer')
-        //.on('mouseenter', '.fm-improve-mine-link', function (evt) {
-            //$(this).tipsy({gravity: 's'}).tipsy('show');
-        //})
         .on('click', '.fm-improve-mine-link', function (evt) {
             var $link = $(this),
                 href = $link.attr('href') || '',
                 target = $link.attr('target') || '_fm',
-                dfd = getLinkDefer($link);
+                id = $link.data('id'),
+                album = $link.data('album');
 
             if (!href.match(/^javascript/)) {
                 return;
             }
 
-            var fm = null,
-                error = false,
-                url = '';
+            evt.preventDefault();
 
-            setTimeout(function () {
-                if (!error) {
-                    url = url ? url : '/';
-                    fm = window.open(url, target);
-                    fm.focus();
-                }
-            }, 500);
-
-            dfd.done(function (link) {
-                $link.attr('href', link);
-                url = link;
-                if (fm) {
-                    fm.location.href = link;
-                }
+            playInFM(id, album, target)
+            .done(function (url) {
+                $link.attr('href', url);
             })
             .fail(function () {
-                error = true;
-                $link.attr('title', '找不到播放链接');
+                $link.attr('title', '抱歉没有找到播放地址');
             });
         });
     }
@@ -14539,6 +14554,7 @@ define('js/fm-mine', function(require, exports, module) {
     }
 
     module.exports = {
+        playInFM: playInFM,
         init: init
     };
 });
