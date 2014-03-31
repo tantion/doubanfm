@@ -1,4 +1,4 @@
-/*! douban-fm-improve - v1.8.0 - 2014-03-31
+/*! douban-fm-improve - v1.8.0 - 2014-04-01
 * https://github.com/tantion/doubanfm
 * Copyright (c) 2014 tantion; Licensed MIT */
 angular.module("ui.bootstrap", ["ui.bootstrap.tpls", "ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.bindHtml","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.position","ui.bootstrap.datepicker","ui.bootstrap.dropdownToggle","ui.bootstrap.modal","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
@@ -3918,6 +3918,20 @@ angular
         });
     };
 
+    $scope.playInFM = function ($event, song) {
+        seajs.use('js/fm-mine', function (fm) {
+            fm.findFMLink(song.id, song.path)
+            .done(function (url) {
+                song.fmLink = url;
+                mine.openOrUpdate(url, 'http://douban.fm/?*');
+            })
+            .fail(function () {
+                song.noFMLink = true;
+            });
+        });
+        return false;
+    };
+
     $scope.toggleChecked = function ($event, song) {
         var target = $event.target;
         if (target.nodeName === 'TD') {
@@ -4415,6 +4429,27 @@ angular
                         defer.reject();
                     }
                 });
+            });
+
+            return defer.promise;
+        },
+
+        openOrUpdate: function (url, match) {
+            var defer = $q.defer();
+
+            chrome.tabs.query({url: match}, function (tabs) {
+                if (tabs && tabs.length) {
+                    chrome.tabs.update(tabs[0].id, {
+                        url: url,
+                        active: true
+                    }, function () {
+                        defer.resolve();
+                    });
+                } else {
+                    chrome.tabs.create({url: url}, function () {
+                        defer.resolve();
+                    });
+                }
             });
 
             return defer.promise;

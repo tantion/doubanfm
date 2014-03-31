@@ -116,6 +116,27 @@ angular
             });
 
             return defer.promise;
+        },
+
+        openOrUpdate: function (url, match) {
+            var defer = $q.defer();
+
+            chrome.tabs.query({url: match}, function (tabs) {
+                if (tabs && tabs.length) {
+                    chrome.tabs.update(tabs[0].id, {
+                        url: url,
+                        active: true
+                    }, function () {
+                        defer.resolve();
+                    });
+                } else {
+                    chrome.tabs.create({url: url}, function () {
+                        defer.resolve();
+                    });
+                }
+            });
+
+            return defer.promise;
         }
     };
 

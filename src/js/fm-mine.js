@@ -52,7 +52,7 @@ define('js/fm-mine', function(require, exports, module) {
         // 防止弹出窗口
         setTimeout(function () {
             if (!error) {
-                url = url ? url : '/';
+                url = url ? url : 'http://douban.fm/';
                 fm = window.open(url, target);
                 fm.focus();
             }
@@ -174,6 +174,7 @@ define('js/fm-mine', function(require, exports, module) {
     }
 
     module.exports = {
+        findFMLink: findFMLink,
         playInFM: playInFM,
         init: init
     };

@@ -121,6 +121,20 @@ angular
         });
     };
 
+    $scope.playInFM = function ($event, song) {
+        seajs.use('js/fm-mine', function (fm) {
+            fm.findFMLink(song.id, song.path)
+            .done(function (url) {
+                song.fmLink = url;
+                mine.openOrUpdate(url, 'http://douban.fm/?*');
+            })
+            .fail(function () {
+                song.noFMLink = true;
+            });
+        });
+        return false;
+    };
+
     $scope.toggleChecked = function ($event, song) {
         var target = $event.target;
         if (target.nodeName === 'TD') {

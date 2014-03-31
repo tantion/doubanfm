@@ -1,4 +1,4 @@
-/*! douban-fm-improve - v1.8.0 - 2014-03-31
+/*! douban-fm-improve - v1.8.0 - 2014-04-01
 * https://github.com/tantion/doubanfm
 * Copyright (c) 2014 tantion; Licensed MIT */
 (function(global, undefined) {
@@ -14430,7 +14430,7 @@ define('js/fm-mine', function(require, exports, module) {
         // 防止弹出窗口
         setTimeout(function () {
             if (!error) {
-                url = url ? url : '/';
+                url = url ? url : 'http://douban.fm/';
                 fm = window.open(url, target);
                 fm.focus();
             }
@@ -14552,6 +14552,7 @@ define('js/fm-mine', function(require, exports, module) {
     }
 
     module.exports = {
+        findFMLink: findFMLink,
         playInFM: playInFM,
         init: init
     };

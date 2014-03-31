@@ -32,8 +32,10 @@
                     </label>
                 </th>
                 <th>歌曲</th>
-                <th width="50px">操作</th>
-                <th width="100px">状态</th>
+                <th>歌手</th>
+                <th>专辑</th>
+                <th width="60px">操作</th>
+                <th width="120px">状态</th>
             </tr>
         </thead>
         <tbody>
@@ -44,7 +46,13 @@
                     </label>
                 </td>
                 <td>
-                    {{song.title}} - {{song.artist}}
+                    <a href="" ng-href="{{song.fmLink}}" ng-click="playInFM($event, song)" target="_fm" title="{{noFMLink ? '找不到播放链接' : '在 FM 中播放该首歌'}}">{{song.title}}</a>
+                </td>
+                <td>
+                    <a href="http://music.douban.com/search?q={{song.artist}}" target="_blank">{{song.artist}}</a>
+                </td>
+                <td>
+                    <a href="{{song.path}}" target="_blank">{{song.subject_title}}</a>
                 </td>
                 <td>
                     <button type="button" class="btn btn-default btn-xs" ng-click="downloadSong(song)" ng-show="song.isReady || !song.downloadId">下载</button>
