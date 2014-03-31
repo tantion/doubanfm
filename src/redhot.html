@@ -37,13 +37,13 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="song in data.songs">
+            <tr ng-repeat="song in data.songs" ng-click="toggleChecked($event, song)">
                 <td>
                     <label class="checkbox-inline">
                         <input type="checkbox" ng-model="song.checked"> {{$index + data.start + 1}}
                     </label>
                 </td>
-                <td ng-click="song.checked = !song.checked">
+                <td>
                     {{song.title}} - {{song.artist}}
                 </td>
                 <td>

@@ -121,6 +121,13 @@ angular
         });
     };
 
+    $scope.toggleChecked = function ($event, song) {
+        var target = $event.target;
+        if (target.nodeName === 'TD') {
+            song.checked = !song.checked;
+        }
+    };
+
     $scope.$watch('data.songs', function (songs) {
         $scope.songs = _.filter(songs, function (song) {
             return song.checked;
