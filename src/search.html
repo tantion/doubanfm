@@ -9,16 +9,23 @@
 <body>
 <div class="container" ng-controller="SearchController">
     <div class="page-header">
-        <h3>搜索<span ng-show="query"> `{{query}}` 结果</span><small> 豆瓣FM音乐助手</small></h3>
+        <h3>搜索歌曲<small> 豆瓣FM音乐助手</small></h3>
     </div>
-    <alert ng-show="alert.msg" type="alert.type" close="alert.msg=''">{{alert.msg}}</alert>
     <div class="fm-improve-action-nav">
+        <form ng-submit="search()" class="fm-improve-search-form pull-left">
+            <div class="input-group">
+                <input type="text" ng-model="query" placeholder="搜索歌曲，歌手，专辑" typeahead="item.title for item in typeahead($viewValue)" typeahead-wait-ms="300" typeahead-on-select="search()" class="form-control">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"><span></button>
+                </span>
+            </div><!-- /input-group -->
+        </form>
+        <span>&nbsp;</span>
         <button type="button" ng-disabled="!songs.length || downloadProcess" class="btn btn-default" ng-click="downloadSongs()"><span class="glyphicon glyphicon-cloud-download"></span> 下载选中歌曲</button>
         <span>&nbsp;</span>
         <button type="button" ng-disabled="!songs.length" class="btn btn-default" ng-click="openUrlModal()"><span class="glyphicon glyphicon-th-list"></span> 选中歌曲的地址</button>
         <span>&nbsp;</span>
         <button type="button" class="btn btn-default" ng-click="checkNeverDownload()"><span class="glyphicon glyphicon-record"></span> 只选未下载歌曲</button>
-        <a href="search.html" target="_blank" class="btn btn-default pull-right"><span class="glyphicon glyphicon-search"></span> 去搜索歌曲</a>
     </div>
     <table class="table table-striped">
         <thead>
@@ -46,15 +53,13 @@
                     </label>
                 </td>
                 <td>
-                    <a href="" ng-if="song.ssid" ng-href="{{song.fmUrl}}" target="_fm" title="在 FM 中播放该首歌">{{song.title}}</a>
-                    <span ng-if="!song.ssid">{{song.title}}</span>
+                    <span>{{song.title}}</span>
                 </td>
                 <td>
-                    <a ng-href="{{song.artistUrl}}" target="_blank">{{song.artist}}</a>
+                    <span>{{song.author}}</span>
                 </td>
                 <td>
-                    <a href="{{song.albumUrl}}" ng-show="!song.programme" target="_blank">{{song.album}}</a>
-                    <a href="{{song.programmeUrl}}" ng-show="song.programme" target="_blank">{{song.programme}}</a>
+                    <span>{{song.album_title}}</span>
                 </td>
                 <td>
                     <button type="button" class="btn btn-default btn-xs" ng-click="downloadSong(song)" ng-show="song.isReady || !song.downloadId">下载</button>
@@ -70,6 +75,9 @@
             </tr>
       </tbody>
     </table>
+    <div class="fm-improve-loading-wrap" ng-show="searching">
+        <img src="images/ajax-loader.gif" alt="">
+    </div>
     <footer>&nbsp;</footer>
 </script>
 <script src="angular-seajs.js"></script>

@@ -38,6 +38,11 @@ angular
             filename = helper.decodeEntiy(filename);
             filename = filename.replace(/"/g, '');
             return filename;
+        },
+
+        removeEm: function (str) {
+            str = str.replace(/<\/?em>/ig, '');
+            return str;
         }
     };
 

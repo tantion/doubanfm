@@ -1,7 +1,7 @@
 angular
 .module('fmApp')
-.factory('download', ['$localStorage', '$q', 'subject', 'musician', 'programme',
-     function ($localStorage, $q, subject, musician, programme) {
+.factory('download', ['$localStorage', '$q', 'subject', 'musician', 'programme', '$http', '_', 'helper',
+     function ($localStorage, $q, subject, musician, programme, $http, _, helper) {
     "use strict";
 
     function itemStatus (item) {
@@ -161,7 +161,7 @@ angular
                 chrome.downloads.search({
                     id: downloadId,
                     exists: true,
-                    query: [item.title, item.artist]
+                    query: [item.title, item.artist || '']
                 }, function (items) {
                     if (items && items.length) {
                         defer.resolve(items[0]);
@@ -251,6 +251,135 @@ angular
                     defer.reject();
                     break;
             }
+
+            return defer.promise;
+        },
+
+        searchTypeahead: function (val) {
+            var defer = $q.defer(),
+                url = 'http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=4.5.4&method=baidu.ting.search.catalogSug&format=json&query=';
+
+            url += encodeURIComponent(val);
+
+            $http({
+                url: url,
+                method: 'get',
+                responseType: 'json',
+                timeout: 30 * 1000
+            })
+            .success(function (data) {
+                var songs = data.song,
+                    albums = data.album;
+
+                songs = _.map(songs, function (song) {
+                    var title = song.songname + ' - ' + song.artistname;
+                    return {
+                        title: title
+                    };
+                }).slice(0, 10);
+                albums = _.map(albums, function (album) {
+                    var title = album.albumname + ' - ' + album.artistname;
+                    return {
+                        title: title
+                    };
+                }).slice(0, 2);
+
+                songs = songs.concat(albums);
+                defer.resolve(songs);
+            })
+            .error(function () {
+                defer.reject();
+            });
+
+            return defer.promise;
+        },
+
+        searchByTitle: function (title) {
+            var defer = $q.defer(),
+                url = 'http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=4.5.4&method=baidu.ting.search.merge&format=json&query=#keyword#&page_no=1&page_size=30&type=-1&data_source=0&use_cluster=1';
+
+            url = url.replace('#keyword#', encodeURIComponent(title));
+
+            $http({
+                url: url,
+                method: 'get',
+                responseType: 'json',
+                cache: true,
+                timeout: 30 * 1000
+            })
+            .success(function (data) {
+                try {
+                    var songs = data.result.song_info.song_list || [];
+                    _.each(songs, function (song) {
+                        song.id = song.song_id;
+                        song.title = helper.removeEm(song.title);
+                        song.author = song.artist = helper.removeEm(song.author) || '';
+                        song.album_title = song.album = helper.removeEm(song.album_title);
+                    });
+                    defer.resolve({
+                        songs: songs
+                    });
+                } catch (e) {
+                    defer.reject();
+                }
+            })
+            .error(function () {
+                defer.reject();
+            });
+
+            return defer.promise;
+        },
+
+        bestSongUrl: function (urls) {
+            var url = null;
+            _.each(urls, function (u) {
+                var kbs = u.file_bitrate;
+                if (u.file_extension === 'mp3' && kbs >= 128) {
+                    if (kbs > 256) {
+                        if (!url) {
+                            url = u.file_link;
+                        }
+                    } else {
+                        url = u.file_link;
+                    }
+                }
+            });
+            if (!url && urls.length && urls[0].file_extension === 'mp3') {
+                url = urls[0].file_link;
+            }
+            return url;
+        },
+
+        searchById: function (songId) {
+            var defer = $q.defer(),
+            url = 'http://tingapi.ting.baidu.com/v1/restserver/ting?from=web&version=4.5.4&method=baidu.ting.song.getInfos&format=json&songid=#songId#';
+
+            url = url.replace('#songId#', songId);
+
+            $http({
+                method: 'get',
+                url: url,
+                responseType: 'json',
+                cache: true,
+                timeout: 30 * 1000
+            })
+            .success(function (data) {
+                try {
+                    var urls = data.songurl.url,
+                    fileUrl;
+                    fileUrl = api.bestSongUrl(urls);
+                    if (fileUrl) {
+                        defer.resolve(fileUrl);
+                    } else {
+                        defer.reject();
+                    }
+                } catch (e) {
+                    defer.reject();
+                }
+            })
+            .error(function () {
+                defer.reject();
+            });
 
             return defer.promise;
         }

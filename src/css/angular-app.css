@@ -37,3 +37,14 @@
 .fm-improve-modal .modal-footer {
     margin-top: 0;
 }
+
+.container {
+    min-width: 800px;
+}
+.fm-improve-search-form {
+    width: 300px;
+}
+.fm-improve-loading-wrap {
+    text-align: center;
+    margin-top: 100px;
+}

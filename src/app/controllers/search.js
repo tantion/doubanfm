@@ -1,7 +1,7 @@
 angular
 .module('fmApp')
-.controller('SearchController', ['$scope', '$location', 'baidu', 'download', '$modal', '_', 'async', '$timeout',
-    function ($scope, $location, baidu, download, $modal, _, async, $timeout) {
+.controller('SearchController', ['$scope', '$location', 'download', '$modal', '_', 'async', '$timeout',
+    function ($scope, $location, download, $modal, _, async, $timeout) {
     "use strict";
 
     var params = $location.search();
@@ -22,12 +22,18 @@ angular
         });
     }
 
-    $scope.loadSongs = function () {
+    $scope.typeahead = function ($viewValue) {
+        return download.searchTypeahead($viewValue);
+    };
 
-        download.loadSongs(params.type, params.id)
+    $scope.search = function () {
+
+        $scope.searching = true;
+
+        download.searchByTitle($scope.query)
         .then(function (data) {
+            $scope.searching = false;
             $scope.data = data;
-            $scope.title = data.title;
 
             angular.forEach(data.songs, function (song, key) {
                 download.findItem(song.id)
@@ -43,15 +49,13 @@ angular
                 $scope.status.ended = true;
             }
         }, function () {
+            $scope.searching = false;
             $scope.status.error = true;
         });
     };
+
     $scope.downloadSong = function (song) {
-        baidu.search({
-            title: song.title,
-            artist: song.artist,
-            album: song.album
-        })
+        download.searchById(song.song_id)
         .then(function (url) {
             song.url = url;
             chrome.downloads.download({
@@ -145,7 +149,8 @@ angular
         detectAllChecked(checked);
     });
 
-    $scope.loadSongs();
-
+    if ($scope.query) {
+        $scope.search();
+    }
 
 }]);
