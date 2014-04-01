@@ -20,6 +20,8 @@
         <button type="button" ng-disabled="!songs.length || downloadProcess" class="btn btn-default" ng-click="downloadSongs()"><span class="glyphicon glyphicon-cloud-download"></span> 下载选中歌曲</button>
         <span>&nbsp;</span>
         <button type="button" ng-disabled="!songs.length" class="btn btn-default" ng-click="openUrlModal()"><span class="glyphicon glyphicon-th-list"></span> 选中歌曲的地址</button>
+        <span>&nbsp;</span>
+        <button type="button" class="btn btn-default" ng-click="checkNeverDownload()"><span class="glyphicon glyphicon-record"></span> 只选没有下载的歌曲</button>
     </div>
     <table class="table table-striped">
         <thead>

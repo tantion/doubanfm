@@ -37,3 +37,6 @@
     margin-right: 30px;
     line-height: 1.5em;
 }
+.fm-improve-modal .modal-footer {
+    margin-top: 0;
+}

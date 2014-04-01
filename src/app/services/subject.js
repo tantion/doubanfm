@@ -44,7 +44,7 @@ angular
                                 return {
                                     id: sid,
                                     ssid: ssid,
-                                    title: title,
+                                    title: helper.fixFilename(title),
                                     album: album,
                                     fmUrl: helper.fmUrl(id, ssid),
                                     albumUrl: url,
@@ -68,7 +68,7 @@ angular
                             if (title) {
                                 return {
                                     id: sid,
-                                    title: title,
+                                    title: helper.fixFilename(title),
                                     album: album,
                                     albumUrl: url,
                                     albumId: id,

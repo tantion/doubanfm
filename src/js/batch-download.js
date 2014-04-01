@@ -31,7 +31,13 @@ define('js/batch-download', function (require, exports, module) {
             subjectId = matches[1],
             href = chrome.extension.getURL('download.html?type=subject&id=' + subjectId);
 
-        $target.append('<a class="fm-improve-batch-link" href="' + href + '" target="_blank">下载专辑</a>');
+        if (!$target.length) {
+            $target = $('#content .related_info').children('h2').first();
+        }
+
+        if ($target.text().indexOf('曲目') > -1) {
+            $target.append('<a class="fm-improve-batch-link" href="' + href + '" target="_blank">下载专辑</a>');
+        }
     }
 
     function init () {

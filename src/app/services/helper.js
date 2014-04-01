@@ -37,6 +37,7 @@ angular
         fixFilename: function (filename) {
             filename = helper.decodeEntiy(filename);
             filename = filename.replace(/"/g, '');
+            return filename;
         }
     };
 

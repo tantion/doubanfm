@@ -14079,7 +14079,13 @@ define('js/batch-download', function (require, exports, module) {
             subjectId = matches[1],
             href = chrome.extension.getURL('download.html?type=subject&id=' + subjectId);
 
-        $target.append('<a class="fm-improve-batch-link" href="' + href + '" target="_blank">下载专辑</a>');
+        if (!$target.length) {
+            $target = $('#content .related_info').children('h2').first();
+        }
+
+        if ($target.text().indexOf('曲目') > -1) {
+            $target.append('<a class="fm-improve-batch-link" href="' + href + '" target="_blank">下载专辑</a>');
+        }
     }
 
     function init () {
@@ -14270,10 +14276,10 @@ define('js/fm-download-baidu', function(require, exports, module) {
     function searchSongInfo (song) {
         var dfd = new $.Deferred(),
             url = 'http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=4.5.4&method=baidu.ting.search.merge&format=json&query=#keyword#&page_no=1&page_size=10&type=-1&data_source=0&use_cluster=1',
-            keyword = song.title + '+-+' + song.artist,
+            keyword = encodeURIComponent(song.title) + '+-+' + encodeURIComponent(song.artist),
             csongId = songCache.get(keyword);
 
-        url = url.replace('#keyword#', encodeURIComponent(keyword));
+        url = url.replace('#keyword#', keyword);
 
         if (csongId) {
             dfd.resolve(csongId);
@@ -14300,7 +14306,6 @@ define('js/fm-download-baidu', function(require, exports, module) {
                         dfd.reject();
                     }
                 } catch (e) {
-                        console.log(e);
                     dfd.reject();
                 }
             })

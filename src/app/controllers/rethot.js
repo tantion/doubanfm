@@ -51,9 +51,8 @@ angular
         })
         .then(function (url) {
             song.url = url;
-            var filename = helper.fixFilename(song.title + ' - ' + song.artist + '.mp3');
             chrome.downloads.download({
-                filename: filename,
+                filename: song.title + ' - ' + song.artist + '.mp3',
                 url: url
             }, function (downloadId) {
                 download.add(song, downloadId);
@@ -114,6 +113,15 @@ angular
                     });
                     return songs;
                 }
+            }
+        });
+    };
+    $scope.checkNeverDownload = function () {
+        angular.forEach($scope.data.songs, function (song) {
+            if (song.isCompleted) {
+                song.checked = false;
+            } else {
+                song.checked = true;
             }
         });
     };

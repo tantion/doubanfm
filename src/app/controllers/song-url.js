@@ -7,7 +7,7 @@ angular
     $scope.songs = songs;
     $scope.urls = [];
     $scope.status = {};
-
+    
     baidu.searchSongs(songs)
     .then(function () {
         $scope.status.fail = false;

@@ -3802,8 +3802,8 @@ angular
 
 angular
 .module('fmApp')
-.controller('BatchDownloadController', ['$scope', '$location', 'baidu', 'download', '$modal', '_', 'async', '$timeout', 'helper',
-    function ($scope, $location, baidu, download, $modal, _, async, $timeout, helper) {
+.controller('BatchDownloadController', ['$scope', '$location', 'baidu', 'download', '$modal', '_', 'async', '$timeout',
+    function ($scope, $location, baidu, download, $modal, _, async, $timeout) {
     "use strict";
 
     var params = $location.search(),
@@ -3861,9 +3861,8 @@ angular
         })
         .then(function (url) {
             song.url = url;
-            var filename = helper.fixFilename(song.title + ' - ' + song.artist + '.mp3');
             chrome.downloads.download({
-                filename: filename,
+                filename: song.title + ' - ' + song.artist + '.mp3',
                 url: url
             }, function (downloadId) {
                 download.add(song, downloadId);
@@ -3924,6 +3923,15 @@ angular
                     });
                     return songs;
                 }
+            }
+        });
+    };
+    $scope.checkNeverDownload = function () {
+        angular.forEach($scope.data.songs, function (song) {
+            if (song.isCompleted) {
+                song.checked = false;
+            } else {
+                song.checked = true;
             }
         });
     };
@@ -4001,9 +4009,8 @@ angular
         })
         .then(function (url) {
             song.url = url;
-            var filename = helper.fixFilename(song.title + ' - ' + song.artist + '.mp3');
             chrome.downloads.download({
-                filename: filename,
+                filename: song.title + ' - ' + song.artist + '.mp3',
                 url: url
             }, function (downloadId) {
                 download.add(song, downloadId);
@@ -4067,6 +4074,15 @@ angular
             }
         });
     };
+    $scope.checkNeverDownload = function () {
+        angular.forEach($scope.data.songs, function (song) {
+            if (song.isCompleted) {
+                song.checked = false;
+            } else {
+                song.checked = true;
+            }
+        });
+    };
 
     $scope.playInFM = function ($event, song) {
         $event.preventDefault();
@@ -4111,7 +4127,7 @@ angular
     $scope.songs = songs;
     $scope.urls = [];
     $scope.status = {};
-
+    
     baidu.searchSongs(songs)
     .then(function () {
         $scope.status.fail = false;
@@ -4528,6 +4544,7 @@ angular
         fixFilename: function (filename) {
             filename = helper.decodeEntiy(filename);
             filename = filename.replace(/"/g, '');
+            return filename;
         }
     };
 
@@ -4726,7 +4743,7 @@ angular
                                 return {
                                     id: sid,
                                     ssid: ssid,
-                                    title: title,
+                                    title: helper.fixFilename(title),
                                     album: album,
                                     fmUrl: helper.fmUrl(id, ssid),
                                     albumUrl: url,
@@ -4750,7 +4767,7 @@ angular
                             if (title) {
                                 return {
                                     id: sid,
-                                    title: title,
+                                    title: helper.fixFilename(title),
                                     album: album,
                                     albumUrl: url,
                                     albumId: id,
