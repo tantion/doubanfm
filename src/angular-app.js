@@ -4918,7 +4918,7 @@ angular
                                 return {
                                     id: sid,
                                     ssid: ssid,
-                                    title: helper.fixFilename(title),
+                                    title: title,
                                     album: album,
                                     fmUrl: helper.fmUrl(sid, ssid),
                                     albumUrl: url,
@@ -4936,8 +4936,9 @@ angular
                             var title = $.trim(item),
                                 sid = id + '-' + i;
 
-                            title = title.match(/^([\d\.\- ]*) (.*)$/);
-                            title = title ? title[2] : '';
+                            title = title.match(/^([\d\.\- ]+)(.*)$/);
+                            title = title ? $.trim(title[2]) : '';
+
 
                             if (title) {
                                 return {
