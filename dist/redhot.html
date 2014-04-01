@@ -20,6 +20,8 @@
         <button type="button" ng-disabled="!songs.length || downloadProcess" class="btn btn-default" ng-click="downloadSongs()"><span class="glyphicon glyphicon-cloud-download"></span> 下载选中歌曲</button>
         <span>&nbsp;</span>
         <button type="button" ng-disabled="!songs.length" class="btn btn-default" ng-click="openUrlModal()"><span class="glyphicon glyphicon-th-list"></span> 选中歌曲的地址</button>
+        <span>&nbsp;</span>
+        <button type="button" class="btn btn-default" ng-click="checkNeverDownload()"><span class="glyphicon glyphicon-record"></span> 只选未下载歌曲</button>
     </div>
     <pagination total-items="data.total" page="page" max-size="10" items-per-page="15" class="pagination-sm fm-improve-pagination" on-select-page="loadRethot(page)"
         boundary-links="true" rotate="false" previous-text="上一页" next-text="下一页" first-text="首页" last-text="尾页"></pagination>
@@ -32,7 +34,7 @@
                     </label>
                 </th>
                 <th>歌曲</th>
-                <th>歌手</th>
+                <th>表演者</th>
                 <th>专辑</th>
                 <th width="60px">操作</th>
                 <th width="120px">状态</th>
