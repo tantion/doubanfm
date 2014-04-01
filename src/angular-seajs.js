@@ -14305,7 +14305,7 @@ define('js/fm-download-baidu', function(require, exports, module) {
 
     function searchSongInfo (song) {
         var dfd = new $.Deferred(),
-            url = 'http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=4.5.4&method=baidu.ting.search.merge&format=json&query=#keyword#&page_no=1&page_size=10&type=-1&data_source=0&use_cluster=1',
+            url = 'http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=4.5.4&method=baidu.ting.search.merge&format=json&query=#keyword#&page_no=1&page_size=30&type=-1&data_source=0&use_cluster=1',
             keyword = encodeURIComponent(song.title) + '+-+' + encodeURIComponent(song.artist),
             csongId = songCache.get(keyword);
 
@@ -14350,16 +14350,50 @@ define('js/fm-download-baidu', function(require, exports, module) {
     // 针对中英混合的情况做一下统一处理
     function fixedSong (song) {
         var title = song.title,
-            titleZh = translate.seperateZh(title);
+            artist = song.artist,
+            tze = null,
+            aze = null;
 
-        song.artist = translate.seperateZh(song.artist);
-
-        if (titleZh !== title) {
-            song.title = titleZh;
-            song.artist = translate.toZh(song.artist);
+        tze = translate.seperateZhEn(title);
+        if (!tze.en || !tze.zh) {
+            tze = translate.seperateEnZh(title);
+        }
+        aze = translate.seperateZhEn(artist);
+        if (!aze.en || !aze.zh) {
+            aze = translate.seperateEnZh(artist);
         }
 
-        song.artist = translate.toAlias(song.artist);
+        // 标题title - 表演artist => title - artist
+        // 标题title - artist => title - artist
+        // title - 表演artist => title - artist
+        // title - artist => title - artist
+        if (tze.en && ((tze.zh && aze.en) || (!tze.zh && aze.en))) {
+            title = tze.en;
+            artist = aze.en;
+        }
+        // 标题title - 表演 => 标题 - 表演
+        // 标题 - 表演 => 标题 - 表演
+        else if (tze.zh && aze.zh && !aze.en) {
+            title = tze.zh;
+            artist = aze.zh;
+        }
+        // 标题 - 表演artist => 标题 - artist : toZh
+        // 标题 - artist => 标题 - artist : toZh
+        else if (tze.zh && !tze.en && aze.en) {
+            title = tze.zh;
+            artist = translate.toZh(aze.en);
+        }
+        // title - 表演 => title - 表演
+        else if (tze.en && !tze.zh && !aze.en && aze.zh) {
+            title = tze.en;
+            artist = aze.zh;
+        }
+
+        title = title || song.title;
+        artist = artist || song.artist;
+
+        song.title = title;
+        song.artist = translate.toAlias(artist);
 
         return song;
     }
@@ -15161,11 +15195,60 @@ define('js/translate', function (require, exports, module) {
             }
             return false;
         },
+        seperateZhEn: function (title) {
+            var matches = title.match(/^([\u4E00-\u9FA5·]{2,}) ([^\u4E00-\u9FA5]{4,})$/),
+                zh = '',
+                en = '';
+            if (matches) {
+                zh = matches[1];
+                en = matches[2];
+            } else {
+                if (this.containsZh(title)) {
+                    zh = title;
+                } else {
+                    en = title;
+                }
+            }
+            return {
+                zh: zh,
+                en: en
+            };
+        },
+        seperateEnZh: function (title) {
+            var matches = title.match(/^([^\u4E00-\u9FA5]{4,}) ([\u4E00-\u9FA5·]{2,})$/),
+                zh = '',
+                en = '';
+            if (matches) {
+                en = matches[1];
+                zh = matches[2];
+            } else {
+                if (this.containsZh(title)) {
+                    zh = title;
+                } else {
+                    en = title;
+                }
+            }
+            return {
+                zh: zh,
+                en: en
+            };
+        },
+        // 中文 en => 中文
         seperateZh: function (title) {
-            var matches = title.match(/^([\u4E00-\u9FA5·]{2,}) ([^\u4E00-\u9FA5]{4,})$/);
+            var r = this.seperateZhEn(title);
 
-            if (matches && matches.length > 1) {
-                title = matches[1] ? matches[1] : title;
+            if (r && r.zh) {
+                title = r.zh;
+            }
+
+            return title;
+        },
+        // en 中文 => en
+        seperateEn: function (title) {
+            var r = this.seperateEnZh(title);
+
+            if (r && r.en) {
+                title = r.en;
             }
 
             return title;

@@ -20,11 +20,60 @@ define('js/translate', function (require, exports, module) {
             }
             return false;
         },
+        seperateZhEn: function (title) {
+            var matches = title.match(/^([\u4E00-\u9FA5·]{2,}) ([^\u4E00-\u9FA5]{4,})$/),
+                zh = '',
+                en = '';
+            if (matches) {
+                zh = matches[1];
+                en = matches[2];
+            } else {
+                if (this.containsZh(title)) {
+                    zh = title;
+                } else {
+                    en = title;
+                }
+            }
+            return {
+                zh: zh,
+                en: en
+            };
+        },
+        seperateEnZh: function (title) {
+            var matches = title.match(/^([^\u4E00-\u9FA5]{4,}) ([\u4E00-\u9FA5·]{2,})$/),
+                zh = '',
+                en = '';
+            if (matches) {
+                en = matches[1];
+                zh = matches[2];
+            } else {
+                if (this.containsZh(title)) {
+                    zh = title;
+                } else {
+                    en = title;
+                }
+            }
+            return {
+                zh: zh,
+                en: en
+            };
+        },
+        // 中文 en => 中文
         seperateZh: function (title) {
-            var matches = title.match(/^([\u4E00-\u9FA5·]{2,}) ([^\u4E00-\u9FA5]{4,})$/);
+            var r = this.seperateZhEn(title);
 
-            if (matches && matches.length > 1) {
-                title = matches[1] ? matches[1] : title;
+            if (r && r.zh) {
+                title = r.zh;
+            }
+
+            return title;
+        },
+        // en 中文 => en
+        seperateEn: function (title) {
+            var r = this.seperateEnZh(title);
+
+            if (r && r.en) {
+                title = r.en;
             }
 
             return title;
