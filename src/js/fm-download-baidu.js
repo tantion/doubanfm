@@ -170,10 +170,16 @@ define('js/fm-download-baidu', function(require, exports, module) {
     function fixedSong (song) {
         var title = song.title,
             titleZh = translate.seperateZh(title);
+
+        song.artist = translate.seperateZh(song.artist);
+
         if (titleZh !== title) {
             song.title = titleZh;
             song.artist = translate.toZh(song.artist);
         }
+
+        song.artist = translate.toAlias(song.artist);
+
         return song;
     }
 

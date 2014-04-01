@@ -8,7 +8,7 @@ angular
         types = {
             'subject': '专辑',
             'programme': '节目',
-            'musician': '歌手'
+            'musician': '最受欢迎'
         };
 
     $scope.batchType = types[params.type];
@@ -32,7 +32,7 @@ angular
         download.loadSongs(params.type, params.id)
         .then(function (data) {
             $scope.data = data;
-            $scope.title = data.album;
+            $scope.title = data.title;
 
             angular.forEach(data.songs, function (song, key) {
                 download.findItem(song.id)

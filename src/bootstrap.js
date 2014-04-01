@@ -14088,9 +14088,25 @@ define('js/batch-download', function (require, exports, module) {
         }
     }
 
+    function injectMusican () {
+        var matches = location.href.match(/music\.douban\.com\/musician\/(\d+)/);
+        if (!matches) {
+            return;
+        }
+
+        var $target = $('#top_songs').children('.hd').find('h2'),
+            id = matches[1],
+            href = chrome.extension.getURL('download.html?type=musician&id=' + id);
+
+        if ($target.text().indexOf('最受欢迎的单曲') > -1) {
+            $target.append('<a class="fm-improve-batch-link" href="' + href + '" target="_blank">下载歌曲</a>');
+        }
+    }
+
     function init () {
         injectRethot();
         injectSubject();
+        injectMusican();
     }
 
     module.exports = {
@@ -14321,10 +14337,16 @@ define('js/fm-download-baidu', function(require, exports, module) {
     function fixedSong (song) {
         var title = song.title,
             titleZh = translate.seperateZh(title);
+
+        song.artist = translate.seperateZh(song.artist);
+
         if (titleZh !== title) {
             song.title = titleZh;
             song.artist = translate.toZh(song.artist);
         }
+
+        song.artist = translate.toAlias(song.artist);
+
         return song;
     }
 
@@ -15113,6 +15135,10 @@ define('js/translate', function (require, exports, module) {
         'richard clayderman': '理查德·克莱德曼'
     };
 
+    var alias = {
+        '理查德·克莱得曼': '理查德·克莱德曼'
+    };
+
     module.exports = {
         containsZh: function (str) {
             if (str.match(/[\u4E00-\u9FA5]+/)) {
@@ -15121,13 +15147,20 @@ define('js/translate', function (require, exports, module) {
             return false;
         },
         seperateZh: function (title) {
-            var matches = title.match(/^([\u4E00-\u9FA5]{2,}) ([^\u4E00-\u9FA5]{4,})$/);
+            var matches = title.match(/^([\u4E00-\u9FA5·]{2,}) ([^\u4E00-\u9FA5]{4,})$/);
 
             if (matches && matches.length > 1) {
                 title = matches[1] ? matches[1] : title;
             }
 
             return title;
+        },
+        toAlias: function (a) {
+            var key = a.toLowerCase();
+            if (alias.hasOwnProperty(key)) {
+                a = alias[key];
+            }
+            return a;
         },
         toZh: function (en) {
             var key = en.toLowerCase();

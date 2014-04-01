@@ -1,7 +1,7 @@
 angular
 .module('fmApp')
-.factory('download', ['$localStorage', '$q', 'subject',
-     function ($localStorage, $q, subject) {
+.factory('download', ['$localStorage', '$q', 'subject', 'musician',
+     function ($localStorage, $q, subject, musician) {
     "use strict";
 
     function itemStatus (item) {
@@ -214,7 +214,19 @@ angular
                         var album = (songs && songs.length) ? songs[0].album : '';
                         defer.resolve({
                             songs: songs,
-                            album: album
+                            title: album
+                        });
+                    }, function () {
+                        defer.reject();
+                    });
+                    break;
+                case 'musician':
+                    musician.loadSongs(id)
+                    .then(function (songs) {
+                        var artist = (songs && songs.length) ? songs[0].artist: '';
+                        defer.resolve({
+                            songs: songs,
+                            title: artist
                         });
                     }, function () {
                         defer.reject();

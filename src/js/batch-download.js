@@ -40,9 +40,25 @@ define('js/batch-download', function (require, exports, module) {
         }
     }
 
+    function injectMusican () {
+        var matches = location.href.match(/music\.douban\.com\/musician\/(\d+)/);
+        if (!matches) {
+            return;
+        }
+
+        var $target = $('#top_songs').children('.hd').find('h2'),
+            id = matches[1],
+            href = chrome.extension.getURL('download.html?type=musician&id=' + id);
+
+        if ($target.text().indexOf('最受欢迎的单曲') > -1) {
+            $target.append('<a class="fm-improve-batch-link" href="' + href + '" target="_blank">下载歌曲</a>');
+        }
+    }
+
     function init () {
         injectRethot();
         injectSubject();
+        injectMusican();
     }
 
     module.exports = {
