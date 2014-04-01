@@ -1,7 +1,7 @@
 angular
 .module('fmApp')
-.controller('RethotController', ['$scope', 'mine', 'baidu', 'download', '$modal', '_', 'async', '$timeout',
-    function ($scope, mine, baidu, download, $modal, _, async, $timeout) {
+.controller('RethotController', ['$scope', 'mine', 'baidu', 'download', '$modal', '_', 'async', '$timeout', 'helper',
+    function ($scope, mine, baidu, download, $modal, _, async, $timeout, helper) {
     "use strict";
 
     $scope.alert = {};
@@ -51,8 +51,9 @@ angular
         })
         .then(function (url) {
             song.url = url;
+            var filename = helper.fixFilename(song.title + ' - ' + song.artist + '.mp3');
             chrome.downloads.download({
-                filename: song.title + ' - ' + song.artist + '.mp3',
+                filename: filename,
                 url: url
             }, function (downloadId) {
                 download.add(song, downloadId);

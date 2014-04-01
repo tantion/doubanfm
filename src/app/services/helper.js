@@ -3,7 +3,9 @@ angular
 .factory('helper', ['$q', function ($q) {
     "use strict";
 
-    return {
+    var delem = null;
+
+    var helper = {
         fmUrl: function (sid, ssid, cid) {
             var href = 'http://douban.fm/?start=#sid#g#ssid#g#channel#&cid=#cid#',
                 channel = 0;
@@ -20,7 +22,24 @@ angular
                        .replace('#channel#', channel);
 
             return href;
+        },
+
+        decodeEntiy: function (str) {
+            if (!delem) {
+                delem = document.createElement('div');
+            }
+            delem.innerHTML = str;
+            str = delem.firstChild.nodeValue;
+            return str;
+        },
+
+        // 有引号下载会出错
+        fixFilename: function (filename) {
+            filename = helper.decodeEntiy(filename);
+            filename = filename.replace(/"/g, '');
         }
     };
+
+    return helper;
 }]);
 

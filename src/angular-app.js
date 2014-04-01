@@ -3802,8 +3802,8 @@ angular
 
 angular
 .module('fmApp')
-.controller('BatchDownloadController', ['$scope', '$location', 'baidu', 'download', '$modal', '_', 'async', '$timeout',
-    function ($scope, $location, baidu, download, $modal, _, async, $timeout) {
+.controller('BatchDownloadController', ['$scope', '$location', 'baidu', 'download', '$modal', '_', 'async', '$timeout', 'helper',
+    function ($scope, $location, baidu, download, $modal, _, async, $timeout, helper) {
     "use strict";
 
     var params = $location.search(),
@@ -3861,8 +3861,9 @@ angular
         })
         .then(function (url) {
             song.url = url;
+            var filename = helper.fixFilename(song.title + ' - ' + song.artist + '.mp3');
             chrome.downloads.download({
-                filename: song.title + ' - ' + song.artist + '.mp3',
+                filename: filename,
                 url: url
             }, function (downloadId) {
                 download.add(song, downloadId);
@@ -3949,8 +3950,8 @@ angular
 
 angular
 .module('fmApp')
-.controller('RethotController', ['$scope', 'mine', 'baidu', 'download', '$modal', '_', 'async', '$timeout',
-    function ($scope, mine, baidu, download, $modal, _, async, $timeout) {
+.controller('RethotController', ['$scope', 'mine', 'baidu', 'download', '$modal', '_', 'async', '$timeout', 'helper',
+    function ($scope, mine, baidu, download, $modal, _, async, $timeout, helper) {
     "use strict";
 
     $scope.alert = {};
@@ -4000,8 +4001,9 @@ angular
         })
         .then(function (url) {
             song.url = url;
+            var filename = helper.fixFilename(song.title + ' - ' + song.artist + '.mp3');
             chrome.downloads.download({
-                filename: song.title + ' - ' + song.artist + '.mp3',
+                filename: filename,
                 url: url
             }, function (downloadId) {
                 download.add(song, downloadId);
@@ -4492,7 +4494,9 @@ angular
 .factory('helper', ['$q', function ($q) {
     "use strict";
 
-    return {
+    var delem = null;
+
+    var helper = {
         fmUrl: function (sid, ssid, cid) {
             var href = 'http://douban.fm/?start=#sid#g#ssid#g#channel#&cid=#cid#',
                 channel = 0;
@@ -4509,8 +4513,25 @@ angular
                        .replace('#channel#', channel);
 
             return href;
+        },
+
+        decodeEntiy: function (str) {
+            if (!delem) {
+                delem = document.createElement('div');
+            }
+            delem.innerHTML = str;
+            str = delem.firstChild.nodeValue;
+            return str;
+        },
+
+        // 有引号下载会出错
+        fixFilename: function (filename) {
+            filename = helper.decodeEntiy(filename);
+            filename = filename.replace(/"/g, '');
         }
     };
+
+    return helper;
 }]);
 
 
