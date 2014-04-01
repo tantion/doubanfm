@@ -8,6 +8,10 @@ define('js/translate', function (require, exports, module) {
         'richard clayderman': '理查德·克莱德曼'
     };
 
+    var alias = {
+        '理查德·克莱得曼': '理查德·克莱德曼'
+    };
+
     module.exports = {
         containsZh: function (str) {
             if (str.match(/[\u4E00-\u9FA5]+/)) {
@@ -16,13 +20,20 @@ define('js/translate', function (require, exports, module) {
             return false;
         },
         seperateZh: function (title) {
-            var matches = title.match(/^([\u4E00-\u9FA5]{2,}) ([^\u4E00-\u9FA5]{4,})$/);
+            var matches = title.match(/^([\u4E00-\u9FA5·]{2,}) ([^\u4E00-\u9FA5]{4,})$/);
 
             if (matches && matches.length > 1) {
                 title = matches[1] ? matches[1] : title;
             }
 
             return title;
+        },
+        toAlias: function (a) {
+            var key = a.toLowerCase();
+            if (alias.hasOwnProperty(key)) {
+                a = alias[key];
+            }
+            return a;
         },
         toZh: function (en) {
             var key = en.toLowerCase();
