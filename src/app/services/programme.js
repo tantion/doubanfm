@@ -55,7 +55,7 @@ angular
                                     albumUrl: albumUrl,
                                     albumId: albumUrl.replace(/.*\/(\d+)\/?$/, '$1'),
                                     artist: artist,
-                                    artistUrl: artistUrl,
+                                    artistUrl: artistUrl + '&sid=' + sid,
                                     programme: programme,
                                     programmeUrl: url
                                 };
