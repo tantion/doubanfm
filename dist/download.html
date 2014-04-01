@@ -67,7 +67,7 @@
                 <td>
                     <span class="label label-default" ng-show="song.isPaused">已暂停</span>
                     <span class="label label-info" ng-show="song.isDownloading">正在下载</span>
-                    <span class="label label-success" ng-show="song.isCompleted">下载完成</span>
+                    <span class="label label-success" ng-show="!song.error && song.isCompleted">下载完成</span>
                     <span class="label label-danger" ng-show="song.error">没有找到资源</span>
                 </td>
             </tr>
