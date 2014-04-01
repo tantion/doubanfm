@@ -4723,7 +4723,13 @@ angular
                 .success(function (html) {
                     html = html.replace(/src=/ig, 'data-src=');
                     var $html = $($.parseHTML(html)),
-                        $musican = $html.find('#info').children(':first').find('a'),
+                        $musican = $html.find('#info').find('.pl')
+                                        .filter(function () {
+                                            if ($(this).text().indexOf('表演者') > -1) {
+                                                return true;
+                                            }
+                                        })
+                                        .find('a'),
                         $wrap = $html.find('.song-items-wrapper'),
                         $items = $wrap.find('.song-item'),
                         $list = $html.find('#db-tags-section').prev(),
