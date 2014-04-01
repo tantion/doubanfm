@@ -1,6 +1,6 @@
 angular
 .module('fmApp')
-.factory('musician', ['$http', '$q', 'helper', function ($http, $q, helper) {
+.factory('programme', ['$http', '$q', 'helper', function ($http, $q, helper) {
     "use strict";
 
     var cacheMap = {};
@@ -8,7 +8,7 @@ angular
     return {
         loadSongs: function (id) {
             var defer = $q.defer(),
-                url = 'http://music.douban.com/musician/' + id,
+                url = 'http://music.douban.com/programme/' + id,
                 songs = [];
 
             if (cacheMap.hasOwnProperty(id)) {
@@ -24,17 +24,22 @@ angular
                 .success(function (html) {
                     html = html.replace(/src=/ig, 'data-src=');
                     var $html = $($.parseHTML(html)),
-                        $musican = $html.find('#headline').find('.info h1'),
-                        $wrap = $html.find('.song-items-wrapper'),
+                        $programme = $html.find('#songlist-title'),
+                        $wrap = $html.find('#songlist-wrapper'),
                         $items = $wrap.find('.song-item'),
-                        artist = $.trim($musican.text());
+                        programme = $.trim($programme.text());
 
                     if ($items.length) {
                         songs = $.map($items, function (item) {
                             var $item = $(item),
-                                sid = $item.attr('id'),
+                                sid = $item.data('songid'),
                                 ssid = $item.data('ssid'),
-                                title = $item.find('.song-name-short').data('title');
+                                $info = $item.find('.song-info'),
+                                $title = $info.find('span').eq(1),
+                                $artist = $info.find('.singer').find('a').first(),
+                                artist = $.trim($artist.text()),
+                                artistUrl = $artist.attr('href'),
+                                title = $.trim($title.text());
 
                             if (title) {
                                 return {
@@ -46,7 +51,9 @@ angular
                                     albumUrl: '',
                                     albumId: '',
                                     artist: artist,
-                                    artistUrl: url
+                                    artistUrl: artistUrl,
+                                    programme: programme,
+                                    programmeUrl: url
                                 };
                             }
                         });

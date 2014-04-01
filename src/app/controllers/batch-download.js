@@ -11,6 +11,7 @@ angular
             'musician': '最受欢迎'
         };
 
+    $scope.type = params.type;
     $scope.batchType = types[params.type];
 
     $scope.alert = {};

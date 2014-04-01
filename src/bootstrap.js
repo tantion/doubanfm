@@ -14103,10 +14103,26 @@ define('js/batch-download', function (require, exports, module) {
         }
     }
 
+    function injectProgramme () {
+        var matches = location.href.match(/music\.douban\.com\/programme\/(\d+)/);
+        if (!matches) {
+            return;
+        }
+
+        var $target = $('#tab').children().first(),
+            id = matches[1],
+            href = chrome.extension.getURL('download.html?type=programme&id=' + id);
+
+        if ($target.text().indexOf('FM') > -1) {
+            $target.prepend('<a href="' + href + '" target="_blank">下载节目</a> <span>或者</span> ');
+        }
+    }
+
     function init () {
         injectRethot();
         injectSubject();
         injectMusican();
+        injectProgramme();
     }
 
     module.exports = {
@@ -15136,7 +15152,8 @@ define('js/translate', function (require, exports, module) {
     };
 
     var alias = {
-        '理查德·克莱得曼': '理查德·克莱德曼'
+        '理查德·克莱得曼': '理查德·克莱德曼',
+        'piano boy': 'Pianoboy'
     };
 
     module.exports = {

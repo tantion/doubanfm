@@ -9,7 +9,8 @@ define('js/translate', function (require, exports, module) {
     };
 
     var alias = {
-        '理查德·克莱得曼': '理查德·克莱德曼'
+        '理查德·克莱得曼': '理查德·克莱德曼',
+        'piano boy': 'Pianoboy'
     };
 
     module.exports = {

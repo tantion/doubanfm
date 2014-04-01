@@ -33,7 +33,10 @@
                 </th>
                 <th>歌曲</th>
                 <th>表演者</th>
-                <th>专辑</th>
+                <th>
+                    <span ng-show="type !== 'programme'">专辑</span>
+                    <span ng-show="type === 'programme'">节目</span>
+                </th>
                 <th width="60px">操作</th>
                 <th width="120px">状态</th>
             </tr>
@@ -53,7 +56,8 @@
                     <a ng-href="{{song.artistUrl}}" target="_blank">{{song.artist}}</a>
                 </td>
                 <td>
-                    <a href="{{song.albumUrl}}" target="_blank">{{song.album}}</a>
+                    <a href="{{song.albumUrl}}" ng-show="!song.programme" target="_blank">{{song.album}}</a>
+                    <a href="{{song.programmeUrl}}" ng-show="song.programme" target="_blank">{{song.programme}}</a>
                 </td>
                 <td>
                     <button type="button" class="btn btn-default btn-xs" ng-click="downloadSong(song)" ng-show="song.isReady || !song.downloadId">下载</button>

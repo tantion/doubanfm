@@ -52,7 +52,7 @@ angular
                                     ssid: ssid,
                                     title: helper.fixFilename(title),
                                     album: album,
-                                    fmUrl: helper.fmUrl(id, ssid),
+                                    fmUrl: helper.fmUrl(sid, ssid),
                                     albumUrl: url,
                                     albumId: id,
                                     artist: artist,

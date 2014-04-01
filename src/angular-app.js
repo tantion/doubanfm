@@ -3813,6 +3813,7 @@ angular
             'musician': '最受欢迎'
         };
 
+    $scope.type = params.type;
     $scope.batchType = types[params.type];
 
     $scope.alert = {};
@@ -4272,8 +4273,8 @@ angular
 
 angular
 .module('fmApp')
-.factory('download', ['$localStorage', '$q', 'subject', 'musician',
-     function ($localStorage, $q, subject, musician) {
+.factory('download', ['$localStorage', '$q', 'subject', 'musician', 'programme',
+     function ($localStorage, $q, subject, musician, programme) {
     "use strict";
 
     function itemStatus (item) {
@@ -4492,6 +4493,7 @@ angular
                         defer.reject();
                     });
                     break;
+
                 case 'musician':
                     musician.loadSongs(id)
                     .then(function (songs) {
@@ -4504,6 +4506,20 @@ angular
                         defer.reject();
                     });
                     break;
+
+                case 'programme':
+                    programme.loadSongs(id)
+                    .then(function (songs) {
+                        var programme = (songs && songs.length) ? songs[0].programme: '';
+                        defer.resolve({
+                            songs: songs,
+                            title: programme
+                        });
+                    }, function () {
+                        defer.reject();
+                    });
+                    break;
+
                 default:
                     defer.reject();
                     break;
@@ -4753,11 +4769,85 @@ angular
                                     ssid: ssid,
                                     title: helper.fixFilename(title),
                                     album: '',
-                                    fmUrl: helper.fmUrl(id, ssid),
+                                    fmUrl: helper.fmUrl(sid, ssid),
                                     albumUrl: '',
                                     albumId: '',
                                     artist: artist,
                                     artistUrl: url
+                                };
+                            }
+                        });
+                    }
+
+                    cacheMap[id] = songs;
+                    defer.resolve(songs);
+                })
+                .error(function () {
+                    defer.reject();
+                });
+            }
+
+            return defer.promise;
+        }
+    };
+}]);
+
+angular
+.module('fmApp')
+.factory('programme', ['$http', '$q', 'helper', function ($http, $q, helper) {
+    "use strict";
+
+    var cacheMap = {};
+
+    return {
+        loadSongs: function (id) {
+            var defer = $q.defer(),
+                url = 'http://music.douban.com/programme/' + id,
+                songs = [];
+
+            if (cacheMap.hasOwnProperty(id)) {
+                songs = cacheMap[id];
+                defer.resolve(songs);
+            } else {
+                $http({
+                    method: 'get',
+                    url: url,
+                    timeout: 30 * 1000,
+                    withCredentials: true
+                })
+                .success(function (html) {
+                    html = html.replace(/src=/ig, 'data-src=');
+                    var $html = $($.parseHTML(html)),
+                        $programme = $html.find('#songlist-title'),
+                        $wrap = $html.find('#songlist-wrapper'),
+                        $items = $wrap.find('.song-item'),
+                        programme = $.trim($programme.text());
+
+                    if ($items.length) {
+                        songs = $.map($items, function (item) {
+                            var $item = $(item),
+                                sid = $item.data('songid'),
+                                ssid = $item.data('ssid'),
+                                $info = $item.find('.song-info'),
+                                $title = $info.find('span').eq(1),
+                                $artist = $info.find('.singer').find('a').first(),
+                                artist = $.trim($artist.text()),
+                                artistUrl = $artist.attr('href'),
+                                title = $.trim($title.text());
+
+                            if (title) {
+                                return {
+                                    id: sid,
+                                    ssid: ssid,
+                                    title: helper.fixFilename(title),
+                                    album: '',
+                                    fmUrl: helper.fmUrl(sid, ssid),
+                                    albumUrl: '',
+                                    albumId: '',
+                                    artist: artist,
+                                    artistUrl: artistUrl,
+                                    programme: programme,
+                                    programmeUrl: url
                                 };
                             }
                         });
@@ -4830,7 +4920,7 @@ angular
                                     ssid: ssid,
                                     title: helper.fixFilename(title),
                                     album: album,
-                                    fmUrl: helper.fmUrl(id, ssid),
+                                    fmUrl: helper.fmUrl(sid, ssid),
                                     albumUrl: url,
                                     albumId: id,
                                     artist: artist,
