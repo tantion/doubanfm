@@ -1,6 +1,7 @@
 angular
 .module('fmApp')
-.factory('download', ['$localStorage', '$q', function ($localStorage, $q) {
+.factory('download', ['$localStorage', '$q', 'subject',
+     function ($localStorage, $q, subject) {
     "use strict";
 
     function itemStatus (item) {
@@ -198,6 +199,30 @@ angular
                         defer.reject();
                     }
                 });
+            }
+
+            return defer.promise;
+        },
+
+        loadSongs: function (type, id) {
+            var defer = $q.defer();
+
+            switch (type) {
+                case 'subject':
+                    subject.loadSongs(id)
+                    .then(function (songs) {
+                        var album = (songs && songs.length) ? songs[0].album : '';
+                        defer.resolve({
+                            songs: songs,
+                            album: album
+                        });
+                    }, function () {
+                        defer.reject();
+                    });
+                    break;
+                default:
+                    defer.reject();
+                    break;
             }
 
             return defer.promise;

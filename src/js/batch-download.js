@@ -21,8 +21,22 @@ define('js/batch-download', function (require, exports, module) {
         $tmpl.html(tmpl);
     }
 
+    function injectSubject () {
+        var matches = location.href.match(/music\.douban\.com\/subject\/(\d+)/);
+        if (!matches) {
+            return;
+        }
+
+        var $target = $('#link-report').next('h2'),
+            subjectId = matches[1],
+            href = chrome.extension.getURL('download.html?type=subject&id=' + subjectId);
+
+        $target.append('<a class="fm-improve-batch-link" href="' + href + '" target="_blank">下载专辑</a>');
+    }
+
     function init () {
         injectRethot();
+        injectSubject();
     }
 
     module.exports = {

@@ -1,1 +1,1 @@
-angular.module("fmApp",["ngStorage","ui.bootstrap"]).factory("_",function(){"use strict";return window._}).factory("async",function(){"use strict";return window.async});
+angular.module("fmApp",["ngStorage","ui.bootstrap"]).config(["$locationProvider",function(a){"use strict";a.html5Mode(!0)}]).factory("_",function(){"use strict";return window._}).factory("async",function(){"use strict";return window.async});

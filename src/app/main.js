@@ -4,6 +4,11 @@ angular
     'ngStorage',
     'ui.bootstrap'
 ])
+.config(['$locationProvider', function ($locationProvider) {
+    "use strict";
+
+    $locationProvider.html5Mode(true);
+}])
 .factory('_', function () {
     "use strict";
 

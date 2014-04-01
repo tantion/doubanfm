@@ -3784,6 +3784,11 @@ angular
     'ngStorage',
     'ui.bootstrap'
 ])
+.config(['$locationProvider', function ($locationProvider) {
+    "use strict";
+
+    $locationProvider.html5Mode(true);
+}])
 .factory('_', function () {
     "use strict";
 
@@ -3794,6 +3799,153 @@ angular
 
     return window.async;
 });
+
+angular
+.module('fmApp')
+.controller('BatchDownloadController', ['$scope', '$location', 'baidu', 'download', '$modal', '_', 'async', '$timeout',
+    function ($scope, $location, baidu, download, $modal, _, async, $timeout) {
+    "use strict";
+
+    var params = $location.search(),
+        types = {
+            'subject': '专辑',
+            'programme': '节目',
+            'musician': '歌手'
+        };
+
+    $scope.batchType = types[params.type];
+
+    $scope.alert = {};
+    $scope.data = {};
+    $scope.status = {};
+    $scope.songs = [];
+
+    $scope.allChecked = false;
+    $scope.page = 0;
+
+    function detectAllChecked (checked) {
+        angular.forEach($scope.data.songs, function (song) {
+            song.checked = checked;
+        });
+    }
+
+    $scope.loadSongs = function () {
+
+        download.loadSongs(params.type, params.id)
+        .then(function (data) {
+            $scope.data = data;
+            $scope.title = data.album;
+
+            angular.forEach(data.songs, function (song, key) {
+                download.findItem(song.id)
+                .then(function (item) {
+                    download.updateStatus(song, item);
+                });
+            });
+            detectAllChecked($scope.allChecked);
+
+            $scope.status.error = false;
+            $scope.status.loaded = true;
+            if (!data.songs.length) {
+                $scope.status.ended = true;
+            }
+        }, function () {
+            $scope.status.error = true;
+        });
+    };
+    $scope.downloadSong = function (song) {
+        baidu.search({
+            title: song.title,
+            artist: song.artist,
+            album: song.album
+        })
+        .then(function (url) {
+            song.url = url;
+            chrome.downloads.download({
+                filename: song.title + ' - ' + song.artist + '.mp3',
+                url: url
+            }, function (downloadId) {
+                download.add(song, downloadId);
+                song.downloadId = downloadId;
+            });
+        }, function () {
+            song.error = true;
+        });
+    };
+    $scope.downloadSongs = function () {
+        $scope.downloadProcess = true;
+        async.eachSeries($scope.songs, function (song, callback) {
+            $scope.downloadSong(song);
+            $timeout(function () {
+                callback();
+            }, 3000);
+        }, function () {
+            $scope.downloadProcess = false;
+        });
+    };
+    $scope.pauseDownload = function (song) {
+        var downloadId = song.downloadId;
+        if (downloadId) {
+            chrome.downloads.pause(downloadId, function () {
+                song.isPaused = true;
+            });
+        }
+    };
+    $scope.resumeDownload = function (song) {
+        var downloadId = song.downloadId;
+        if (downloadId) {
+            chrome.downloads.resume(downloadId, function () {
+                song.isPaused = false;
+            });
+        }
+    };
+
+    chrome.downloads.onChanged.addListener(function (delta) {
+        download.findSong($scope.data.songs, delta.id)
+        .then(function (song) {
+            download.updateStatus(song, delta);
+        });
+    });
+
+    $scope.openUrlModal = function () {
+        $modal.open({
+            templateUrl: 'partails/song-url.html',
+            controller: 'SongUrlController',
+            resolve: {
+                songs: function () {
+                    var songs = angular.copy($scope.songs);
+                    songs = _.map(songs, function (song) {
+                        return {
+                            title: song.title,
+                            artist: song.artist,
+                            album: song.album
+                        };
+                    });
+                    return songs;
+                }
+            }
+        });
+    };
+
+    $scope.toggleChecked = function ($event, song) {
+        var target = $event.target;
+        if (target.nodeName === 'TD') {
+            song.checked = !song.checked;
+        }
+    };
+
+    $scope.$watch('data.songs', function (songs) {
+        $scope.songs = _.filter(songs, function (song) {
+            return song.checked;
+        });
+    }, true);
+    $scope.$watch('allChecked', function (checked) {
+        detectAllChecked(checked);
+    });
+
+    $scope.loadSongs();
+
+}]);
 
 angular
 .module('fmApp')
@@ -3895,7 +4047,7 @@ angular
     });
 
     $scope.openUrlModal = function () {
-        var modalInstance = $modal.open({
+        $modal.open({
             templateUrl: 'partails/song-url.html',
             controller: 'SongUrlController',
             resolve: {
@@ -3911,10 +4063,6 @@ angular
                     return songs;
                 }
             }
-        });
-
-        modalInstance.result.then(function () {
-        }, function () {
         });
     };
 
@@ -4106,7 +4254,8 @@ angular
 
 angular
 .module('fmApp')
-.factory('download', ['$localStorage', '$q', function ($localStorage, $q) {
+.factory('download', ['$localStorage', '$q', 'subject',
+     function ($localStorage, $q, subject) {
     "use strict";
 
     function itemStatus (item) {
@@ -4307,10 +4456,61 @@ angular
             }
 
             return defer.promise;
+        },
+
+        loadSongs: function (type, id) {
+            var defer = $q.defer();
+
+            switch (type) {
+                case 'subject':
+                    subject.loadSongs(id)
+                    .then(function (songs) {
+                        var album = (songs && songs.length) ? songs[0].album : '';
+                        defer.resolve({
+                            songs: songs,
+                            album: album
+                        });
+                    }, function () {
+                        defer.reject();
+                    });
+                    break;
+                default:
+                    defer.reject();
+                    break;
+            }
+
+            return defer.promise;
         }
     };
 
     return api;
+}]);
+
+
+angular
+.module('fmApp')
+.factory('helper', ['$q', function ($q) {
+    "use strict";
+
+    return {
+        fmUrl: function (sid, ssid, cid) {
+            var href = 'http://douban.fm/?start=#sid#g#ssid#g#channel#&cid=#cid#',
+                channel = 0;
+
+            if (typeof cid === 'undefined') {
+                cid = 2000000 + parseInt(sid, 10);
+            } else {
+                channel = cid;
+            }
+
+            href = href.replace('#ssid#', ssid)
+                       .replace('#sid#', sid)
+                       .replace('#cid#', cid)
+                       .replace('#channel#', channel);
+
+            return href;
+        }
+    };
 }]);
 
 
@@ -4457,4 +4657,99 @@ angular
     };
 
     return mine;
+}]);
+
+angular
+.module('fmApp')
+.factory('subject', ['$http', '$q', 'helper', function ($http, $q, helper) {
+    "use strict";
+
+    var cacheMap = {};
+
+    return {
+        loadSongs: function (id) {
+            var defer = $q.defer(),
+                url = 'http://music.douban.com/subject/' + id,
+                songs = [];
+
+            if (cacheMap.hasOwnProperty(id)) {
+                songs = cacheMap[id];
+                defer.resolve(songs);
+            } else {
+                $http({
+                    method: 'get',
+                    url: url,
+                    timeout: 30 * 1000,
+                    withCredentials: true
+                })
+                .success(function (html) {
+                    html = html.replace(/src=/ig, 'data-src=');
+                    var $html = $($.parseHTML(html)),
+                        $musican = $html.find('#info').children(':first').find('a'),
+                        $wrap = $html.find('.song-items-wrapper'),
+                        $items = $wrap.find('.song-item'),
+                        $list = $html.find('#db-tags-section').prev(),
+                        list = '',
+                        album = $.trim($html.filter('#wrapper').children('h1').text()),
+                        artist = $.trim($musican.first().text()),
+                        artistUrl = 'http://music.douban.com' + $musican.attr('href');
+
+                    if ($items.length) {
+                        songs = $.map($items, function (item) {
+                            var $item = $(item),
+                                sid = $item.attr('id'),
+                                ssid = $item.data('ssid'),
+                                title = $item.find('.song-name-short').data('title');
+
+                            if (title) {
+                                return {
+                                    id: sid,
+                                    ssid: ssid,
+                                    title: title,
+                                    album: album,
+                                    fmUrl: helper.fmUrl(id, ssid),
+                                    albumUrl: url,
+                                    albumId: id,
+                                    artist: artist,
+                                    artistUrl: artistUrl
+                                };
+                            }
+                        });
+                    }
+                    // 没有播放列表时
+                    else if ($list.length) {
+                        list = $list.html().split(/<br\/?>/i);
+                        songs = $.map(list, function (item, i) {
+                            var title = $.trim(item),
+                                sid = id + '-' + i;
+
+                            title = title.match(/^([\d\.\- ]*) (.*)$/);
+                            title = title ? title[2] : '';
+
+                            if (title) {
+                                return {
+                                    id: sid,
+                                    title: title,
+                                    album: album,
+                                    albumUrl: url,
+                                    albumId: id,
+                                    artist: artist,
+                                    artistUrl: artistUrl
+                                };
+                            }
+                        });
+                    }
+                    // TODO 还有一种情况 只有在简介中存在时
+
+                    cacheMap[id] = songs;
+                    defer.resolve(songs);
+                })
+                .error(function () {
+                    defer.reject();
+                });
+            }
+
+            return defer.promise;
+        }
+    };
 }]);

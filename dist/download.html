@@ -2,27 +2,25 @@
 <html ng-app="fmApp">
 <head>
 <meta charset="UTF-8">
-<title>批量下载豆瓣红心频道的歌曲 - 豆瓣FM音乐助手</title>
+<title>批量下载{{batchType}}歌曲 - 豆瓣FM音乐助手</title>
 <link rel="stylesheet" href="bootstrap/css/bootstrap.css">
 <link rel="stylesheet" href="angular-app.css">
 </head>
 <body>
-<div class="container" ng-controller="RethotController">
+<div class="container" ng-controller="BatchDownloadController">
     <div class="page-header">
-        <h3>加心歌曲列表 <small>豆瓣FM音乐助手</small></h3>
+        <h3><span ng-show="title">《{{title}}》</span>{{batchType}}歌曲列表 <small>豆瓣FM音乐助手</small></h3>
     </div>
     <alert ng-show="alert.msg" type="alert.type" close="alert.msg=''">{{alert.msg}}</alert>
     <div class="alert alert-info" ng-show="!status.loaded || status.error" ng-class="{'alert-danger': status.error}">
         <span ng-show="!status.loaded">正在加载数据...</span>
-        <span ng-show="status.error">加载失败，需要先 <a href="http://douban.fm/common_login?redir=/mine" target="_blank">登录豆瓣帐号</a></span>
+        <span ng-show="status.error">加载失败，刷新当前页试试</span>
     </div>
     <div class="fm-improve-action-nav">
         <button type="button" ng-disabled="!songs.length || downloadProcess" class="btn btn-default" ng-click="downloadSongs()"><span class="glyphicon glyphicon-cloud-download"></span> 下载选中歌曲</button>
         <span>&nbsp;</span>
         <button type="button" ng-disabled="!songs.length" class="btn btn-default" ng-click="openUrlModal()"><span class="glyphicon glyphicon-th-list"></span> 选中歌曲的地址</button>
     </div>
-    <pagination total-items="data.total" page="page" max-size="10" items-per-page="15" class="pagination-sm fm-improve-pagination" on-select-page="loadRethot(page)"
-        boundary-links="true" rotate="false" previous-text="上一页" next-text="下一页" first-text="首页" last-text="尾页"></pagination>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -46,13 +44,13 @@
                     </label>
                 </td>
                 <td>
-                    <a href="" ng-href="{{song.fmLink}}" ng-click="playInFM($event, song)" target="_fm" title="{{noFMLink ? '找不到播放链接' : '在 FM 中播放该首歌'}}">{{song.title}}</a>
+                    <a href="" ng-href="{{song.fmUrl}}" target="_fm" title="在 FM 中播放该首歌">{{song.title}}</a>
                 </td>
                 <td>
-                    <a href="http://music.douban.com/search?q={{song.artist}}&sid={{song.id}}" target="_blank">{{song.artist}}</a>
+                    <a ng-href="{{song.artistUrl}}" target="_blank">{{song.artist}}</a>
                 </td>
                 <td>
-                    <a href="{{song.path}}" target="_blank">{{song.subject_title}}</a>
+                    <a href="{{song.albumUrl}}" target="_blank">{{song.album}}</a>
                 </td>
                 <td>
                     <button type="button" class="btn btn-default btn-xs" ng-click="downloadSong(song)" ng-show="song.isReady || !song.downloadId">下载</button>
@@ -68,8 +66,6 @@
             </tr>
       </tbody>
     </table>
-    <pagination total-items="data.total" page="page" max-size="10" items-per-page="15" class="pagination-sm fm-improve-pagination" on-select-page="loadRethot(page)"
-        boundary-links="true" rotate="false" previous-text="上一页" next-text="下一页" first-text="首页" last-text="尾页"></pagination>
     <footer>&nbsp;</footer>
 </script>
 <script src="angular-seajs.js"></script>

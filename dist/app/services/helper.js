@@ -1,0 +1,1 @@
+angular.module("fmApp").factory("helper",["$q",function(){"use strict";return{fmUrl:function(a,b,c){var d="http://douban.fm/?start=#sid#g#ssid#g#channel#&cid=#cid#",e=0;return"undefined"==typeof c?c=2e6+parseInt(a,10):e=c,d=d.replace("#ssid#",b).replace("#sid#",a).replace("#cid#",c).replace("#channel#",e)}}}]);

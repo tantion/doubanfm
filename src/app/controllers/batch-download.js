@@ -1,8 +1,17 @@
 angular
 .module('fmApp')
-.controller('RethotController', ['$scope', 'mine', 'baidu', 'download', '$modal', '_', 'async', '$timeout',
-    function ($scope, mine, baidu, download, $modal, _, async, $timeout) {
+.controller('BatchDownloadController', ['$scope', '$location', 'baidu', 'download', '$modal', '_', 'async', '$timeout',
+    function ($scope, $location, baidu, download, $modal, _, async, $timeout) {
     "use strict";
+
+    var params = $location.search(),
+        types = {
+            'subject': '专辑',
+            'programme': '节目',
+            'musician': '歌手'
+        };
+
+    $scope.batchType = types[params.type];
 
     $scope.alert = {};
     $scope.data = {};
@@ -18,12 +27,12 @@ angular
         });
     }
 
-    $scope.loadRethot = function (page) {
-        $scope.page = page;
+    $scope.loadSongs = function () {
 
-        mine.rethot(page)
+        download.loadSongs(params.type, params.id)
         .then(function (data) {
             $scope.data = data;
+            $scope.title = data.album;
 
             angular.forEach(data.songs, function (song, key) {
                 download.findItem(song.id)
@@ -42,12 +51,11 @@ angular
             $scope.status.error = true;
         });
     };
-
     $scope.downloadSong = function (song) {
         baidu.search({
             title: song.title,
             artist: song.artist,
-            album: song.subject_title
+            album: song.album
         })
         .then(function (url) {
             song.url = url;
@@ -108,26 +116,12 @@ angular
                         return {
                             title: song.title,
                             artist: song.artist,
-                            album: song.subject_title
+                            album: song.album
                         };
                     });
                     return songs;
                 }
             }
-        });
-    };
-
-    $scope.playInFM = function ($event, song) {
-        $event.preventDefault();
-        seajs.use('js/fm-mine', function (fm) {
-            fm.findFMLink(song.id, song.path)
-            .done(function (url) {
-                song.fmLink = url;
-                mine.openOrUpdate(url, 'http://douban.fm/?*');
-            })
-            .fail(function () {
-                song.noFMLink = true;
-            });
         });
     };
 
@@ -147,6 +141,6 @@ angular
         detectAllChecked(checked);
     });
 
-    $scope.loadRethot(1);
+    $scope.loadSongs();
 
 }]);

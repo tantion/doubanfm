@@ -14067,8 +14067,22 @@ define('js/batch-download', function (require, exports, module) {
         $tmpl.html(tmpl);
     }
 
+    function injectSubject () {
+        var matches = location.href.match(/music\.douban\.com\/subject\/(\d+)/);
+        if (!matches) {
+            return;
+        }
+
+        var $target = $('#link-report').next('h2'),
+            subjectId = matches[1],
+            href = chrome.extension.getURL('download.html?type=subject&id=' + subjectId);
+
+        $target.append('<a class="fm-improve-batch-link" href="' + href + '" target="_blank">下载专辑</a>');
+    }
+
     function init () {
         injectRethot();
+        injectSubject();
     }
 
     module.exports = {
@@ -14148,7 +14162,7 @@ define('js/fm-download-baidu', function(require, exports, module) {
 
         s1 = s1.replace(/<\/?em>/ig, '');
 
-        if (s1.toLowerCase().match(s2.toLowerCase())) {
+        if (s1.toLowerCase().indexOf(s2.toLowerCase()) > -1) {
             flag = true;
         } else {
             flag = false;
@@ -14254,7 +14268,7 @@ define('js/fm-download-baidu', function(require, exports, module) {
     function searchSongInfo (song) {
         var dfd = new $.Deferred(),
             url = 'http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=4.5.4&method=baidu.ting.search.merge&format=json&query=#keyword#&page_no=1&page_size=10&type=-1&data_source=0&use_cluster=1',
-            keyword = song.title + ' - ' + song.artist,
+            keyword = song.title + '+-+' + song.artist,
             csongId = songCache.get(keyword);
 
         url = url.replace('#keyword#', encodeURIComponent(keyword));
@@ -14284,6 +14298,7 @@ define('js/fm-download-baidu', function(require, exports, module) {
                         dfd.reject();
                     }
                 } catch (e) {
+                        console.log(e);
                     dfd.reject();
                 }
             })

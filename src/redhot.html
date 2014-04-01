@@ -2,7 +2,7 @@
 <html ng-app="fmApp">
 <head>
 <meta charset="UTF-8">
-<title>批量下载豆瓣红心频道的歌曲</title>
+<title>批量下载豆瓣红心频道的歌曲 - 豆瓣FM音乐助手</title>
 <link rel="stylesheet" href="bootstrap/css/bootstrap.css">
 <link rel="stylesheet" href="angular-app.css">
 </head>
@@ -49,7 +49,7 @@
                     <a href="" ng-href="{{song.fmLink}}" ng-click="playInFM($event, song)" target="_fm" title="{{noFMLink ? '找不到播放链接' : '在 FM 中播放该首歌'}}">{{song.title}}</a>
                 </td>
                 <td>
-                    <a href="http://music.douban.com/search?q={{song.artist}}" target="_blank">{{song.artist}}</a>
+                    <a href="http://music.douban.com/search?q={{song.artist}}&sid={{song.id}}" target="_blank">{{song.artist}}</a>
                 </td>
                 <td>
                     <a href="{{song.path}}" target="_blank">{{song.subject_title}}</a>

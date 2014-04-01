@@ -31,6 +31,13 @@
     overflow: hidden;
 }
 
+.fm-improve-batch-link {
+    font-size: 12px;
+    float: right;
+    margin-right: 30px;
+    line-height: 1.5em;
+}
+
 #fm-bg {
     background-image: none !important;
 }
