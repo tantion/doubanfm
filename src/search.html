@@ -36,6 +36,7 @@
                     </label>
                 </th>
                 <th>歌曲</th>
+                <th width="80px">播放</th>
                 <th>表演者</th>
                 <th>
                     <span ng-show="type !== 'programme'">专辑</span>
@@ -53,13 +54,18 @@
                     </label>
                 </td>
                 <td>
-                    <span>{{song.title}}</span>
+                    <span ng-show="!song.song_id">{{song.title}}</span>
+                    <a ng-show="song.song_id" href="http://music.baidu.com/song/{{song.song_id}}" target="_blank">{{song.title}}</a>
+                </td>
+                <td>
+                    <a ng-show="song.song_id" href="http://play.baidu.com/?__m=mboxCtrl.playSong&__a={{song.song_id}}" target="_baidu_music_naga_">播放</a>
                 </td>
                 <td>
                     <span>{{song.author}}</span>
                 </td>
                 <td>
-                    <span>{{song.album_title}}</span>
+                    <span ng-show="!song.album_id">{{song.album_title}}</span>
+                    <a ng-show="song.album_id" href="http://music.baidu.com/album/{{song.album_id}}" target="_blank">{{song.album_title}}</a>
                 </td>
                 <td>
                     <button type="button" class="btn btn-default btn-xs" ng-click="downloadSong(song)" ng-show="song.isReady || !song.downloadId">下载</button>
