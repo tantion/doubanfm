@@ -57,7 +57,7 @@
                     <a href="{{song.albumUrl}}" target="_blank">{{song.album}}</a>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-default btn-xs" ng-click="downloadSong(song)" ng-show="!song.error && (song.isReady || !song.downloadId)">下载</button>
+                    <button type="button" class="btn btn-default btn-xs" ng-disabled="song.waiting" ng-click="downloadSong(song)" ng-show="!song.error && (song.isReady || !song.downloadId)">下载</button>
                     <a ng-href="search.html?query={{song.title}}" class="btn btn-default btn-xs" ng-show="song.error" title="搜索歌名" target="_blank">搜索</a>
                     <button type="button" class="btn btn-default btn-xs" ng-click="pauseDownload(song)" ng-show="song.isDownloading">暂停</button>
                     <button type="button" class="btn btn-default btn-xs" ng-click="resumeDownload(song)" ng-show="song.isPaused">恢复</button>
@@ -71,6 +71,9 @@
             </tr>
       </tbody>
     </table>
+    <div class="fm-improve-loading-wrap" ng-show="loading">
+        <img src="images/ajax-loader.gif" alt="">
+    </div>
     <footer>&nbsp;</footer>
 </script>
 <script src="angular-seajs.js"></script>

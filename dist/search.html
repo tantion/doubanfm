@@ -68,7 +68,7 @@
                     <a ng-show="song.album_id" href="http://music.baidu.com/album/{{song.album_id}}" target="_blank">{{song.album_title}}</a>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-default btn-xs" ng-click="downloadSong(song)" ng-show="song.isReady || !song.downloadId">下载</button>
+                    <button type="button" class="btn btn-default btn-xs" ng-disabled="song.waiting" ng-click="downloadSong(song)" ng-show="song.isReady || !song.downloadId">下载</button>
                     <button type="button" class="btn btn-default btn-xs" ng-click="pauseDownload(song)" ng-show="song.isDownloading">暂停</button>
                     <button type="button" class="btn btn-default btn-xs" ng-click="resumeDownload(song)" ng-show="song.isPaused">恢复</button>
                 </td>

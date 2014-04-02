@@ -1,4 +1,4 @@
-/*! douban-fm-improve - v2.0.0 - 2014-04-02
+/*! douban-fm-improve - v2.0.1 - 2014-04-03
 * https://github.com/tantion/doubanfm
 * Copyright (c) 2014 tantion; Licensed MIT */
 (function(global, undefined) {
