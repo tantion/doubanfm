@@ -4146,7 +4146,7 @@ angular
 
     var params = $location.search();
 
-    $scope.query = params.query;
+    $scope.query = params.query || '';
 
     $scope.alert = {};
     $scope.data = {};
