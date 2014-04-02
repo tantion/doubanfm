@@ -4,6 +4,12 @@ A chrome extension for Douban FM
 
 ## Change Log
 
+- v2.0.0 - April 2 2014
+    - 支持搜索下载歌曲。
+    - 可以批量下载音乐专辑、节目、表演者中的歌曲。
+    - 支持高品质的MP3下载。
+    - 更好的架构。
+
 - v1.7.10 - March 18 2014
    - Fixed fm-subject, fm-musician link error. -- v1.7.10
    - Removed player-ad in fm-programme. -- v1.7.9

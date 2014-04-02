@@ -22,7 +22,7 @@
         <button type="button" ng-disabled="!songs.length" class="btn btn-default" ng-click="openUrlModal()"><span class="glyphicon glyphicon-th-list"></span> 选中歌曲的地址</button>
         <span>&nbsp;</span>
         <button type="button" class="btn btn-default" ng-click="checkNeverDownload()"><span class="glyphicon glyphicon-record"></span> 只选未下载歌曲</button>
-        <a href="search.html" target="_blank" class="btn btn-default pull-right"><span class="glyphicon glyphicon-search"></span> 去搜索歌曲</a>
+        <a href="search.html?query={{title}}" target="_search" class="btn btn-default pull-right"><span class="glyphicon glyphicon-search"></span> 去搜索歌曲</a>
     </div>
     <table class="table table-striped">
         <thead>
@@ -57,7 +57,8 @@
                     <a href="{{song.albumUrl}}" target="_blank">{{song.album}}</a>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-default btn-xs" ng-click="downloadSong(song)" ng-show="song.isReady || !song.downloadId">下载</button>
+                    <button type="button" class="btn btn-default btn-xs" ng-click="downloadSong(song)" ng-show="!song.error && (song.isReady || !song.downloadId)">下载</button>
+                    <a ng-href="search.html?query={{song.title}}" class="btn btn-default btn-xs" ng-show="song.error" title="搜索歌名" target="_blank">搜索</a>
                     <button type="button" class="btn btn-default btn-xs" ng-click="pauseDownload(song)" ng-show="song.isDownloading">暂停</button>
                     <button type="button" class="btn btn-default btn-xs" ng-click="resumeDownload(song)" ng-show="song.isPaused">恢复</button>
                 </td>
