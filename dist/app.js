@@ -1,1 +1,2 @@
-seajs.use("js/main");
+// main
+seajs.use('js/main');

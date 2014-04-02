@@ -29,6 +29,7 @@ angular
     $scope.search = function () {
 
         $scope.searching = true;
+        $scope.data.songs = [];
 
         download.searchByTitle($scope.query)
         .then(function (data) {

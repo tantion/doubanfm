@@ -22,7 +22,7 @@
         <button type="button" ng-disabled="!songs.length" class="btn btn-default" ng-click="openUrlModal()"><span class="glyphicon glyphicon-th-list"></span> 选中歌曲的地址</button>
         <span>&nbsp;</span>
         <button type="button" class="btn btn-default" ng-click="checkNeverDownload()"><span class="glyphicon glyphicon-record"></span> 只选未下载歌曲</button>
-        <a href="search.html" target="_blank" class="btn btn-default pull-right"><span class="glyphicon glyphicon-search"></span> 去搜索歌曲</a>
+        <a href="search.html?query={{title}}" target="_search" class="btn btn-default pull-right"><span class="glyphicon glyphicon-search"></span> 去搜索歌曲</a>
     </div>
     <table class="table table-striped">
         <thead>

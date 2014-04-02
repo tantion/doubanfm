@@ -1,1 +1,181 @@
-define("js/fm-mine",function(require,a,b){"use strict";function c(a,b){var c=l[a],d=new j.Deferred;return a&&b.match(/http:\/\/music\.douban\.com\/subject\/\d+\//i)?c?d.resolve(c):k.subjectList(b).done(function(b){var e=k.findById(b,a);e?(c=k.fmLink(e.sid,e.ssid),l[a]=c,d.resolve(c)):d.reject()}).fail(function(){d.reject()}):d.reject(),d.promise()}function d(a,b,d){var e=null,f=new j.Deferred,g=!1,h="";return d=d||"_fm",setTimeout(function(){g||(h=h?h:"http://douban.fm/",e=window.open(h,d),e.focus())},500),c(a,b).done(function(a){h=a,e&&(e.location.href=a),f.resolve(a)}).fail(function(){g=!0,f.reject()}),f.promise()}function e(){var a=j("#song_list_tmpl"),b=a.html(),c="";a.length&&(c='<p class="song_title"><a class="fm-improve-mine-link" data-album="{%=s.path%}" data-id="{%=s.id%}" href="javascript:" target="_fm" title="在 FM 播放该首歌">{%=s.title%}</a></p>',b=b.replace('<p class="song_title">{%=s.title%}</p>',c),a.html(b),j("#record_viewer").on("click",".fm-improve-mine-link",function(a){var b=j(this),c=b.attr("href")||"",e=b.attr("target")||"_fm",f=b.data("id"),g=b.data("album");c.match(/^javascript/)&&(a.preventDefault(),d(f,g,e).done(function(a){b.attr("href",a)}).fail(function(){b.attr("title","抱歉没有找到播放地址")}))}))}function f(){var a=j("#chl_list_tmpl"),b=a.html();a.length&&(b=b.replace(/target="_blank"/g,'target="_fm"'),a.html(b))}function g(a){var b=new j.Deferred;return j.ajax({type:"get",url:a,dataType:"json",timeout:3e4}).done(function(a){a&&"liked"===a.song_type?b.resolve(a):b.reject()}).fail(function(){b.reject()}),b.promise()}function h(){chrome.runtime.onMessage.addListener(function(a,b,c){return g(a.url).done(function(a){c(a)}).fail(function(){c()}),!0})}function i(){location.href.match(/douban\.fm\/mine/i)&&(f(),e(),h())}var j=require("jquery"),k=require("js/helper"),l={};b.exports={findFMLink:c,playInFM:d,init:i}});
+//
+// fm mine page improve
+// http://douban.fm/mine
+//
+define('js/fm-mine', function(require, exports, module) {
+    "use strict";
+
+    var $ = require('jquery');
+    var helper = require('js/helper');
+
+    var cacheMap = {};
+
+    function findFMLink (id, album) {
+        var href = cacheMap[id],
+            dfd = new $.Deferred();
+
+        if (id && album.match(/http:\/\/music\.douban\.com\/subject\/\d+\//i)) {
+            if (href) {
+                dfd.resolve(href);
+            } else {
+                helper.subjectList(album)
+                .done(function (songs) {
+                    var song = helper.findById(songs, id);
+
+                    if (song) {
+                        href = helper.fmLink(song.sid, song.ssid);
+                        cacheMap[id] = href;
+                        dfd.resolve(href);
+                    } else {
+                        dfd.reject();
+                    }
+                })
+                .fail(function () {
+                    dfd.reject();
+                });
+            }
+        } else {
+            dfd.reject();
+        }
+
+        return dfd.promise();
+    }
+
+    function playInFM (id, album, target) {
+        var fm = null,
+            dfd = new $.Deferred(),
+            error = false,
+            url = '';
+
+        target = target || '_fm';
+
+        // 防止弹出窗口
+        setTimeout(function () {
+            if (!error) {
+                url = url ? url : 'http://douban.fm/';
+                fm = window.open(url, target);
+                fm.focus();
+            }
+        }, 500);
+
+        findFMLink(id, album)
+        .done(function (link) {
+            url = link;
+            if (fm) {
+                fm.location.href = link;
+            }
+            dfd.resolve(link);
+        })
+        .fail(function () {
+            error = true;
+            dfd.reject();
+        });
+
+        return dfd.promise();
+    }
+
+    // 添加在 FM 播放的链接
+    function initSongList() {
+        var $tmpl = $('#song_list_tmpl'),
+            tmpl = $tmpl.html(),
+            repl = '';
+
+        if (!$tmpl.length) {
+            return;
+        }
+
+        repl = '<p class="song_title"><a class="fm-improve-mine-link" data-album="{%=s.path%}" data-id="{%=s.id%}" href="javascript:" target="_fm" title="在 FM 播放该首歌">{%=s.title%}</a></p>';
+        tmpl = tmpl.replace('<p class="song_title">{%=s.title%}</p>', repl);
+
+        $tmpl.html(tmpl);
+
+        $('#record_viewer')
+        .on('click', '.fm-improve-mine-link', function (evt) {
+            var $link = $(this),
+                href = $link.attr('href') || '',
+                target = $link.attr('target') || '_fm',
+                id = $link.data('id'),
+                album = $link.data('album');
+
+            if (!href.match(/^javascript/)) {
+                return;
+            }
+
+            evt.preventDefault();
+
+            playInFM(id, album, target)
+            .done(function (url) {
+                $link.attr('href', url);
+            })
+            .fail(function () {
+                $link.attr('title', '抱歉没有找到播放地址');
+            });
+        });
+    }
+
+    // 为频道播放的 target 到 _fm 窗口
+    function initChannelList() {
+        var $tmpl = $('#chl_list_tmpl'),
+            tmpl = $tmpl.html();
+
+        if (!$tmpl.length) {
+            return;
+        }
+
+        tmpl = tmpl.replace(/target="_blank"/g, 'target="_fm"');
+
+        $tmpl.html(tmpl);
+    }
+
+    function requestRethot (url) {
+        var dfd = new $.Deferred();
+
+        $.ajax({
+            type: 'get',
+            url: url,
+            dataType: 'json',
+            timeout: 30 * 1000
+        })
+        .done(function (data) {
+            if (data && data.song_type === 'liked') {
+                dfd.resolve(data);
+            } else {
+                dfd.reject();
+            }
+        })
+        .fail(function () {
+            dfd.reject();
+        });
+
+        return dfd.promise();
+    }
+
+    function initListener () {
+        chrome.runtime.onMessage.addListener(function (msg, sender, sendRespone) {
+
+            requestRethot(msg.url)
+            .done(function (data) {
+                sendRespone(data);
+            })
+            .fail(function () {
+                sendRespone();
+            });
+
+            return true;
+        });
+    }
+
+    function init() {
+        if (location.href.match(/douban\.fm\/mine/i)) {
+            initChannelList();
+            initSongList();
+            initListener();
+        }
+    }
+
+    module.exports = {
+        findFMLink: findFMLink,
+        playInFM: playInFM,
+        init: init
+    };
+});

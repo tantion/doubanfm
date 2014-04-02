@@ -1,1 +1,186 @@
-define("js/fm-search",function(require,a,b){"use strict";function c(a){var b="",c=null,d=0;for(a.length;10>d;d+=1)c=a[d],c&&(b+='<li><a href="#url#" target="#target#"><img src="#img#" width="40" /><div><em>#title#</em></div></a></li>'.replace("#target#",c.target||"_fm").replace("#url#",c.url).replace("#img#",c.img||"data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==").replace("#title#",c.title||""));return b}function d(a,b){var d=h.trim(a.val());j&&(clearTimeout(j),j=null),d?j=setTimeout(function(){i.search(d).done(function(d){var f=c(d);f?(b.find("ul").html(f),b.show()):(b.find("ul").html(""),b.hide()),e(a,b)}).fail(function(){e(a,b)})},500):b.hide()}function e(a,b){var c=a.closest("form"),d=c.offset();b.offset({top:d.top+c.outerHeight(),left:d.left})}function f(a){var b=h("#search_suggest_music");b.length||(b=h('<div id="search_suggest_music"><ul></ul></div>').appendTo("body")),b.hide(),a.on("blur",function(){setTimeout(function(){b.hide()},300)}).on("focus",function(){d(a,b)}).on("keyup",function(c){var e=null;if(/13$|27$|38$|40$/.test(c.keyCode)&&b.is(":visible"))switch(c.preventDefault(),e=b.find(".curr_item"),e.removeClass("curr_item"),c.keyCode){case 38:e.prev("li").length?e.prev("li").addClass("curr_item"):b.find("li:last").addClass("curr_item");break;case 40:e.next("li").length?e.next("li").addClass("curr_item"):b.find("li:first").addClass("curr_item");break;case 27:b.hide();break;case 13:e.length&&window.open(e.find("a").attr("href"),"_fm")}else d(a,b)}).on("keydown",function(a){/27$|38$|40$/.test(a.keyCode)&&b.is(":visible")&&a.preventDefault()}).closest("form").on("submit",function(c){c.preventDefault(),d(a,b)}),h(window).on("load resize",function(){e(a,b)})}function g(){if(location.href.match(/^http:\/\/music\.douban\.com/i)){var a=h(".nav-search"),b=null,c=null,d=h('<div class="fm-improve-search"></div>').insertAfter(".nav-search .inp-btn");d.append('<label><input name="fm-improve-search" class="fm-improve-search-song" type="radio">搜歌名</label>'),d.append('<label><input name="fm-improve-search" class="fm-improve-search-default" type="radio">搜专辑、歌手</label>'),c=a.find('label[for="inp-query"]').remove(),c.text()&&a.find("#inp-query").attr("placeholder",c.text()),a.find(".fm-improve-search-default").prop("checked",!0),b=a.clone(),b.find("#inp-query").attr("id","inp-fm-query").attr("name","search_fm").attr("placeholder","搜索歌名").val(""),b.find(".fm-improve-search-song").prop("checked",!0),b.hide(),a.after(b),h(".nav-search").on("click",".fm-improve-search-song",function(){return a.hide(),b.show(),!1}).on("click",".fm-improve-search-default",function(){return a.show(),b.hide(),!1}),f(b.find("#inp-fm-query"))}}var h=require("jquery"),i=require("js/helper"),j=null;b.exports={init:g}});
+//
+// fm search base on sina weibo
+// http://music.douban.com
+//
+define('js/fm-search', function(require, exports, module) {
+    "use strict";
+
+    var $ = require('jquery'),
+        helper = require('js/helper');
+
+    function renderList (items) {
+        var lis = '',
+            item = null;
+
+        for (var i = 0, len = items.length; i < 10; i += 1) {
+            item = items[i];
+            if (item) {
+                lis += ('<li><a href="#url#" target="#target#"><img src="#img#" width="40" /><div><em>#title#</em></div></a></li>'
+                        .replace('#target#', item.target || '_fm')
+                        .replace('#url#', item.url)
+                        .replace('#img#', item.img || 'data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==')
+                        .replace('#title#', item.title || '')
+                       );
+            }
+        }
+
+        return lis;
+    }
+
+    var timerId = null;
+    function searchKeyword ($input, $result) {
+        var key = $.trim($input.val());
+
+        if (timerId) {
+            clearTimeout(timerId);
+            timerId = null;
+        }
+
+        if (key) {
+            timerId = setTimeout(function () {
+                helper.search(key)
+                .done(function (items) {
+                    var list = renderList(items);
+                    if (list) {
+                        $result.find('ul').html(list);
+                        $result.show();
+                    } else {
+                        $result.find('ul').html('');
+                        $result.hide();
+                    }
+                    resetResultPos($input, $result);
+                })
+                .fail(function () {
+                    resetResultPos($input, $result);
+                });
+            }, 500);
+        } else {
+            $result.hide();
+        }
+    }
+
+    function resetResultPos ($input, $result) {
+        var $inputForm = $input.closest('form'),
+            offset = $inputForm.offset();
+        $result.offset({
+            top: offset.top + $inputForm.outerHeight(),
+            left: offset.left
+        });
+    }
+
+    function applySearchInput ($input) {
+        var $result = $('#search_suggest_music');
+
+        if (!$result.length) {
+            $result = $('<div id="search_suggest_music"><ul></ul></div>').appendTo('body');
+        }
+
+        $result.hide();
+
+        $input
+        .on('blur', function () {
+            setTimeout(function () {
+                $result.hide();
+            }, 300);
+        })
+        .on('focus', function () {
+            searchKeyword($input, $result);
+        })
+        .on('keyup', function (e) {
+            var $curr = null;
+
+            if (/13$|27$|38$|40$/.test(e.keyCode) && $result.is(":visible")) {
+                e.preventDefault();
+
+                $curr = $result.find('.curr_item');
+                $curr.removeClass('curr_item');
+                switch (e.keyCode) {
+                    case 38: // UP ARROW
+                        if ($curr.prev('li').length) {
+                            $curr.prev('li').addClass('curr_item');
+                        } else {
+                            $result.find('li:last').addClass('curr_item');
+                        }
+                        break;
+                    case 40: // DOWN ARROW
+                        if ($curr.next('li').length) {
+                            $curr.next('li').addClass('curr_item');
+                        } else {
+                            $result.find('li:first').addClass('curr_item');
+                        }
+                        break;
+                    case 27:  // ESC
+                        $result.hide();
+                        break;
+                    case 13: // ENTER
+                        if ($curr.length) {
+                            window.open($curr.find('a').attr('href'), '_fm');
+                        }
+                        break;
+                }
+            } else {
+                searchKeyword($input, $result);
+            }
+        })
+        .on('keydown', function (e) {
+            if (/27$|38$|40$/.test(e.keyCode) && $result.is(":visible")) {
+                e.preventDefault();
+            }
+        })
+        .closest('form')
+        .on('submit', function (evt) {
+            evt.preventDefault();
+            searchKeyword($input, $result);
+        });
+
+        $(window)
+        .on('load resize', function () {
+            resetResultPos($input, $result);
+        });
+
+    }
+
+    function init () {
+        if (!location.href.match(/^http:\/\/music\.douban\.com/i)) {
+            return;
+        }
+
+        var $search = $('.nav-search'),
+            $fm = null,
+            $label = null,
+            $btn = $('<div class="fm-improve-search"></div>').insertAfter('.nav-search .inp-btn');
+
+        $btn.append('<label><input name="fm-improve-search" class="fm-improve-search-song" type="radio">搜歌名</label>');
+        $btn.append('<label><input name="fm-improve-search" class="fm-improve-search-default" type="radio">搜专辑、歌手</label>');
+
+        $label = $search.find('label[for="inp-query"]').remove();
+        if ($label.text()) {
+            $search.find('#inp-query').attr('placeholder', $label.text());
+        }
+        $search.find('.fm-improve-search-default').prop('checked', true);
+
+        $fm = $search.clone();
+        $fm.find('#inp-query').attr('id', 'inp-fm-query').attr('name', 'search_fm').attr('placeholder', '搜索歌名').val('');
+        $fm.find('.fm-improve-search-song').prop('checked', true);
+        $fm.hide();
+        $search.after($fm);
+
+        $('.nav-search')
+        .on('click', '.fm-improve-search-song', function () {
+            $search.hide();
+            $fm.show();
+            return false;
+        })
+        .on('click', '.fm-improve-search-default', function () {
+            $search.show();
+            $fm.hide();
+            return false;
+        });
+
+        applySearchInput($fm.find('#inp-fm-query'));
+    }
+
+    module.exports = {
+        init: init
+    };
+});

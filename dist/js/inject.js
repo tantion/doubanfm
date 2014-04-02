@@ -1,1 +1,27 @@
-define("js/inject",function(require,a,b){"use strict";function c(a,b){var c=a;0!==c.indexOf("chrome-extension://")&&(c=chrome.extension.getURL(c));var d=document.createElement("script");d.src=c,d.type="text/javascript";for(var e in b)b.hasOwnProperty(e)&&d.setAttribute(e,b[e]);document.body.appendChild(d)}b.exports=c});
+//
+// inject script to document
+//
+define('js/inject', function(require, exports, module) {
+    "use strict";
+
+    function injectScript (src, options) {
+        var url = src;
+        if (url.indexOf('chrome-extension://') !== 0) {
+            url = chrome.extension.getURL(url);
+        }
+
+        var script = document.createElement('script');
+        script.src = url;
+        script.type = 'text/javascript';
+
+        for (var key in options) {
+            if (options.hasOwnProperty(key)) {
+                script.setAttribute(key, options[key]);
+            }
+        }
+
+        document.body.appendChild(script);
+    }
+
+    module.exports = injectScript;
+});

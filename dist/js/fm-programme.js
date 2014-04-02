@@ -1,1 +1,34 @@
-define("js/fm-programme",function(require,a,b){"use strict";function c(){location.href.match(/^http:\/\/music\.douban\.com\/programme\/\d+/)&&d(".song-item").on("click",".fm-improve-programme-link",function(a){a.stopPropagation()}).each(function(){var a=d(this),b=e.fmLink(a.data("songid"),a.data("ssid")),c=a.find("span").eq(1),f=d.trim(c.text()),g='<a href="#href#" class="fm-improve-programme-link" target="_fm" title="在 FM 播放">#name#</a>'.replace("#name#",f).replace("#href#",b);c.html(g)})}var d=require("jquery"),e=require("js/helper");b.exports={init:c}});
+//
+// music programme page improve
+// http://music.douban.com/programme/:id
+//
+define('js/fm-programme', function(require, exports, module) {
+    "use strict";
+
+    var $ = require('jquery'),
+        helper = require('js/helper');
+
+    function init () {
+        if (!location.href.match(/^http:\/\/music\.douban\.com\/programme\/\d+/)) {
+            return;
+        }
+
+        $('.song-item')
+        .on('click', '.fm-improve-programme-link', function (evt) {
+            evt.stopPropagation();
+        })
+        .each(function () {
+            var $song = $(this),
+                href = helper.fmLink($song.data('songid'), $song.data('ssid')),
+                $name = $song.find('span').eq(1),
+                name = $.trim($name.text()),
+                rpl = '<a href="#href#" class="fm-improve-programme-link" target="_fm" title="在 FM 播放">#name#</a>'.replace('#name#', name).replace('#href#', href);
+
+            $name.html(rpl);
+        });
+    }
+
+    module.exports = {
+        init: init
+    };
+});

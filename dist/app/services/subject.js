@@ -1,1 +1,101 @@
-angular.module("fmApp").factory("subject",["$http","$q","helper",function(a,b,c){"use strict";var d={};return{loadSongs:function(e){var f=b.defer(),g="http://music.douban.com/subject/"+e,h=[];return d.hasOwnProperty(e)?(h=d[e],f.resolve(h)):a({method:"get",url:g,timeout:3e4,withCredentials:!0}).success(function(a){a=a.replace(/src=/gi,"data-src=");var b=$($.parseHTML(a)),i=b.find("#info").find(".pl").filter(function(){return $(this).text().indexOf("表演者")>-1?!0:void 0}).find("a"),j=b.find(".song-items-wrapper"),k=j.find(".song-item"),l=b.find("#db-tags-section").prev(),m="",n=$.trim(b.filter("#wrapper").children("h1").text()),o=$.trim(i.first().text()),p="http://music.douban.com"+i.attr("href");k.length?h=$.map(k,function(a){var b=$(a),d=b.attr("id"),f=b.data("ssid"),h=b.find(".song-name-short").data("title");return h?{id:d,ssid:f,title:h,album:n,fmUrl:c.fmUrl(d,f),albumUrl:g,albumId:e,artist:o,artistUrl:p}:void 0}):l.length&&(m=l.html().split(/<br\/?>/i),h=$.map(m,function(a,b){var d=$.trim(a),f=e+"-"+b;return d=d.match(/^([\d\.\- ]+)(.*)$/),d=d?$.trim(d[2]):"",d?{id:f,title:c.fixFilename(d),album:n,albumUrl:g,albumId:e,artist:o,artistUrl:p}:void 0})),d[e]=h,f.resolve(h)}).error(function(){f.reject()}),f.promise}}}]);
+angular
+.module('fmApp')
+.factory('subject', ['$http', '$q', 'helper', function ($http, $q, helper) {
+    "use strict";
+
+    var cacheMap = {};
+
+    return {
+        loadSongs: function (id) {
+            var defer = $q.defer(),
+                url = 'http://music.douban.com/subject/' + id,
+                songs = [];
+
+            if (cacheMap.hasOwnProperty(id)) {
+                songs = cacheMap[id];
+                defer.resolve(songs);
+            } else {
+                $http({
+                    method: 'get',
+                    url: url,
+                    timeout: 30 * 1000,
+                    withCredentials: true
+                })
+                .success(function (html) {
+                    html = html.replace(/src=/ig, 'data-src=');
+                    var $html = $($.parseHTML(html)),
+                        $musican = $html.find('#info').find('.pl')
+                                        .filter(function () {
+                                            if ($(this).text().indexOf('表演者') > -1) {
+                                                return true;
+                                            }
+                                        })
+                                        .find('a'),
+                        $wrap = $html.find('.song-items-wrapper'),
+                        $items = $wrap.find('.song-item'),
+                        $list = $html.find('#db-tags-section').prev(),
+                        list = '',
+                        album = $.trim($html.filter('#wrapper').children('h1').text()),
+                        artist = $.trim($musican.first().text()),
+                        artistUrl = 'http://music.douban.com' + $musican.attr('href');
+
+                    if ($items.length) {
+                        songs = $.map($items, function (item) {
+                            var $item = $(item),
+                                sid = $item.attr('id'),
+                                ssid = $item.data('ssid'),
+                                title = $item.find('.song-name-short').data('title');
+
+                            if (title) {
+                                return {
+                                    id: sid,
+                                    ssid: ssid,
+                                    title: title,
+                                    album: album,
+                                    fmUrl: helper.fmUrl(sid, ssid),
+                                    albumUrl: url,
+                                    albumId: id,
+                                    artist: artist,
+                                    artistUrl: artistUrl
+                                };
+                            }
+                        });
+                    }
+                    // 没有播放列表时
+                    else if ($list.length) {
+                        list = $list.html().split(/<br\/?>/i);
+                        songs = $.map(list, function (item, i) {
+                            var title = $.trim(item),
+                                sid = id + '-' + i;
+
+                            title = title.match(/^([\d\.\- ]+)(.*)$/);
+                            title = title ? $.trim(title[2]) : '';
+
+
+                            if (title) {
+                                return {
+                                    id: sid,
+                                    title: helper.fixFilename(title),
+                                    album: album,
+                                    albumUrl: url,
+                                    albumId: id,
+                                    artist: artist,
+                                    artistUrl: artistUrl
+                                };
+                            }
+                        });
+                    }
+                    // TODO 还有一种情况 只有在简介中存在时
+
+                    cacheMap[id] = songs;
+                    defer.resolve(songs);
+                })
+                .error(function () {
+                    defer.reject();
+                });
+            }
+
+            return defer.promise;
+        }
+    };
+}]);

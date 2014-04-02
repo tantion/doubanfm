@@ -4,10 +4,14 @@ angular
     'ngStorage',
     'ui.bootstrap'
 ])
-.config(['$locationProvider', function ($locationProvider) {
+.config(['$locationProvider', '$compileProvider',
+    function ($locationProvider, $compileProvider) {
     "use strict";
 
     $locationProvider.html5Mode(true);
+
+    // unsafe for chrome extension
+    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
 }])
 .factory('_', function () {
     "use strict";

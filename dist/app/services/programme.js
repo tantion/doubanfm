@@ -1,1 +1,77 @@
-angular.module("fmApp").factory("programme",["$http","$q","helper",function(a,b,c){"use strict";var d={};return{loadSongs:function(e){var f=b.defer(),g="http://music.douban.com/programme/"+e,h=[];return d.hasOwnProperty(e)?(h=d[e],f.resolve(h)):a({method:"get",url:g,timeout:3e4,withCredentials:!0}).success(function(a){a=a.replace(/src=/gi,"data-src=");var b=$($.parseHTML(a)),i=b.find("#songlist-title"),j=b.find("#songlist-wrapper"),k=j.find(".song-item"),l=$.trim(i.text());k.length&&(h=$.map(k,function(a){var b=$(a),d=b.next(".detail-info"),e=d.find(".album-info a").first(),f=$.trim(e.find(".album-title").text()),h=e.attr("href"),i=b.data("songid"),j=b.data("ssid"),k=b.find(".song-info"),m=k.find("span").eq(1),n=k.find(".singer").find("a").first(),o=$.trim(n.text()),p=n.attr("href"),q=$.trim(m.text());return q?{id:i,ssid:j,title:c.fixFilename(q),album:f,fmUrl:c.fmUrl(i,j),albumUrl:h,albumId:h.replace(/.*\/(\d+)\/?$/,"$1"),artist:o,artistUrl:p+"&sid="+i,programme:l,programmeUrl:g}:void 0})),d[e]=h,f.resolve(h)}).error(function(){f.reject()}),f.promise}}}]);
+angular
+.module('fmApp')
+.factory('programme', ['$http', '$q', 'helper', function ($http, $q, helper) {
+    "use strict";
+
+    var cacheMap = {};
+
+    return {
+        loadSongs: function (id) {
+            var defer = $q.defer(),
+                url = 'http://music.douban.com/programme/' + id,
+                songs = [];
+
+            if (cacheMap.hasOwnProperty(id)) {
+                songs = cacheMap[id];
+                defer.resolve(songs);
+            } else {
+                $http({
+                    method: 'get',
+                    url: url,
+                    timeout: 30 * 1000,
+                    withCredentials: true
+                })
+                .success(function (html) {
+                    html = html.replace(/src=/ig, 'data-src=');
+                    var $html = $($.parseHTML(html)),
+                        $programme = $html.find('#songlist-title'),
+                        $wrap = $html.find('#songlist-wrapper'),
+                        $items = $wrap.find('.song-item'),
+                        programme = $.trim($programme.text());
+
+                    if ($items.length) {
+                        songs = $.map($items, function (item) {
+                            var $item = $(item),
+                                $albumInfo = $item.next('.detail-info'),
+                                $album = $albumInfo.find('.album-info a').first(),
+                                album = $.trim($album.find('.album-title').text()),
+                                albumUrl = $album.attr('href'),
+                                sid = $item.data('songid'),
+                                ssid = $item.data('ssid'),
+                                $info = $item.find('.song-info'),
+                                $title = $info.find('span').eq(1),
+                                $artist = $info.find('.singer').find('a').first(),
+                                artist = $.trim($artist.text()),
+                                artistUrl = $artist.attr('href'),
+                                title = $.trim($title.text());
+
+                            if (title) {
+                                return {
+                                    id: sid,
+                                    ssid: ssid,
+                                    title: helper.fixFilename(title),
+                                    album: album,
+                                    fmUrl: helper.fmUrl(sid, ssid),
+                                    albumUrl: albumUrl,
+                                    albumId: albumUrl.replace(/.*\/(\d+)\/?$/, '$1'),
+                                    artist: artist,
+                                    artistUrl: artistUrl + '&sid=' + sid,
+                                    programme: programme,
+                                    programmeUrl: url
+                                };
+                            }
+                        });
+                    }
+
+                    cacheMap[id] = songs;
+                    defer.resolve(songs);
+                })
+                .error(function () {
+                    defer.reject();
+                });
+            }
+
+            return defer.promise;
+        }
+    };
+}]);

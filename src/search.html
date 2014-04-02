@@ -12,11 +12,11 @@
         <h3>搜索歌曲<small> 豆瓣FM音乐助手</small></h3>
     </div>
     <div class="fm-improve-action-nav">
-        <form ng-submit="search()" class="fm-improve-search-form pull-left">
+        <form class="fm-improve-search-form pull-left">
             <div class="input-group">
                 <input type="text" ng-model="query" placeholder="搜索歌曲，歌手，专辑" typeahead="item.title for item in typeahead($viewValue)" typeahead-wait-ms="300" typeahead-on-select="search()" class="form-control">
                 <span class="input-group-btn">
-                    <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"><span></button>
+                    <button class="btn btn-default" ng-click="search()" type="button"><span class="glyphicon glyphicon-search"><span></button>
                 </span>
             </div><!-- /input-group -->
         </form>
