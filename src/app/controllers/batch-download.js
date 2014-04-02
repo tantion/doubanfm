@@ -53,6 +53,7 @@ angular
         });
     };
     $scope.downloadSong = function (song) {
+        song.waiting = true;
         baidu.search({
             title: song.title,
             artist: song.artist,
@@ -66,9 +67,11 @@ angular
             }, function (downloadId) {
                 download.add(song, downloadId);
                 song.downloadId = downloadId;
+                song.waiting = false;
             });
         }, function () {
             song.error = true;
+            song.waiting = false;
         });
     };
     $scope.downloadSongs = function () {

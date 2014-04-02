@@ -1,4 +1,4 @@
-/*! douban-fm-improve - v2.0.0 - 2014-04-02
+/*! douban-fm-improve - v2.0.0 - 2014-04-03
 * https://github.com/tantion/doubanfm
 * Copyright (c) 2014 tantion; Licensed MIT */
 angular.module("ui.bootstrap", ["ui.bootstrap.tpls", "ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.bindHtml","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.position","ui.bootstrap.datepicker","ui.bootstrap.dropdownToggle","ui.bootstrap.modal","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
@@ -3859,6 +3859,7 @@ angular
         });
     };
     $scope.downloadSong = function (song) {
+        song.waiting = true;
         baidu.search({
             title: song.title,
             artist: song.artist,
@@ -3872,9 +3873,11 @@ angular
             }, function (downloadId) {
                 download.add(song, downloadId);
                 song.downloadId = downloadId;
+                song.waiting = false;
             });
         }, function () {
             song.error = true;
+            song.waiting = false;
         });
     };
     $scope.downloadSongs = function () {
