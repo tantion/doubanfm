@@ -56,6 +56,7 @@ angular
     };
 
     $scope.downloadSong = function (song) {
+        song.waiting = true;
         download.searchById(song.song_id)
         .then(function (url) {
             song.url = url;
@@ -65,8 +66,10 @@ angular
             }, function (downloadId) {
                 download.add(song, downloadId);
                 song.downloadId = downloadId;
+                song.waiting = false;
             });
         }, function () {
+            song.waiting = false;
             song.error = true;
         });
     };

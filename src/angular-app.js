@@ -3836,8 +3836,12 @@ angular
 
     $scope.loadSongs = function () {
 
+        $scope.loading = true;
+        $scope.data.songs = [];
+
         download.loadSongs(params.type, params.id)
         .then(function (data) {
+            $scope.loading = false;
             $scope.data = data;
             $scope.title = data.title;
 
@@ -3855,6 +3859,7 @@ angular
                 $scope.status.ended = true;
             }
         }, function () {
+            $scope.loading = false;
             $scope.status.error = true;
         });
     };
@@ -3987,8 +3992,12 @@ angular
     $scope.loadRethot = function (page) {
         $scope.page = page;
 
+        $scope.loading = true;
+        $scope.data.songs = [];
+
         mine.rethot(page)
         .then(function (data) {
+            $scope.loading = false;
             $scope.data = data;
 
             angular.forEach(data.songs, function (song, key) {
@@ -4005,17 +4014,20 @@ angular
                 $scope.status.ended = true;
             }
         }, function () {
+            $scope.loading = false;
             $scope.status.error = true;
         });
     };
 
     $scope.downloadSong = function (song) {
+        song.waiting = true;
         baidu.search({
             title: song.title,
             artist: song.artist,
             album: song.subject_title
         })
         .then(function (url) {
+            song.waiting = false;
             song.url = url;
             chrome.downloads.download({
                 filename: song.title + ' - ' + song.artist + '.mp3',
@@ -4184,6 +4196,7 @@ angular
     };
 
     $scope.downloadSong = function (song) {
+        song.waiting = true;
         download.searchById(song.song_id)
         .then(function (url) {
             song.url = url;
@@ -4193,8 +4206,10 @@ angular
             }, function (downloadId) {
                 download.add(song, downloadId);
                 song.downloadId = downloadId;
+                song.waiting = false;
             });
         }, function () {
+            song.waiting = false;
             song.error = true;
         });
     };

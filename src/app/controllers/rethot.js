@@ -21,8 +21,12 @@ angular
     $scope.loadRethot = function (page) {
         $scope.page = page;
 
+        $scope.loading = true;
+        $scope.data.songs = [];
+
         mine.rethot(page)
         .then(function (data) {
+            $scope.loading = false;
             $scope.data = data;
 
             angular.forEach(data.songs, function (song, key) {
@@ -39,17 +43,20 @@ angular
                 $scope.status.ended = true;
             }
         }, function () {
+            $scope.loading = false;
             $scope.status.error = true;
         });
     };
 
     $scope.downloadSong = function (song) {
+        song.waiting = true;
         baidu.search({
             title: song.title,
             artist: song.artist,
             album: song.subject_title
         })
         .then(function (url) {
+            song.waiting = false;
             song.url = url;
             chrome.downloads.download({
                 filename: song.title + ' - ' + song.artist + '.mp3',

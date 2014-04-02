@@ -30,8 +30,12 @@ angular
 
     $scope.loadSongs = function () {
 
+        $scope.loading = true;
+        $scope.data.songs = [];
+
         download.loadSongs(params.type, params.id)
         .then(function (data) {
+            $scope.loading = false;
             $scope.data = data;
             $scope.title = data.title;
 
@@ -49,6 +53,7 @@ angular
                 $scope.status.ended = true;
             }
         }, function () {
+            $scope.loading = false;
             $scope.status.error = true;
         });
     };
