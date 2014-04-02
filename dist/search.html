@@ -14,7 +14,7 @@
     <div class="fm-improve-action-nav">
         <form class="fm-improve-search-form pull-left" ng-submit="search()">
             <div class="input-group">
-                <input type="text" ng-model="query" placeholder="搜索歌曲，歌手，专辑" typeahead="item.title for item in typeahead($viewValue)" typeahead-wait-ms="300" typeahead-on-select="search()" class="form-control">
+                <input type="text" ng-model="query" autofocus placeholder="搜索歌曲，歌手，专辑" typeahead="item.title for item in typeahead($viewValue)" typeahead-wait-ms="300" typeahead-on-select="search()" class="form-control">
                 <span class="input-group-btn">
                     <button class="btn btn-default"><span class="glyphicon glyphicon-search"><span></button>
                 </span>
