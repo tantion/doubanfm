@@ -3,7 +3,7 @@
 // http://douban.fm
 //
 
-// 因为肯 jQuery 还没加载完，所以这样处理
+// 因为可能 jQuery 还没加载完，所以这样处理
 Do.ready(function() {
     "use strict";
 
@@ -47,22 +47,20 @@ Do.ready(function() {
         }
 
         function init () {
-
-            if (!$ && !$('#simulate-sec').length) {
-                return;
-            }
-
-            Do.ready('fm-player', function () {
-                window.$(window).bind('radio:start', function (evt, data) {
-                    if (data && data.song) {
-                        if (!hasInited) {
-                            initRender();
-                            hasInited = true;
+            if (location.hostname === 'douban.fm' && location.pathname === '/') {
+                Do.ready('fm-player', function () {
+                    window.$(window).bind('radio:start', function (evt, data) {
+                        if (data && data.song) {
+                            if (!hasInited) {
+                                initRender();
+                                hasInited = true;
+                            }
+                            renderFMDownload(data.song);
                         }
-                        renderFMDownload(data.song);
-                    }
+                    });
                 });
-            });
+
+            }
         }
 
         init();

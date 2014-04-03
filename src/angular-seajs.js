@@ -14469,6 +14469,33 @@ define('js/fm-download-baidu', function(require, exports, module) {
 });
 
 //
+// connect background.js -> inject code
+// 调用原页面的歌曲
+//
+define('js/fm-message', function(require, exports, module) {
+    "use strict";
+
+    function init () {
+        if (location.hostname === 'douban.fm' && location.pathname === '/') {
+            chrome.runtime.onMessage.addListener(function (msg) {
+                switch (msg.action) {
+                    case 'nextSong':
+                    case 'loveSong':
+                    case 'banSong':
+                        window.postMessage(msg, "*");
+                        break;
+                }
+            });
+        }
+    }
+
+    module.exports = {
+        init: init
+    };
+});
+
+
+//
 // fm mine page improve
 // http://douban.fm/mine
 //
@@ -15154,7 +15181,8 @@ define('js/main', function(require, exports, module) {
             require('js/fm-musician'), // 为 music.douban.com/musician/:id 页面添加在FM播放的链接功能
             require('js/fm-search'), // 搜索插件
             require('js/fm-download-baidu'), // 百度音乐下载 MP3
-            require('js/batch-download') // 批量下载入口
+            require('js/batch-download'), // 批量下载入口
+            require('js/fm-message') // 消息调用
         ],
         inject = require('js/inject');
 
@@ -15169,8 +15197,12 @@ define('js/main', function(require, exports, module) {
         }
     });
 
-    inject('inject/ad-block.js'); // 移除广告
-    inject('inject/fm-download.js'); // 下载当前播放的音乐
+    // only inject in http://douban.fm/?*
+    if (location.hostname === 'douban.fm' && location.pathname === '/') {
+        inject('inject/ad-block.js'); // 移除广告
+        inject('inject/fm-download.js'); // 下载当前播放的音乐
+        inject('inject/fm-message.js'); // 消息调用
+    }
 });
 
 //
