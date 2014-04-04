@@ -15,7 +15,10 @@
                             DBR.act('skip');
                             break;
                         case 'loveSong':
-                            DBR.act('love');
+                            // 标志为喜欢
+                            if (!DBR.selected_like()) {
+                                DBR.act('love');
+                            }
                             break;
                         case 'banSong':
                             DBR.act('ban');

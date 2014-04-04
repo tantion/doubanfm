@@ -1,0 +1,1 @@
+!function(){"use strict";"douban.fm"===location.hostname&&"/"===location.pathname&&Do.ready("fm-player",function(){window.addEventListener("message",function(a){var b=a.data,c=window.DBR;if(b&&c&&!c.is_paused())switch(b.action){case"nextSong":c.act("skip");break;case"loveSong":c.selected_like()||c.act("love");break;case"banSong":c.act("ban")}},!1)})}();

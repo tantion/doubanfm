@@ -37,6 +37,9 @@ function sendMessageToFM (message) {
                 chrome.tabs.sendMessage(tab.id, message);
             }
         });
+        if (!tabs.length && message.action === 'nextSong') {
+            chrome.tabs.create({url: 'http://douban.fm/'});
+        }
     });
 }
 
