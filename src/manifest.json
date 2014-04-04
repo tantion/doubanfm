@@ -30,20 +30,20 @@
         "_execute_browser_action": {
             "suggested_key": {
                 "default": "Alt+Period",
-                "default": "MacCtrl+Period"
+                "mac": "MacCtrl+Period"
             }
         },
         "love_song": {
             "suggested_key": {
                 "default": "Alt+Comma",
-                "default": "MacCtrl+Comma"
+                "mac": "MacCtrl+Comma"
             },
             "description": "加心当前播放的歌曲"
         },
         "ban_song": {
             "suggested_key": {
                 "default": "Alt+M",
-                "default": "MacCtrl+M"
+                "mac": "MacCtrl+M"
             },
             "description": "不喜欢当前播放的歌曲"
         }
