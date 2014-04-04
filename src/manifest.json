@@ -3,7 +3,7 @@
 
     "name": "豆瓣FM音乐助手",
     "description": "让豆瓣FM支持下载歌曲和封面图片，可以搜索、播放和批量下载红心、专辑、节目中的歌曲。",
-    "version": "2.1.2",
+    "version": "2.1.3",
 
     "permissions": [
         "<all_urls>",
@@ -29,18 +29,18 @@
     "commands": {
         "_execute_browser_action": {
             "suggested_key": {
-                "mac": "MacCtrl+Period"
+                "default": "MacCtrl+Period"
             }
         },
         "love_song": {
             "suggested_key": {
-                "mac": "MacCtrl+Comma"
+                "default": "MacCtrl+Comma"
             },
             "description": "加心当前播放的歌曲"
         },
         "ban_song": {
             "suggested_key": {
-                "mac": "MacCtrl+B"
+                "default": "MacCtrl+M"
             },
             "description": "不喜欢当前播放的歌曲"
         }
