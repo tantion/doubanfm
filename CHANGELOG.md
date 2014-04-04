@@ -4,6 +4,9 @@ A chrome extension for Douban FM
 
 ## Change Log
 
+- v2.1.0 - April 5 2014
+    - 支持快捷操作 加心(Alt+,) 下一首(Alt+.) 不再收听(Alt+b)
+
 - v2.0.0 - April 2 2014
     - 支持搜索下载歌曲。
     - 可以批量下载音乐专辑、节目、表演者中的歌曲。
