@@ -35,7 +35,7 @@ angular
                                 $albumInfo = $item.next('.detail-info'),
                                 $album = $albumInfo.find('.album-info a').first(),
                                 album = $.trim($album.find('.album-title').text()),
-                                albumUrl = $album.attr('href'),
+                                albumUrl = $album.attr('href') || '',
                                 sid = $item.data('songid'),
                                 ssid = $item.data('ssid'),
                                 $info = $item.find('.song-info'),
