@@ -29,21 +29,18 @@
     "commands": {
         "_execute_browser_action": {
             "suggested_key": {
-                "default": "Alt+Period",
-                "mac": "MacCtrl+Period"
+                "default": "Ctrl+Shift+9"
             }
         },
         "love_song": {
             "suggested_key": {
-                "default": "Alt+Comma",
-                "mac": "MacCtrl+Comma"
+                "default": "Ctrl+Shift+8"
             },
             "description": "加心当前播放的歌曲"
         },
         "ban_song": {
             "suggested_key": {
-                "default": "Alt+M",
-                "mac": "MacCtrl+M"
+                "default": "Ctrl+Shift+7"
             },
             "description": "不喜欢当前播放的歌曲"
         }

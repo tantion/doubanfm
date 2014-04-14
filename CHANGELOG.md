@@ -4,7 +4,8 @@ A chrome extension for Douban FM
 
 ## Change Log
 
-- v2.1.1 - April 5 2014
+- v2.2.0 - April 15 2014
+    - Fixed baidu download
     - 支持快捷操作 加心(Ctrl+,) 下一首(Ctrl+.) 不再收听(Ctrl+M) Mac下有效
 
 - v2.0.0 - April 2 2014
