@@ -1,4 +1,4 @@
-/*! douban-fm-improve - v2.1.5 - 2014-04-11
+/*! douban-fm-improve - v2.1.5 - 2014-04-15
 * https://github.com/tantion/doubanfm
 * Copyright (c) 2014 tantion; Licensed MIT */
 angular.module("ui.bootstrap", ["ui.bootstrap.tpls", "ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.bindHtml","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.position","ui.bootstrap.datepicker","ui.bootstrap.dropdownToggle","ui.bootstrap.modal","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
@@ -4785,40 +4785,46 @@ angular
 
         bestSongUrl: function (urls) {
             var url = null;
-            _.each(urls, function (u) {
-                var kbs = u.file_bitrate;
-                if (u.file_extension === 'mp3' && kbs >= 128) {
+            $.each(urls, function (u) {
+                var kbs = u.rate;
+                if (u.format === 'mp3' && kbs >= 128) {
                     if (kbs > 256) {
                         if (!url) {
-                            url = u.file_link;
+                            url = u.songLink;
                         }
                     } else {
-                        url = u.file_link;
+                        url = u.songLink;
                     }
                 }
             });
-            if (!url && urls.length && urls[0].file_extension === 'mp3') {
-                url = urls[0].file_link;
+            if (!url) {
+                for (var key in urls) {
+                    if (urls.hasOwnProperty(key)) {
+                        if (urls[key].format === 'mp3') {
+                            url = urls[key].songLink;
+                            break;
+                        }
+                    }
+                }
             }
             return url;
         },
 
         searchById: function (songId) {
-            var defer = $q.defer(),
-            url = 'http://tingapi.ting.baidu.com/v1/restserver/ting?from=web&version=4.5.4&method=baidu.ting.song.getInfos&format=json&songid=#songId#';
-
-            url = url.replace('#songId#', songId);
+            var defer = $q.defer();
 
             $http({
-                method: 'get',
-                url: url,
+                method: 'post',
+                url: 'http://play.baidu.com/data/music/songlink?cache=' + songId,
                 responseType: 'json',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                data: 'hq=1&type=mp3&songIds=' + songId,
                 cache: true,
                 timeout: 30 * 1000
             })
             .success(function (data) {
                 try {
-                    var urls = data.songurl.url,
+                    var urls = data.data.songList[0].linkinfo,
                     fileUrl;
                     fileUrl = api.bestSongUrl(urls);
                     if (fileUrl) {

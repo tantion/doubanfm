@@ -1,4 +1,4 @@
-/*! douban-fm-improve - v2.1.5 - 2014-04-11
+/*! douban-fm-improve - v2.1.5 - 2014-04-15
 * https://github.com/tantion/doubanfm
 * Copyright (c) 2014 tantion; Licensed MIT */
 (function(global, undefined) {
@@ -14247,42 +14247,51 @@ define('js/fm-download-baidu', function(require, exports, module) {
     function whichUrl (urls) {
         var url = null;
         $.each(urls, function (i, u) {
-            var kbs = u.file_bitrate;
-            if (u.file_extension === 'mp3' && kbs >= 128) {
+            var kbs = u.rate;
+            if (u.format === 'mp3' && kbs >= 128) {
                 if (kbs > 256) {
                     if (!url) {
-                        url = u.file_link;
+                        url = u.songLink;
                     }
                 } else {
-                    url = u.file_link;
+                    url = u.songLink;
                 }
             }
         });
-        if (!url && urls.length && urls[0].file_extension === 'mp3') {
-            url = urls[0].file_link;
+        if (!url) {
+            for (var key in urls) {
+                if (urls.hasOwnProperty(key)) {
+                    if (urls[key].format === 'mp3') {
+                        url = urls[key].songLink;
+                        break;
+                    }
+                }
+            }
         }
         return url;
     }
 
     function fetchSongUrl (songId) {
         var dfd = new $.Deferred(),
-            curl = urlCache.get(songId),
-            url = 'http://tingapi.ting.baidu.com/v1/restserver/ting?from=web&version=4.5.4&method=baidu.ting.song.getInfos&format=json&songid=#songId#';
+            curl = urlCache.get(songId);
 
         if (curl) {
             dfd.resolve(curl);
         } else {
-            url = url.replace('#songId#', songId);
-
             $.ajax({
-                type: 'get',
-                url: url,
+                type: 'post',
+                url: 'http://play.baidu.com/data/music/songlink',
+                data: {
+                    hq: 1,
+                    type: 'mp3',
+                    songIds: songId
+                },
                 dataType: 'json',
                 timeout: 30 * 1000
             })
             .done(function (data) {
                 try {
-                    var urls = data.songurl.url,
+                    var urls = data.data.songList[0].linkinfo,
                         fileUrl;
                     fileUrl = whichUrl(urls);
                     if (fileUrl) {
@@ -14463,6 +14472,7 @@ define('js/fm-download-baidu', function(require, exports, module) {
     }
 
     module.exports = {
+        whichUrl: whichUrl,
         search: search,
         init: init
     };
