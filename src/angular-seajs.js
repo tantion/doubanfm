@@ -1,4 +1,4 @@
-/*! douban-fm-improve - v2.2.0 - 2014-04-15
+/*! douban-fm-improve - v2.2.0 - 2014-04-27
 * https://github.com/tantion/doubanfm
 * Copyright (c) 2014 tantion; Licensed MIT */
 (function(global, undefined) {
@@ -15085,10 +15085,7 @@ define('js/helper', function(require, exports, module) {
             } else {
                 $.ajax({
                     type: 'get',
-                    url: url,
-                    xhrFields: {
-                        withCredentials: true
-                    }
+                    url: url
                 })
                 .done(function (data) {
                     var matches = data.match(/"pid":"pl_wb_feedlist".+,"html":(".*")}\)<\/script>/),
@@ -15101,12 +15098,13 @@ define('js/helper', function(require, exports, module) {
                     }
 
                     try {
+                        html = html.replace(/src=/ig, 'data-src=');
                         html = $.parseJSON(html);
                         $html = $($.parseHTML(html));
 
                         $html.find('.feed_list').each(function () {
                             var $item = $(this),
-                            $em = $item.find('em').eq(0),
+                            $em = $item.find('[node-type="feed_list_content"]').children('em'),
                             $link = $em.find('a[title^="http://douban.fm"]'),
                             $img = $item.find('.piclist img.bigcursor').eq(0);
 
@@ -15116,7 +15114,7 @@ define('js/helper', function(require, exports, module) {
                                 items.push({
                                     title: $em.text(),
                                     url: $link.attr('title'),
-                                    img: $img.attr('src')
+                                    img: $img.data('src')
                                 });
                             }
                         });
