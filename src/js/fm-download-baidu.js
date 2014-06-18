@@ -40,7 +40,7 @@ define('js/fm-download-baidu', function(require, exports, module) {
             songId;
 
         $.each(songs, function (i, s) {
-            if (match(s.title, title) && (match(s.author, artist) || match(s.title, artist))) {
+            if (!s.title.match(/- 伴奏$/) && match(s.title, title) && (match(s.author, artist) || match(s.title, artist))) {
                 if (!good) {
                     good = s;
                 }
@@ -63,6 +63,7 @@ define('js/fm-download-baidu', function(require, exports, module) {
 
     // 找出最合适的那条下载链接，
     // MP3 格式，比特率 192 - 256 kbs 这样
+    // UPDATE AT 2014-06-18 取比特率最大的那条
     function whichUrl (urls) {
         var url = null;
         $.each(urls, function (i, u) {
