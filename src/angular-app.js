@@ -1,4 +1,4 @@
-/*! douban-fm-improve - v2.2.1 - 2014-04-27
+/*! douban-fm-improve - v2.2.1 - 2014-06-18
 * https://github.com/tantion/doubanfm
 * Copyright (c) 2014 tantion; Licensed MIT */
 angular.module("ui.bootstrap", ["ui.bootstrap.tpls", "ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.bindHtml","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.position","ui.bootstrap.datepicker","ui.bootstrap.dropdownToggle","ui.bootstrap.modal","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
@@ -4784,29 +4784,23 @@ angular
         },
 
         bestSongUrl: function (urls) {
-            var url = null;
-            $.each(urls, function (u) {
-                var kbs = u.rate;
-                if (u.format === 'mp3' && kbs >= 128) {
-                    if (kbs > 256) {
-                        if (!url) {
+            var url = '',
+                song = null;
+
+            $.each(urls, function (i, u) {
+                if (u.format === 'mp3') {
+                    if (song) {
+                        if (u.rate > song.rate) {
+                            song = u;
                             url = u.songLink;
                         }
                     } else {
+                        song = u;
                         url = u.songLink;
                     }
                 }
             });
-            if (!url) {
-                for (var key in urls) {
-                    if (urls.hasOwnProperty(key)) {
-                        if (urls[key].format === 'mp3') {
-                            url = urls[key].songLink;
-                            break;
-                        }
-                    }
-                }
-            }
+
             return url;
         },
 

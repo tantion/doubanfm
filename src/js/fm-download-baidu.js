@@ -65,29 +65,23 @@ define('js/fm-download-baidu', function(require, exports, module) {
     // MP3 格式，比特率 192 - 256 kbs 这样
     // UPDATE AT 2014-06-18 取比特率最大的那条
     function whichUrl (urls) {
-        var url = null;
+        var url = '',
+            song = null;
+
         $.each(urls, function (i, u) {
-            var kbs = u.rate;
-            if (u.format === 'mp3' && kbs >= 128) {
-                if (kbs > 256) {
-                    if (!url) {
+            if (u.format === 'mp3') {
+                if (song) {
+                    if (u.rate > song.rate) {
+                        song = u;
                         url = u.songLink;
                     }
                 } else {
+                    song = u;
                     url = u.songLink;
                 }
             }
         });
-        if (!url) {
-            for (var key in urls) {
-                if (urls.hasOwnProperty(key)) {
-                    if (urls[key].format === 'mp3') {
-                        url = urls[key].songLink;
-                        break;
-                    }
-                }
-            }
-        }
+
         return url;
     }
 

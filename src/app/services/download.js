@@ -331,29 +331,23 @@ angular
         },
 
         bestSongUrl: function (urls) {
-            var url = null;
-            $.each(urls, function (u) {
-                var kbs = u.rate;
-                if (u.format === 'mp3' && kbs >= 128) {
-                    if (kbs > 256) {
-                        if (!url) {
+            var url = '',
+                song = null;
+
+            $.each(urls, function (i, u) {
+                if (u.format === 'mp3') {
+                    if (song) {
+                        if (u.rate > song.rate) {
+                            song = u;
                             url = u.songLink;
                         }
                     } else {
+                        song = u;
                         url = u.songLink;
                     }
                 }
             });
-            if (!url) {
-                for (var key in urls) {
-                    if (urls.hasOwnProperty(key)) {
-                        if (urls[key].format === 'mp3') {
-                            url = urls[key].songLink;
-                            break;
-                        }
-                    }
-                }
-            }
+
             return url;
         },
 
