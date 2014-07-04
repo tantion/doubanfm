@@ -1,1 +1,0 @@
-angular.module("fmApp").factory("copy",["$q",function(a){"use strict";return function(b){var c=angular.element("#copy-clipboard-tmp"),d=a.defer();return c.length||(c=angular.element('<textarea id="copy-clipboard-tmp" />').appendTo("body")),c.val(b),c[0].select(),document.execCommand("copy"),d.resolve(),d.promise}}]);
