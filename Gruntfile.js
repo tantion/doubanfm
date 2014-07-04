@@ -94,9 +94,9 @@ module.exports = function(grunt) {
     clean: {
       all: ['dist/'],
       build: [
-        'dist/angular/',
+        'dist/angular/**/*.js',
+        '!dist/angular/angular.js',
         'dist/app/',
-        'dist/bootstrap/',
         'dist/js/',
         'dist/lib/',
         'dist/seajs/'
