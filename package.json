@@ -1,7 +1,7 @@
 {
   "name": "douban-fm-improve",
   "description": "让豆瓣FM支持下载歌曲和封面图片，可以搜索、播放和批量下载红心、专辑、节目中的歌曲。",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "engines": {
     "node": ">= 0.10.0"
   },
